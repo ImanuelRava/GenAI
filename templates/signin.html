@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - EduPro</title>
+    <style>
+        :root { --primary-color: #4F46E5; --bg-color: #F3F4F6; --white: #ffffff; --error: #EF4444; --success: #10B981; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .auth-container { background: var(--white); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); text-decoration: none; display: inline-block; margin-bottom: 10px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        input { width: 100%; padding: 12px; border: 1px solid #D1D5DB; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .switch-text { margin-top: 20px; font-size: 0.9rem; color: #6B7280; }
+        .switch-link { color: var(--primary-color); font-weight: 600; text-decoration: none; }
+        .message { margin-top: 15px; padding: 10px; border-radius: 8px; font-size: 0.9rem; display: none; }
+        .message.error { background: #FEF2F2; color: var(--error); display: block; }
+        .message.success { background: #ECFDF5; color: var(--success); display: block; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="/" class="logo">EduPro</a>
+        <h2>Create Account</h2>
+        <form id="registerForm">
+            <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" required placeholder="John Doe"></div>
+            <div class="form-group"><label>Email Address</label><input type="email" id="reg-email" required placeholder="you@example.com"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="reg-password" required placeholder="Create a password"></div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div id="message" class="message"></div>
+        <div class="switch-text">Already have an account? <a href="/login" class="switch-link">Log In</a></div>
+    </div>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const messageBox = document.getElementById('message');
+
+            // Send to Python API
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            const data = await response.json();
+
+            if (data.status === "success") {
+                // Save locally for UI
+                localStorage.setItem('currentUser', email);
+                localStorage.setItem(email, JSON.stringify({ name, email, password }));
+                messageBox.textContent = "Account created! Redirecting...";
+                messageBox.className = "message success";
+                setTimeout(() => window.location.href = "/", 1500);
+            } else {
+                messageBox.textContent = "Error registering account.";
+                messageBox.className = "message error";
+            }
+        });
+    </script>
+</body>
+</html>

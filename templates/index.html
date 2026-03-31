@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPro - Online Learning Platform</title>
+    <style>
+        :root {
+            --primary-color: #4F46E5; --primary-hover: #4338ca;
+            --secondary-color: #10B981; --dark-bg: #111827; --light-bg: #F9FAFB;
+            --white: #ffffff; --text-main: #1F2937; --text-muted: #6B7280;
+            --border-color: #E5E7EB; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 8px; --container-width: 1200px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; color: var(--text-main); background-color: var(--white); }
+        a { text-decoration: none; color: inherit; } ul { list-style: none; } img { max-width: 100%; display: block; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 20px; }
+        .btn { display: inline-block; padding: 10px 24px; border-radius: var(--radius); font-weight: 600; cursor: pointer; border: none; font-size: 1rem; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        .section-title { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
+        .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .badge { background-color: #EEF2FF; color: var(--primary-color); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        header { background-color: var(--white); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 8px; }
+        .nav-links { display: flex; gap: 30px; } .nav-links a { font-weight: 500; color: var(--text-main); }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .hero { background-color: var(--light-bg); padding: 80px 0; }
+        .hero-container { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+        .hero-content h1 { font-size: 3rem; line-height: 1.2; margin-bottom: 20px; color: var(--dark-bg); }
+        .hero-content p { font-size: 1.125rem; color: var(--text-muted); margin-bottom: 30px; max-width: 500px; }
+        .stats { background-color: var(--primary-color); color: var(--white); padding: 30px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 20px; }
+        .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .courses { padding: 80px 0; }
+        .course-card { background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; transition: transform 0.2s; }
+        .course-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .course-image { height: 180px; width: 100%; object-fit: cover; }
+        .course-info { padding: 20px; }
+        .course-category { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; display: block; }
+        .course-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .course-title a:hover { color: var(--primary-color); text-decoration: underline; }
+        .course-instructor { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
+        .course-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .rating { display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--text-main); }
+        .star { color: var(--secondary-color); }
+        .price { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+        @media (max-width: 768px) { .nav-links { display: none; } .hero-container { flex-direction: column-reverse; text-align: center; } .hero-content h1 { font-size: 2.2rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">EduPro</a>
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/#courses">Courses</a>
+                    <a href="#">Mentors</a>
+                </div>
+                <div class="nav-actions" id="auth-buttons"></div>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <span class="badge">New Version 2.0</span>
+                    <h1>Master New Skills With Expert Mentors</h1>
+                    <p>Access over 20,000 courses in coding, design, business, and marketing. Learn at your own pace.</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                        <a href="/signin" class="btn btn-primary">Get Started</a>
+                        <a href="/#courses" class="btn btn-outline">View Demo</a>
+                    </div>
+                </div>
+                <div class="hero-image"><img src="https://picsum.photos/seed/eduHero/600/400" alt="Student learning" width="600" height="400"></div>
+            </div>
+        </section>
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item"><h3>50k+</h3><p>Active Students</p></div>
+                    <div class="stat-item"><h3>120+</h3><p>Expert Mentors</p></div>
+                    <div class="stat-item"><h3>5k+</h3><p>Online Courses</p></div>
+                    <div class="stat-item"><h3>4.9</h3><p>Average Rating</p></div>
+                </div>
+            </div>
+        </section>
+        <section id="courses" class="courses">
+            <div class="container">
+                <h2 class="section-title">Popular Courses</h2>
+                <p class="section-subtitle">Explore our highest-rated content.</p>
+                <div class="course-grid">
+                    <!-- UPDATED: Link to Python Route -->
+                    <article class="course-card">
+                        <img src="https://picsum.photos/seed/artificialintelligence/400/250" alt="AI for Chemistry" class="course-image">
+                        <div class="course-info">
+                            <span class="course-category">Data Science & Chemistry</span>
+                            <h3 class="course-title"><a href="/chemistry-course">AI for Chemistry</a></h3>
+                            <p class="course-instructor">By Dr. Emily Chen</p>
+                            <div class="course-meta">
+                                <div class="rating"><span class="star">★</span> 4.9 (2.5k)</div>
+                                <span class="price">Free</span>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- Other placeholders... -->
+                    <article class="course-card"><img src="https://picsum.photos/seed/webdesign/400/250" class="course-image"><div class="course-info"><span class="course-category">Design</span><h3 class="course-title">Web Design for Beginners</h3><p class="course-instructor">By Brad Schiff</p><div class="course-meta"><div class="rating"><span class="star">★</span> 4.9</div><span class="price">$12.99</span></div></div></article>
+                    <article class="course-card"><img src="https://picsum.photos/seed/marketing/400/250" class="course-image"><div class="course-info"><span class="course-category">Marketing</span><h3 class="course-title">Digital Marketing Masterclass</h3><p class="course-instructor">By Phil Ebiner</p><div class="course-meta"><div class="rating"><span class="star">★</span> 4.7</div><span class="price">$18.99</span></div></div></article>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer style="background-color: #111827; color: #D1D5DB; padding: 40px 0; text-align: center; font-size: 0.9rem;">
+        &copy; 2023 EduPro Platform. All rights reserved.
+    </footer>
+
+    <script>
+        function checkLoginStatus() {
+            const currentUserEmail = localStorage.getItem('currentUser');
+            const authContainer = document.getElementById('auth-buttons');
+            if (currentUserEmail) {
+                const userData = JSON.parse(localStorage.getItem(currentUserEmail));
+                authContainer.innerHTML = `<span style="margin-right:15px; font-weight:600; font-size:0.9rem;">Hello, ${userData.name}</span><button onclick="logout()" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.9rem;">Log Out</button>`;
+            } else {
+                authContainer.innerHTML = `<a href="/login" style="font-weight: 600;">Log in</a><a href="/signin" class="btn btn-primary" style="padding: 8px 16px;">Sign Up</a>`;
+            }
+        }
+        async function logout() {
+            // 1. Tell Python to logout
+            await fetch('/api/logout');
+            // 2. Clear local storage
+            localStorage.removeItem('currentUser');
+            // 3. Reload
+            location.reload();
+        }
+        document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    </script>
+</body>
+</html>

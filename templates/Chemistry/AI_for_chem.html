@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for Chemistry - EduPro</title>
+    <style>
+        :root { --primary-color: #4F46E5; --primary-hover: #4338ca; --dark-bg: #111827; --light-bg: #F9FAFB; --white: #ffffff; --text-main: #1F2937; --text-muted: #6B7280; --border-color: #E5E7EB; --radius: 8px; --container-width: 1200px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; color: var(--text-main); background-color: var(--white); }
+        a { text-decoration: none; color: inherit; } ul { list-style: none; } img { max-width: 100%; display: block; border-radius: var(--radius); margin: 20px 0; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 20px; }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: var(--radius); font-weight: 600; cursor: pointer; border: none; font-size: 1rem; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        
+        header { background: var(--white); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
+        nav { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 8px; }
+        .nav-links { display: flex; gap: 30px; } .nav-links a { font-weight: 500; color: var(--text-main); }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .course-page { padding: 40px 0; background-color: var(--light-bg); min-height: 100vh; }
+        .breadcrumb { margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); }
+        .course-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
+        
+        .course-hero { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: white; padding: 40px; border-radius: var(--radius); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .hero-text h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        
+        .tabs { border-bottom: 1px solid var(--border-color); margin-bottom: 20px; display: flex; gap: 20px; }
+        .tab-btn { padding: 12px 0; background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Content Reader Styles --- */
+        .chapter-list-item {
+            display: flex; align-items: center; padding: 20px; background: var(--white);
+            border: 1px solid var(--border-color); margin-bottom: 10px; border-radius: var(--radius);
+            cursor: pointer; transition: 0.2s;
+        }
+        .chapter-list-item:hover { transform: translateX(5px); border-color: var(--primary-color); }
+        .chapter-num { width: 40px; height: 40px; background: #EEF2FF; color: var(--primary-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
+
+        .content-view { display: none; background: var(--white); padding: 40px; border-radius: var(--radius); border: 1px solid var(--border-color); }
+        .content-view.active { display: block; }
+        .content-header { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px; }
+        .content-body { line-height: 1.8; font-size: 1.1rem; color: #374151; }
+        .content-body h2 { margin-top: 30px; margin-bottom: 15px; color: var(--text-main); }
+        .content-body p { margin-bottom: 20px; }
+        .back-btn { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); margin-bottom: 20px; cursor: pointer; font-weight: 600; }
+        .back-btn:hover { color: var(--primary-color); }
+
+        .app-interface { background: #1f2937; border-radius: var(--radius); padding: 30px; color: white; text-align: center; min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .course-card { background: var(--white); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 90px; border: 1px solid var(--border-color); }
+        .price-tag { font-size: 2.5rem; font-weight: 800; color: #10B981; margin: 15px 0; }
+
+        @media (max-width: 768px) { .course-grid { grid-template-columns: 1fr; } .nav-links { display: none; } .course-hero { flex-direction: column; text-align: center; gap: 20px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">EduPro</a>
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/#courses">Courses</a>
+                </div>
+                <div class="nav-actions" id="auth-buttons"></div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="course-page">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/">Home</a> <span>/</span> <a href="/#courses">Courses</a> <span>/</span> <span style="color:var(--text-main)">AI for Chemistry</span>
+            </div>
+
+            <div class="course-grid">
+                <!-- LEFT COLUMN -->
+                <div class="main-content">
+                    
+                    <div class="course-hero">
+                        <div class="hero-text">
+                            <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; text-transform: uppercase;">Free Course</span>
+                            <h1>AI for Chemistry</h1>
+                            <p style="opacity: 0.9; margin-top: 10px;">Master the intersection of Machine Learning and Molecular Science.</p>
+                        </div>
+                        <div style="font-size: 4rem; opacity: 0.8;">⚗️ 🤖</div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab('overview')">Overview</button>
+                        <button class="tab-btn" onclick="openTab('textbook')">Textbook Chapters</button>
+                        <button class="tab-btn" onclick="openTab('application')">AI Application</button>
+                    </div>
+
+                    <!-- TAB: OVERVIEW -->
+                    <div id="overview" class="tab-content active">
+                        <h3>About this Course</h3>
+                        <p style="line-height: 1.8; margin-top: 10px;">Chemistry is entering a new era using Artificial Intelligence to predict molecular properties and simulate reactions.</p>
+                    </div>
+
+                    <!-- TAB: TEXTBOOK -->
+                    <div id="textbook" class="tab-content">
+                        <h3>Digital Textbook</h3>
+                        <p style="color:var(--text-muted); margin-bottom:20px;">Select a chapter to start reading.</p>
+                        
+                        <!-- The List of Chapters -->
+                        <div id="chapter-list-container">
+                            Loading chapters...
+                        </div>
+
+                        <!-- The Content Viewer (Hidden by default) -->
+                        <div id="content-viewer" class="content-view">
+                            <div class="back-btn" onclick="closeContent()">← Back to Chapters</div>
+                            <div class="content-header">
+                                <h1 id="viewer-title">Chapter Title</h1>
+                            </div>
+                            <div class="content-body" id="viewer-body">
+                                <!-- Content injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: APPLICATION -->
+                    <div id="application" class="tab-content">
+                        <h3>AI Chemistry Lab</h3>
+                        <div class="app-interface" style="margin-top:20px;">
+                            <h3>Molecule Predictor</h3>
+                            <p>Draw a structure or upload a file to predict its properties instantly.</p>
+                            <div style="width: 100%; height: 150px; background: #374151; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px dashed #6B7280;">AI Model Loading...</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <aside>
+                    <div class="course-card">
+                        <h3>This course includes:</h3>
+                        <ul style="margin: 20px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                            <li>✓ Interactive AI Lab</li>
+                            <li>✓ 4 Chapter Digital Textbook</li>
+                        </ul>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.1rem; color: var(--text-muted);">Course Price</div>
+                            <div class="price-tag">Free</div>
+                            <button id="enrollBtn" class="btn btn-primary">Access Course</button>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. THE CONTENT DATA ---
+        const courseContent = {
+            chap1: {
+                title: "Chapter 1: Introduction to Chem-AI",
+                body: `
+                    <p>Welcome to the future of molecular discovery. For centuries, chemistry was a discipline of trial and error. Chemists would mix compounds in "wet labs," wait days for reactions, and hope for the desired result.</p>
+                    <img src="https://picsum.photos/seed/chemintro/800/400" alt="Chemistry Lab">
+                    <h2>The Digital Shift</h2>
+                    <p>Today, we are shifting towards "Dry Labs." Using AI, we can simulate millions of reactions in seconds. This doesn't replace the chemist; it empowers them to make smarter decisions.</p>
+                `
+            },
+            chap2: {
+                title: "Chapter 2: Representing Molecules (SMILES)",
+                body: `
+                    <p><strong>SMILES</strong> (Simplified Molecular-Input Line-Entry System) is a chemical notation system that uses ASCII strings to describe the structure of chemical molecules.</p>
+                    <img src="https://picsum.photos/seed/smilesexample/800/400" alt="SMILES">
+                    <h2>Basic Examples</h2>
+                    <p><strong>Water (H₂O):</strong> Represented as <code>O</code>. Hydrogens are implicit.</p>
+                    <p><strong>Ethanol (C₂H₆O):</strong> Represented as <code>CCO</code>. Carbon-Carbon-Oxygen.</p>
+                `
+            },
+            chap3: {
+                title: "Chapter 3: Predicting Properties",
+                body: `
+                    <p>AI allows us to predict molecular properties like toxicity and solubility before ever making the molecule.</p>
+                    <img src="https://picsum.photos/seed/dataprediction/800/400" alt="Prediction">
+                    <h2>QSPR Models</h2>
+                    <p>We use regression models to find patterns linking structure to property.</p>
+                `
+            },
+            chap4: {
+                title: "Chapter 4: Generative AI in Drug Design",
+                body: `
+                    <p>Generative AI can <strong>invent</strong> new molecules that don't exist yet.</p>
+                    <img src="https://picsum.photos/seed/generativeai/800/400" alt="Generative AI">
+                    <h2>De Novo Design</h2>
+                    <p>Models like VAEs explore the vast chemical space to find new drug candidates.</p>
+                `
+            }
+        };
+
+        // --- 2. RENDER FUNCTION ---
+        function renderChapterList() {
+            try {
+                const listContainer = document.getElementById('chapter-list-container');
+                
+                if (!listContainer) {
+                    alert("Error: Could not find the div with id 'chapter-list-container'. Check your HTML.");
+                    return;
+                }
+
+                if (typeof courseContent === 'undefined') {
+                    listContainer.innerHTML = "<span style='color:red'>Error: 'courseContent' is not defined. Check for a syntax error above.</span>";
+                    return;
+                }
+
+                const keys = Object.keys(courseContent);
+                
+                if (keys.length === 0) {
+                    listContainer.innerHTML = "<p>No chapters available.</p>";
+                    return;
+                }
+
+                let html = '';
+                keys.forEach((key, index) => {
+                    const data = courseContent[key];
+                    html += `
+                        <div class="chapter-list-item" onclick="loadContent('${key}')">
+                            <div class="chapter-num">${index + 1}</div>
+                            <div>
+                                <h4 style="font-size:1.1rem; font-weight:700;">${data.title}</h4>
+                                <p style="font-size:0.9rem; color:var(--text-muted)">Read Chapter</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                listContainer.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+                const listContainer = document.getElementById('chapter-list-container');
+                if(listContainer) {
+                    listContainer.innerHTML = `<span style='color:red'>Script Error: ${e.message}</span>`;
+                }
+            }
+        }
+
+        // --- 3. LOAD CONTENT ---
+        function loadContent(chapterKey) {
+            const data = courseContent[chapterKey];
+            if (!data) return;
+            document.getElementById('chapter-list-container').style.display = 'none';
+            document.getElementById('content-viewer').classList.add('active');
+            document.getElementById('viewer-title').textContent = data.title;
+            document.getElementById('viewer-body').innerHTML = data.body;
+            document.querySelector('.course-page').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function closeContent() {
+            document.getElementById('content-viewer').classList.remove('active');
+            document.getElementById('chapter-list-container').style.display = 'block';
+        }
+
+        // --- 4. TABS ---
+        function openTab(name) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- 5. AUTH (WITH NULL FIX) ---
+        function checkLoginStatus() {
+            const currentUserEmail = localStorage.getItem('currentUser');
+            const authContainer = document.getElementById('auth-buttons');
+            const enrollBtn = document.getElementById('enrollBtn');
+
+            if (currentUserEmail) {
+                // Try to get data
+                let userData = JSON.parse(localStorage.getItem(currentUserEmail));
+
+                // FIX: If data is missing, create default to prevent crash
+                if (!userData) {
+                    userData = { name: "Student", email: currentUserEmail };
+                }
+
+                authContainer.innerHTML = `
+                    <span style="margin-right:15px; font-weight:600; font-size:0.9rem;">Hello, ${userData.name}</span>
+                    <button onclick="logout()" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.9rem;">Log Out</button>
+                `;
+                
+                enrollBtn.textContent = "Start Learning Now";
+                enrollBtn.style.backgroundColor = "#10B981"; 
+                enrollBtn.onclick = () => { openTab('textbook'); document.querySelector('.course-page').scrollIntoView({behavior: 'smooth'}); };
+            } else {
+                authContainer.innerHTML = `<a href="/login" style="font-weight: 600;">Log in</a><a href="/signin" class="btn btn-primary" style="padding: 8px 16px;">Sign Up</a>`;
+                enrollBtn.textContent = "Login to Access";
+                enrollBtn.onclick = () => window.location.href = "/login";
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout');
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => { 
+            checkLoginStatus(); 
+            renderChapterList(); 
+        });
+    </script>
+</body>
+</html>
