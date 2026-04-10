@@ -2,140 +2,307 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Module 1 Quiz | AI in Chemistry</title>
+    <!-- 3Dmol.js for chemical structure visualization -->
     <script src="https://3dmol.org/build/3Dmol-min.js"></script>
     <style>
-        /* --- SAME STYLING AS BEFORE --- */
+        /* --- CORE DESIGN SYSTEM (Matching index.html) --- */
         :root { 
-            --primary: #00f2ff; --secondary: #7000ff; --accent: #00ff88; 
-            --bg-dark: #050a14; --glass-bg: rgba(10, 20, 40, 0.9); 
-            --glass-border: rgba(255, 255, 255, 0.1); --text-main: #fff; --text-muted: #b0c4de; 
-            --success: #00ff88; --error: #ff4444;
+            --primary: #00f2ff; 
+            --secondary: #7000ff; 
+            --accent: #00ff88; 
+            --bg-dark: #050a14; 
+            --glass-bg: rgba(10, 20, 40, 0.75); 
+            --glass-border: rgba(255, 255, 255, 0.1); 
+            --text-main: #ffffff; 
+            --text-muted: #b0c4de; 
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         
-        #web-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
 
+        /* --- CANVAS BACKGROUND --- */
+        #web-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 95%);
+        }
+
+        /* --- HEADER STYLING (Identical to index.html) --- */
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 10, 20, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .container {
+            max-width: 1200px; 
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+
+        /* --- MAIN LAYOUT ADJUSTMENTS --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 0;
+        }
+
+        /* --- QUIZ CARD --- */
         .quiz-card {
-            background: var(--glass-bg);
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
             position: relative;
             overflow: hidden;
             z-index: 10;
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
 
         .progress-container {
-            width: 100%; height: 6px; background: rgba(255,255,255,0.1);
-            border-radius: 10px; margin-bottom: 30px; overflow: hidden;
+            width: 100%; height: 6px; background: rgba(0,0,0,0.3);
+            border-radius: 10px; margin-bottom: 35px; overflow: hidden;
         }
         .progress-bar {
-            height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary));
-            width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--primary);
+            height: 100%; 
+            background: linear-gradient(90deg, var(--secondary), var(--primary)); 
+            width: 0%; 
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 0 10px var(--primary);
         }
 
         #viewer-container {
-            width: 100%; height: 300px; background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border); border-radius: 12px;
-            margin-bottom: 20px; position: relative; display: none;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            width: 100%; height: 320px; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            margin-bottom: 25px; position: relative; display: none;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
+        
         .viewer-instruction {
             position: absolute; bottom: 10px; right: 15px; font-size: 0.75rem;
-            color: var(--text-muted); background: rgba(0,0,0,0.8); padding: 4px 8px;
+            color: var(--text-muted); background: rgba(0,0,0,0.7); padding: 4px 8px;
             border-radius: 4px; pointer-events: none; z-index: 5;
         }
 
-        .question-text { font-size: 1.4rem; font-weight: 600; margin-bottom: 20px; color: #fff; }
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .question-text { 
+            font-size: 1.5rem; font-weight: 600; margin-bottom: 30px; 
+            color: #fff; line-height: 1.4;
+        }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
 
         .option-btn {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 15px 20px; color: var(--text-muted);
-            font-size: 1rem; cursor: pointer; text-align: left; transition: all 0.2s ease;
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 18px 24px; color: var(--text-muted);
+            font-size: 1.05rem; cursor: pointer; text-align: left; transition: all 0.2s ease;
             position: relative; display: flex; align-items: center;
         }
+
         .option-btn:hover:not([disabled]) {
-            background: rgba(255,255,255,0.05); border-color: var(--primary); transform: translateX(5px);
+            background: rgba(255,255,255,0.05); 
+            border-color: var(--primary); 
+            transform: translateX(5px); 
+            color: #fff;
         }
-        .option-btn.correct { background: rgba(0, 255, 136, 0.1); border-color: var(--success); color: var(--success); }
-        .option-btn.wrong { background: rgba(255, 68, 68, 0.1); border-color: var(--error); color: var(--error); }
+
+        .option-btn.correct { 
+            background: rgba(0, 255, 136, 0.1); 
+            border-color: var(--accent); 
+            color: var(--accent); 
+        }
         
-        .status-icon { margin-left: auto; font-weight: bold; font-size: 1.2rem; display: none; }
+        .option-btn.wrong { 
+            background: rgba(255, 68, 68, 0.1); 
+            border-color: #ff4444; 
+            color: #ff4444; 
+        }
+        
+        .status-icon { margin-left: auto; font-weight: bold; font-size: 1.4rem; display: none; }
         .option-btn.correct .status-icon, .option-btn.wrong .status-icon { display: block; }
 
         .next-btn {
-            margin-top: 30px; background: var(--primary); color: #000; border: none;
-            padding: 12px 30px; border-radius: 30px; font-size: 1rem; font-weight: bold;
+            margin-top: 35px; 
+            background: linear-gradient(135deg, var(--secondary), var(--primary)); 
+            color: #fff; border: none;
+            padding: 12px 30px; border-radius: 8px; font-size: 1rem; font-weight: bold;
             cursor: pointer; float: right; display: none;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3); transition: 0.3s;
         }
-        .next-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0, 242, 255, 0.6); }
+        .next-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 242, 255, 0.4); 
+        }
 
-        .score-screen { text-align: center; display: none; }
-        .score-circle {
-            width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary);
-            display: flex; justify-content: center; align-items: center; font-size: 2.5rem;
-            font-weight: 800; color: var(--primary); margin: 0 auto 20px auto;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-        }
-        .score-msg { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 30px; }
+        .score-screen { text-align: center; display: none; padding: 20px 0; }
         
-        .retry-btn {
-            background: transparent; border: 2px solid var(--primary); color: var(--primary);
-            padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;
-            transition: 0.3s; text-decoration: none; display: inline-block;
+        .score-circle {
+            width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--primary);
+            display: flex; justify-content: center; align-items: center; font-size: 2.8rem;
+            font-weight: 800; color: var(--primary); margin: 0 auto 30px auto;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+            transition: all 0.5s ease;
         }
-        .retry-btn:hover { background: var(--primary); color: #000; }
 
-        .back-link {
-            position: absolute; top: 30px; left: 20px; color: var(--text-muted);
-            text-decoration: none; font-size: 0.9rem; z-index: 100;
+        .score-msg { color: var(--text-muted); font-size: 1.3rem; margin-bottom: 40px; line-height: 1.6; }
+        
+        .retry-btn, .next-module-btn {
+            background: transparent; 
+            border: 2px solid var(--primary); 
+            color: var(--primary);
+            padding: 12px 30px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s; 
+            text-decoration: none; 
+            display: inline-block; 
+            margin: 5px;
         }
-        .back-link:hover { color: var(--primary); }
+        
+        .retry-btn:hover, .next-module-btn:hover { 
+            background: var(--primary); 
+            color: #000; 
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-layout { flex-direction: column; gap: 15px; }
+            nav ul { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .quiz-card { padding: 30px 20px; }
+            .question-text { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- CANVAS BACKGROUND -->
     <canvas id="web-canvas"></canvas>
-    <a href="./introduction_nicobot.html" class="back-link">← Back to Lecture</a>
 
-    <div class="container">
-        <div class="quiz-card" id="quiz-box">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
+    <!-- HEADER (Same format as index.html) -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo">ChemAI Research</a>
+            <nav>
+                <ul>
+                    <li><a href="./introduction_nicobot.html">Home</a></li>
+                    <li><a href="./data-extraction.html">Data Extraction</a></li>
+                    <li><a href="./citation-tool.html">Citation Network</a></li>
+                    <li><a href="./nicobot-embed.html">NiCOBot</a></li>
+                    <li><a href="./quiz.html" class="active">Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Page title removed as requested -->
+
+            <div class="quiz-card" id="quiz-box">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <div id="viewer-container"></div>
+                <div class="viewer-instruction">Interactive 3D Viewport</div>
+                
+                <div class="question-text" id="question">Initializing System...</div>
+                <div class="options-grid" id="options"></div>
+                <button class="next-btn" id="next-btn">Next Question →</button>
             </div>
-            
-            <div id="viewer-container"></div>
-            
-            <div class="question-text" id="question">Question goes here?</div>
-            <div class="options-grid" id="options"></div>
-            <button class="next-btn" id="next-btn">Next Question →</button>
-        </div>
 
-        <div class="quiz-card score-screen" id="score-box">
-            <h2 style="margin-bottom: 20px;">Assessment Complete</h2>
-            <div class="score-circle" id="final-score">0%</div>
-            <p class="score-msg" id="score-msg">Calculating...</p>
-            <button class="retry-btn" onclick="location.reload()">Retry Module 1</button>
-            <br><br>
-            <a href="lecture-2-metal.html" class="retry-btn" style="border-color: var(--accent); color: var(--accent);">Proceed to Module 2 →</a>
+            <div class="quiz-card score-screen" id="score-box">
+                <h2 style="margin-bottom: 20px; color: #fff;">Assessment Complete</h2>
+                <div class="score-circle" id="final-score">0%</div>
+                <p class="score-msg" id="score-msg">Calculating results...</p>
+                <button class="retry-btn" onclick="location.reload()">Retry Module 1</button>
+                <br><br>
+                <a href="lecture-2-metal.html" class="next-module-btn" style="border-color: var(--accent); color: var(--accent);">Proceed to Module 2 →</a>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // --- 1. GLOBAL VARIABLES ---
         let viewer = null; 
         let molData = {}; 
-        let quizData = []; // This will hold the 10 selected questions
+        let quizData = []; 
         
         // --- 2. FULL QUESTION BANK (50 Questions) ---
-        // Type: 'theory' or 'structure'
         const fullQuestionBank = [
             // --- THEORETICAL QUESTIONS (1-30) ---
             { id: 1, type: "theory", question: "Which step in the catalytic cycle involves the metal increasing its oxidation state?", options: ["Transmetalation", "Reductive Elimination", "Oxidative Addition", "Ligand Exchange"], correct: 2 },
@@ -194,7 +361,6 @@
 
         // --- 3. SHUFFLE & SELECT 10 QUESTIONS ---
         function getRandomQuestions(allQuestions, count) {
-            // Fisher-Yates Shuffle
             const shuffled = [...allQuestions];
             for (let i = shuffled.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -204,6 +370,8 @@
         }
 
         // --- 4. FETCH DATA & START QUIZ ---
+        // Attempting to fetch from the backend. 
+        // Note: If backend is not running, the .catch will trigger theory-only mode.
         fetch('http://127.0.0.1:5001/api/molecules')
             .then(response => {
                 if (!response.ok) throw new Error("Network response was not ok");
@@ -211,18 +379,13 @@
             })
             .then(data => {
                 molData = data;
-                console.log("Molecules loaded:", Object.keys(molData).length);
-                
-                // Select 10 random questions
+                // If we have data, allow structure questions
                 quizData = getRandomQuestions(fullQuestionBank, 10);
-                
-                console.log("Selected Questions:", quizData.map(q => q.id));
                 initializeQuiz(); 
             })
             .catch(error => {
-                console.error("Error loading molecules:", error);
-                alert("Failed to connect to Python Backend. Make sure quiz_server.py is running on port 5001.");
-                // Fallback: Load theory questions only if data fails
+                console.warn("Backend unavailable:", error);
+                // Fallback: Use only theory questions if molecules fail to load
                 quizData = getRandomQuestions(fullQuestionBank.filter(q => q.type === 'theory'), 10);
                 initializeQuiz();
             });
@@ -232,43 +395,37 @@
             const container = document.getElementById('viewer-container');
             container.style.display = 'block';
 
-            // 1. Only create the viewer ONCE
             if (!viewer) {
                 viewer = $3Dmol.createViewer(container, { backgroundColor: "transparent" });
             }
 
-            // 2. Check if data exists
             if (!molData[molKey]) {
                 console.error("Molecule key not found:", molKey);
+                container.style.display = 'none';
                 return;
             }
 
+            // Decode base64 molfile
             const molBlock = atob(molData[molKey]);
 
-            // 3. Clear the OLD molecule and ADD the NEW one
             viewer.clear(); 
             viewer.addModel(molBlock, "mol");
-            
-            // 4. Style the Molecule
             viewer.setStyle({}, {stick: {colorscheme: "Jmol", radius: 0.15}, sphere: {scale: 0.25}});
             viewer.zoomTo();
 
-            // 5. ADD ATOM LABELS (Logic below)
             const model = viewer.getModel();
             const atoms = model.selectedAtoms({});
 
             atoms.forEach(atom => {
-                // Remove the condition to label EVERYTHING
                 viewer.addLabel(atom.elem, {
                     position: {x: atom.x, y: atom.y, z: atom.z},
                     fontColor: 'white',
-                    fontSize: 12, // Smaller font for many labels
+                    fontSize: 12,
                     backgroundColor: 'black',
                     backgroundOpacity: 0.5
                 });
             });
 
-            // 6. Render
             viewer.render();
         }
 
@@ -290,6 +447,7 @@
         }
 
         function loadQuiz() {
+            // Hide 3D viewer by default, only show if needed
             document.getElementById('viewer-container').style.display = 'none';
 
             const currentData = quizData[currentQIndex];
@@ -328,6 +486,7 @@
             } else {
                 selectedBtn.classList.add('wrong');
                 selectedBtn.querySelector('.status-icon').innerText = '✕';
+                // Show correct answer
                 allBtns[correctIndex].classList.add('correct');
                 allBtns[correctIndex].querySelector('.status-icon').innerText = '✓';
             }
@@ -343,96 +502,165 @@
             }
         });
 
+        // --- UPDATED SCORE LOGIC ---
         function showScore() {
             quizBox.style.display = 'none';
             scoreBox.style.display = 'block';
             const percentage = Math.round((score / quizData.length) * 100);
             finalScoreEl.innerText = `${percentage}%`;
 
-            if(percentage >= 80) {
-                scoreMsgEl.innerText = "Excellent! You are ready for the lab.";
-                finalScoreEl.style.borderColor = "var(--success)";
-                finalScoreEl.style.color = "var(--success)";
-            } else if (percentage >= 50) {
-                scoreMsgEl.innerText = "Good effort. Review the mechanisms.";
+            // Reset styles
+            finalScoreEl.style.borderColor = '';
+            finalScoreEl.style.color = '';
+            finalScoreEl.style.boxShadow = '';
+
+            if (percentage < 30) {
+                finalScoreEl.style.borderColor = "#ff4444";
+                finalScoreEl.style.color = "#ff4444";
+                finalScoreEl.style.boxShadow = "0 0 30px rgba(255, 68, 68, 0.5)";
+                scoreMsgEl.innerText = "Needs significant improvement. Please review the lecture notes.";
+            } else if (percentage >= 30 && percentage <= 70) {
+                finalScoreEl.style.borderColor = "#ffcc00"; 
+                finalScoreEl.style.color = "#ffcc00";
+                finalScoreEl.style.boxShadow = "0 0 30px rgba(255, 204, 0, 0.5)";
+                scoreMsgEl.innerText = "Good progress. Keep studying the mechanisms.";
             } else {
-                scoreMsgEl.innerText = "Needs improvement. Please review the lecture notes.";
+                finalScoreEl.style.borderColor = "var(--accent)";
+                finalScoreEl.style.color = "var(--accent)";
+                finalScoreEl.style.boxShadow = "0 0 30px rgba(0, 255, 136, 0.5)";
+                scoreMsgEl.innerText = "Excellent! You are ready for the lab.";
             }
         }
     </script>
     
-    <!-- Background Script -->
+    <!-- OPTIMIZED CANVAS BACKGROUND ANIMATION (Matching index.html) -->
     <script>
         const canvas = document.getElementById('web-canvas');
-        if(canvas) {
-            // ... (Keep your background particle code here) ...
-            const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Configuration
+        const PARTICLE_DENSITY = 9000;
+        const MOUSE_RADIUS = 150;
+        const CONNECT_DISTANCE = 120;
+
+        window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-            let particlesArray;
-            const mouse = { x: null, y: null, radius: 150 };
-            window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
-            class Particle {
-                constructor(x, y, dx, dy, size, color) {
-                    this.x = x; this.y = y; this.dx = dx; this.dy = dy;
-                    this.size = size; this.color = color;
-                    this.density = (Math.random() * 30) + 1;
-                }
-                draw() {
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill();
-                }
-                update() {
-                    if (this.x > canvas.width || this.x < 0) this.dx = -this.dx;
-                    if (this.y > canvas.height || this.y < 0) this.dy = -this.dy;
-                    let dx = mouse.x - this.x, dy = mouse.y - this.y, distance = Math.sqrt(dx*dx + dy*dy);
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance, forceDirectionY = dy / distance, force = (mouse.radius - distance) / mouse.radius;
-                        const directionX = forceDirectionX * force * this.density, directionY = forceDirectionY * force * this.density;
-                        this.x -= directionX * 5; this.y -= directionY * 5;
-                    } else { this.x += this.dx; this.y += this.dy; }
-                    this.draw();
-                }
+            initParticles();
+        });
+
+        const mouse = {
+            x: null,
+            y: null
+        };
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+                this.density = (Math.random() * 30) + 1;
             }
-            function initParticles() {
-                particlesArray = [];
-                let numberOfParticles = (canvas.height * canvas.width) / 9000;
-                for (let i = 0; i < numberOfParticles; i++) {
-                    let size = (Math.random() * 2) + 1;
-                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let dx = (Math.random() * 0.4) - 0.2, dy = (Math.random() * 0.4) - 0.2;
-                    let color = '#00f2ff';
-                    particlesArray.push(new Particle(x, y, dx, dy, size, color));
-                }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
             }
-            function connect() {
-                let opacityValue = 1;
-                for (let a = 0; a < particlesArray.length; a++) {
-                    for (let b = a; b < particlesArray.length; b++) {
-                        let dist = ((particlesArray[a].x - particlesArray[b].x)**2 + (particlesArray[a].y - particlesArray[b].y)**2);
-                        if (dist < (canvas.width/7)*(canvas.height/7)) {
-                            opacityValue = 1 - (dist/20000);
-                            ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
-                            ctx.lineWidth = 1; ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                            ctx.stroke();
-                        }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < MOUSE_RADIUS) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (MOUSE_RADIUS - distance) / MOUSE_RADIUS;
+                    
+                    const directionX = forceDirectionX * force * this.density;
+                    const directionY = forceDirectionY * force * this.density;
+
+                    this.x -= directionX * 5; 
+                    this.y -= directionY * 5;
+                } else {
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                }
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / PARTICLE_DENSITY;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 0.4) - 0.2;
+                let directionY = (Math.random() * 0.4) - 0.2;
+                let color = '#00f2ff'; // Cyan particles
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) +
+                                   ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                    
+                    if (distance < (CONNECT_DISTANCE * CONNECT_DISTANCE)) {
+                        opacityValue = 1 - (distance / (CONNECT_DISTANCE * CONNECT_DISTANCE));
+                        ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
                     }
                 }
             }
-            function animate() {
-                requestAnimationFrame(animate);
-                ctx.clearRect(0, 0, innerWidth, innerHeight);
-                for (let i = 0; i < particlesArray.length; i++) particlesArray[i].update();
-                connect();
-            }
-            initParticles(); animate();
         }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        initParticles();
+        animate();
     </script>
 </body>
 </html>

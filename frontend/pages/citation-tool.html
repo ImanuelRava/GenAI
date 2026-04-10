@@ -9,96 +9,482 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        /* --- CORE DESIGN SYSTEM (Keep Existing CSS) --- */
-        :root { 
-            --primary: #00f2ff; --secondary: #7000ff; --accent: #00ff88; 
-            --bg-dark: #050a14; --glass-bg: rgba(10, 20, 40, 0.95); 
-            --glass-border: rgba(255, 255, 255, 0.1); --text-main: #fff; 
-            --text-muted: #b0c4de; 
+        /* --- CORE DESIGN SYSTEM --- */
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --accent: #00ff88;
+            --bg-dark: #050a14;
+            --glass-bg: rgba(10, 20, 40, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #b0c4de;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        #web-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 95%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+        
+        body { 
+            background: var(--bg-dark); /* Solid background since canvas is removed */
+            color: var(--text-main); 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
-        header { height: 70px; border-bottom: 1px solid var(--glass-border); background: rgba(5, 10, 20, 0.9); backdrop-filter: blur(10px); flex-shrink: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
-        .logo { font-size: 1.2rem; font-weight: 700; text-decoration: none; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .back-btn { color: var(--text-muted); text-decoration: none; border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; transition: 0.3s; }
-        .back-btn:hover { border-color: var(--primary); color: var(--primary); }
+        /* --- HEADER STYLING --- */
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 10, 20, 0.95);
+            backdrop-filter: blur(8px);
+            height: auto; 
+            flex-shrink: 0;
+        }
 
-        .app-container { display: flex; height: calc(100vh - 70px); overflow: hidden; position: relative; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Back Button Styling */
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            border: 1px solid var(--primary);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            background: rgba(0, 242, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+        }
+
+        /* --- APP SPECIFIC STYLING --- */
+        .app-container { 
+            display: flex; 
+            height: calc(100vh - 80px); /* Adjust height based on header */
+            overflow: hidden; 
+            position: relative; 
+        }
 
         /* LEFT SIDEBAR */
-        .sidebar { width: 380px; background: var(--glass-bg); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
-        .sidebar-content { padding: 25px; overflow-y: auto; height: 100%; }
-        .control-group { margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; }
-        .control-group h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-
-        label { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; cursor: pointer; }
-        input[type="radio"] { accent-color: var(--secondary); transform: scale(1.2); }
-        .file-drop { border: 2px dashed var(--glass-border); background: rgba(0,0,0,0.2); padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
-        .file-drop:hover { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
-        
-        .btn-run { width: 100%; background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3); }
-        .btn-run:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 255, 0.4); }
-        .btn-run:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* NEW: Download Button Style */
-        .btn-download { 
-            width: 100%; background: transparent; border: 1px solid var(--accent); 
-            color: var(--accent); padding: 10px; border-radius: 8px; margin-top: 10px; 
-            cursor: pointer; transition: 0.3s; font-weight: bold; display: none; /* Hidden until data loaded */
+        .sidebar { 
+            width: 380px; 
+            background: var(--glass-bg); 
+            border-right: 1px solid var(--glass-border); 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            z-index: 10; 
+            backdrop-filter: blur(12px);
         }
-        .btn-download:hover { background: var(--accent); color: #000; }
+        
+        .sidebar-content { 
+            padding: 25px; 
+            overflow-y: auto; 
+            height: 100%; 
+        }
+        
+        .control-group { 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid var(--glass-border); 
+            padding-bottom: 20px; 
+        }
+        
+        .control-group h3 { 
+            color: var(--primary); 
+            margin-bottom: 15px; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
 
-        .suggestion-item { background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent); padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
-        .suggestion-item:hover { background: rgba(255,255,255,0.1); border-left-color: #fff; }
-        .sug-title { font-weight: 600; color: #fff; margin-bottom: 4px; display: block; font-size: 0.9rem; }
-        .sug-meta { color: var(--text-muted); font-size: 0.8rem; }
+        .control-group svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        label { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            margin-bottom: 8px; 
+            cursor: pointer; 
+        }
+        
+        input[type="radio"] { 
+            accent-color: var(--secondary); 
+            transform: scale(1.2); 
+        }
+        
+        .file-drop { 
+            border: 2px dashed var(--glass-border); 
+            background: rgba(0,0,0,0.2); 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-bottom: 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-drop:hover { 
+            border-color: var(--primary); 
+            background: rgba(0, 242, 255, 0.05); 
+        }
+        
+        .btn-run { 
+            width: 100%; 
+            background: linear-gradient(135deg, var(--secondary), var(--primary)); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3); 
+        }
+        
+        .btn-run:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 242, 255, 0.4); 
+        }
+        
+        .btn-run:disabled { 
+            background: #555; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+
+        .btn-download { 
+            width: 100%; 
+            background: transparent; 
+            border: 1px solid var(--accent); 
+            color: var(--accent); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-weight: bold; 
+            display: none; 
+        }
+        
+        .btn-download:hover { 
+            background: var(--accent); 
+            color: #000; 
+        }
+
+        .suggestion-item { 
+            background: rgba(255,255,255,0.03); 
+            border-left: 3px solid var(--accent); 
+            padding: 12px; 
+            border-radius: 0 8px 8px 0; 
+            margin-bottom: 12px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        
+        .suggestion-item:hover { 
+            background: rgba(255,255,255,0.1); 
+            border-left-color: #fff; 
+        }
+        
+        .sug-title { 
+            font-weight: 600; 
+            color: #fff; 
+            margin-bottom: 4px; 
+            display: block; 
+            font-size: 0.9rem; 
+        }
+        
+        .sug-meta { 
+            color: var(--text-muted); 
+            font-size: 0.8rem; 
+        }
 
         /* CENTER GRAPH AREA */
-        .main-view { flex: 1; position: relative; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; z-index: 1; }
-        #cy { width: 100%; height: 100%; min-height: 0; outline: none; }
+        .main-view { 
+            flex: 1; 
+            position: relative; 
+            background: rgba(0,0,0,0.2); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 1; 
+        }
         
-        .empty-state { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted); pointer-events: none; }
-        .empty-state i { font-size: 3rem; margin-bottom: 15px; display: block; opacity: 0.5; }
-        .loader-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.8); backdrop-filter: blur(5px); z-index: 50; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #cy { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 0; 
+            outline: none; 
+        }
+        
+        .empty-state { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            color: var(--text-muted); 
+            pointer-events: none; 
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            stroke: var(--text-muted);
+        }
+
+        .loader-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(5, 10, 20, 0.8); 
+            backdrop-filter: blur(5px); 
+            z-index: 50; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+        }
+        
+        .spinner { 
+            width: 40px; 
+            height: 40px; 
+            border: 4px solid rgba(255,255,255,0.1); 
+            border-top: 4px solid var(--primary); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 15px; 
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
 
         /* ZOOM CONTROLS */
-        .zoom-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 20, 40, 0.9); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 30px; display: flex; align-items: center; gap: 15px; z-index: 30; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .zoom-label { color: var(--text-muted); font-size: 0.8rem; font-weight: bold; width: 40px; }
-        input[type="range"] { -webkit-appearance: none; appearance: none; width: 150px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 5px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary); transition: 0.2s; }
+        .zoom-controls { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(10, 20, 40, 0.9); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid var(--glass-border); 
+            padding: 10px 25px; 
+            border-radius: 30px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            z-index: 30; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); 
+        }
+        
+        .zoom-label { 
+            color: var(--text-muted); 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            width: 40px; 
+        }
+        
+        input[type="range"] { 
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 150px; 
+            height: 6px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 5px; 
+            outline: none; 
+        }
+        
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 18px; 
+            height: 18px; 
+            border-radius: 50%; 
+            background: var(--primary); 
+            cursor: pointer; 
+            box-shadow: 0 0 10px var(--primary); 
+            transition: 0.2s; 
+        }
 
         /* RIGHT SIDEBAR */
-        .info-sidebar { position: absolute; top: 0; right: 0; bottom: 0; width: 400px; background: var(--glass-bg); border-left: 1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 20; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .info-sidebar.open { transform: translateX(0); }
-        .info-header { padding: 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
-        .info-header h3 { color: var(--primary); margin: 0; }
-        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-        .close-btn:hover { color: #fff; }
-        .info-content { padding: 25px; overflow-y: auto; height: calc(100% - 70px); }
-        .detail-card { margin-bottom: 25px; }
-        .detail-label { display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .detail-value { font-size: 1.1rem; color: #fff; line-height: 1.5; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .stat-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--glass-border); }
-        .stat-val { font-size: 1.8rem; font-weight: bold; color: var(--accent); display: block; }
-        .stat-lbl { font-size: 0.8rem; color: var(--text-muted); }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .info-sidebar { 
+            position: absolute; 
+            top: 0; 
+            right: 0; 
+            bottom: 0; 
+            width: 400px; 
+            background: var(--glass-bg); 
+            border-left: 1px solid var(--glass-border); 
+            backdrop-filter: blur(12px); 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5); 
+            z-index: 20; 
+            transform: translateX(100%); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        
+        .info-sidebar.open { 
+            transform: translateX(0); 
+        }
+        
+        .info-header { 
+            padding: 20px; 
+            border-bottom: 1px solid var(--glass-border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .info-header h3 { 
+            color: var(--primary); 
+            margin: 0; 
+        }
+        
+        .close-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        
+        .close-btn:hover { 
+            color: #fff; 
+        }
+        
+        .info-content { 
+            padding: 25px; 
+            overflow-y: auto; 
+            height: calc(100% - 70px); 
+        }
+        
+        .detail-card { 
+            margin-bottom: 25px; 
+        }
+        
+        .detail-label { 
+            display: block; 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 5px; 
+        }
+        
+        .detail-value { 
+            font-size: 1.1rem; 
+            color: #fff; 
+            line-height: 1.5; 
+        }
+        
+        .stat-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        
+        .stat-box { 
+            background: rgba(255,255,255,0.05); 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            border: 1px solid var(--glass-border); 
+        }
+        
+        .stat-val { 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            color: var(--accent); 
+            display: block; 
+        }
+        
+        .stat-lbl { 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+        }
+
+        ::-webkit-scrollbar { 
+            width: 8px; 
+        }
+        
+        ::-webkit-scrollbar-track { 
+            background: rgba(0,0,0,0.2); 
+        }
+        
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 4px; 
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="web-canvas"></canvas>
-
     <header>
-        <a href="../nicobot.html" class="logo"><span style="color:var(--primary);">&lt;</span> ChemAI Research</a>
-        <a href="../nicobot.html" class="back-btn">Back to Hub</a>
+        <div class="container header-layout">
+            <div class="logo">Citation Network</div>
+            <a href="../nicobot.html" class="back-btn">
+                <span>&larr;</span> Back to NiCOBot
+            </a>
+        </div>
     </header>
 
     <div class="app-container">
@@ -106,7 +492,10 @@
         <aside class="sidebar">
             <div class="sidebar-content">
                 <div class="control-group">
-                    <h3>⚙️ Settings</h3>
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Settings
+                    </h3>
                     <div style="margin-bottom: 20px;">
                         <label><input type="radio" name="type" value="forward" checked> Forward (PDF)</label>
                         <label><input type="radio" name="type" value="backward"> Backward (PDF)</label>
@@ -114,17 +503,20 @@
                     </div>
 
                     <div class="file-drop" onclick="document.getElementById('fileInput').click()">
-                        <div id="fileName" style="color:var(--primary);">📂 Click to Upload File</div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <div id="fileName" style="color:var(--primary);">Click to Upload File</div>
                         <input type="file" id="fileInput" style="display: none" onchange="updateFileName(this)">
                     </div>
 
                     <button class="btn-run" id="runBtn" onclick="runAnalysis()">Build Network</button>
-                    <!-- NEW: DOWNLOAD BUTTON -->
-                    <button class="btn-download" id="downloadBtn" onclick="downloadExcel()">⬇ Download Full Data (Excel)</button>
+                    <button class="btn-download" id="downloadBtn" onclick="downloadExcel()">Download Full Data (Excel)</button>
                 </div>
 
                 <div class="control-group" style="border:none;">
-                    <h3>💡 Suggestions (Top Papers)</h3>
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        Suggestions (Top Papers)
+                    </h3>
                     <div id="suggestionsList" style="opacity: 0.5;">
                         <p style="font-size: 0.8rem; font-style: italic;">Run analysis to see suggestions...</p>
                     </div>
@@ -136,7 +528,7 @@
         <main class="main-view">
             <div id="cy"></div>
             <div class="empty-state" id="emptyState">
-                <i>🕸️</i>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 <h2>Network Visualization</h2>
                 <p>Visualizing Top 30 Papers. Use the button on the left to download all data.</p>
             </div>
@@ -192,7 +584,7 @@
 
         function updateFileName(input) {
             if(input.files && input.files[0]) {
-                document.getElementById('fileName').innerText = "📄 " + input.files[0].name;
+                document.getElementById('fileName').innerText = "File Selected: " + input.files[0].name;
             }
         }
 
@@ -203,14 +595,9 @@
                 return;
             }
 
-            // 1. Create Worksheet
             const ws = XLSX.utils.json_to_sheet(fullPaperData);
-            
-            // 2. Create Workbook
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Papers");
-
-            // 3. Write File
             XLSX.writeFile(wb, "Citation_Network_Data.xlsx");
         }
 
@@ -228,7 +615,7 @@
             btn.disabled = true;
             loader.style.display = 'flex';
             emptyState.style.display = 'none';
-            dlBtn.style.display = 'none'; // Hide download until success
+            dlBtn.style.display = 'none';
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
@@ -239,12 +626,9 @@
                 if (!response.ok) throw new Error("Backend Error");
                 const data = await response.json();
 
-                // STORE FULL DATA
                 fullPaperData = data.all_papers || [];
-
                 initCytoscape(data.elements);
 
-                // Render Suggestions
                 list.style.opacity = "1";
                 list.innerHTML = '';
                 if (data.suggestions.length > 0) {
@@ -259,7 +643,6 @@
                     list.innerHTML = '<p style="font-size:0.8rem">No suggestions found.</p>';
                 }
 
-                // Show Download Button
                 dlBtn.style.display = 'block';
 
             } catch (e) {
@@ -281,7 +664,6 @@
             return baseVal + (normalized * scale);
         }
 
-        // --- ZOOM SLIDER LOGIC ---
         const zoomSlider = document.getElementById('zoomSlider');
         const zoomLabel = document.getElementById('zoomLabel');
         zoomSlider.addEventListener('input', (e) => {
@@ -345,111 +727,55 @@
             } catch (error) { console.error("Cytoscape Error:", error); }
         }
 
-        // --- HELPER: RESET ALL NODES TO DEFAULT COLORS ---
         function resetNodeStyles() {
             if (!window.cy) return;
-            
             window.cy.nodes().forEach(node => {
                 const isMain = node.data('is_main') === "True";
-                
                 if (isMain) {
-                    // Reset Main Node to Gold
                     node.style('background-color', '#FFD700');
                     node.style('width', 30);
                     node.style('height', 30);
                     node.style('border-width', 3);
                 } else {
-                    // Reset Normal Nodes to Cyan
                     node.style('background-color', '#00f2ff');
                     node.style('width', 15);
                     node.style('height', 15);
                     node.style('border-width', 1);
                 }
-                
-                // Reset Border Color
                 node.style('border-color', '#fff');
             });
-            
-            // Reset Edge Colors
             window.cy.edges().forEach(edge => {
                 edge.style('line-color', 'rgba(255, 255, 255, 0.15)');
                 edge.style('target-arrow-color', 'rgba(255, 255, 255, 0.3)');
             });
         }
 
-        // --- UNIFIED FOCUS LOGIC (Updated with Force Color) ---
         function focusOnNode(nodeId) {
             if (!window.cy) return;
-
             const node = window.cy.getElementById(nodeId);
-            
-            if (!node) {
-                console.warn("Node not found:", nodeId);
-                return;
-            }
-
-            // 1. RESET EVERYTHING to Blue/Gold first
+            if (!node) return;
             resetNodeStyles();
-
-            // 2. FORCE COLOR TO RED
-            node.style('background-color', '#ff0055'); // Force RED
+            node.style('background-color', '#ff0055');
             node.style('border-color', '#ff0055');
-            node.style('width', 25); // Slightly bigger
+            node.style('width', 25);
             node.style('height', 25);
-
-            // 3. HIGHLIGHT CONNECTED EDGES (Optional but nice)
             const connectedEdges = node.connectedEdges();
             connectedEdges.style('line-color', '#ff0055');
             connectedEdges.style('target-arrow-color', '#ff0055');
-
-            // 4. SHOW DETAILS
-            const data = node.data();
-            showNodeDetails(data);
-
-            // 5. PAN TO NODE
+            showNodeDetails(node.data());
             const nodePos = node.position();
             const targetPan = {
                 x: (window.cy.width() / 2) - nodePos.x,
                 y: (window.cy.height() / 2) - nodePos.y
             };
-
             window.cy.animate({
                 pan: targetPan,
                 zoom: 1,
                 duration: 500,
                 easing: 'ease-out-cubic'
             });
-
-            // Sync Slider
             document.getElementById('zoomSlider').value = 1;
             document.getElementById('zoomLabel').innerText = "100%";
-        }
-
-        // --- EVENT LISTENERS ---
-
-        // 1. Suggestion Click
-        function clickSuggestion(nodeId) {
-            focusOnNode(nodeId);
-        }
-
-        // 2. Node Click
-        window.cy.on('tap', 'node', function(evt) {
-            const node = evt.target;
-            focusOnNode(node.id()); 
-        });
-
-        // 3. Background Click (Reset)
-        window.cy.on('tap', function(event) {
-            if( event.target === window.cy ){
-                closeNodeDetails();
-                resetNodeStyles(); // Reset colors back to Blue/Gold
-            }
-        });
-
-        // 4. Close Button (Reset colors)
-        function closeNodeDetails() {
-            document.getElementById('rightSidebar').classList.remove('open');
-            resetNodeStyles();
         }
 
         function clickSuggestion(nodeId) { focusOnNode(nodeId); }
@@ -473,7 +799,15 @@
             document.getElementById('rightSidebar').classList.add('open');
         }
 
-        function closeNodeDetails() { document.getElementById('rightSidebar').classList.remove('open'); }
+        function closeNodeDetails() { 
+            document.getElementById('rightSidebar').classList.remove('open');
+            resetNodeStyles();
+        }
+
+        window.cy.on('tap', 'node', function(evt) { focusOnNode(evt.target.id()); });
+        window.cy.on('tap', function(event) {
+            if( event.target === window.cy ){ closeNodeDetails(); resetNodeStyles(); }
+        });
     </script>
 </body>
 </html>

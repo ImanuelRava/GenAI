@@ -45,7 +45,7 @@
 
         /* --- Layout & Typography --- */
         .container {
-            max-width: 1200px;
+            max-width: 1200px; 
             margin: 0 auto;
             padding: 0 25px;
             position: relative;
@@ -54,15 +54,19 @@
 
         header {
             padding: 20px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 100;
             background: rgba(5, 10, 20, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         .logo {
@@ -86,11 +90,10 @@
             color: var(--text-main);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.3s;
-            text-transform: uppercase;
             font-size: 0.8rem;
+            text-transform: uppercase;
             letter-spacing: 1px;
+            transition: color 0.3s;
         }
 
         nav a:hover, nav a.active {
@@ -141,10 +144,9 @@
             transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Clickable Card Styles (For NiCOBot) */
         .glass-card.clickable {
             cursor: pointer;
-            text-decoration: none; /* For anchor tags */
+            text-decoration: none;
             display: block;
             color: inherit;
             position: relative;
@@ -189,15 +191,15 @@
             margin-bottom: 15px;
         }
 
-        /* Specific Sections Styling */
+        /* Shared Layouts */
         .two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
         }
 
-        /* Nitrogen Section */
-        .nitrogen-visual {
+        /* Visual Components (Shared between NiCOBot and Nitrogen) */
+        .molecule-visual {
             background: linear-gradient(135deg, rgba(112, 0, 255, 0.1), rgba(0, 0, 0, 0));
             border-radius: 12px;
             padding: 20px;
@@ -205,10 +207,13 @@
             align-items: center;
             justify-content: center;
             border: 1px dashed var(--secondary);
+            height: 100%;
+            min-height: 250px;
         }
 
         .molecule-representation {
             font-size: 4rem;
+            font-weight: bold;
             filter: drop-shadow(0 0 10px var(--secondary));
             animation: float 6s ease-in-out infinite;
         }
@@ -218,7 +223,7 @@
             50% { transform: translateY(-15px); }
         }
 
-        /* List styling for the card preview */
+        /* List styling */
         .preview-list {
             list-style: none;
             padding-left: 0;
@@ -249,6 +254,7 @@
         @media (max-width: 900px) {
             .two-column { grid-template-columns: 1fr; }
             .hero h1 { font-size: 2.5rem; }
+            .header-layout { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -257,14 +263,13 @@
     <canvas id="web-canvas"></canvas>
 
     <header>
-        <div class="container" style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+        <div class="container header-layout">
             <a href="index.html" class="logo">ChemAI Research</a>
             <nav>
                 <ul>
                     <li><a href="index.html" class="active">Home</a></li>
-                    <!-- Updated Link to Dedicated Page -->
                     <li><a href="nicobot.html">NiCOBot</a></li>
-                    <li><a href="#nitrogen">Nitrogen Ligands</a></li>
+                    <li><a href="redox-ligands.html">Redox Active Ligands</a></li>
                 </ul>
             </nav>
         </div>
@@ -279,10 +284,9 @@
             </div>
         </section>
 
-        <!-- NiCOBot Section (Clickable Link to Detail Page) -->
+        <!-- NiCOBot Section (Updated Visual to match Redox) -->
         <section id="nicobot">
             <div class="container">
-                <!-- Wrap entire card in anchor tag for navigation -->
                 <a href="nicobot.html" class="glass-card clickable">
                     <div class="click-hint">View Project &rarr;</div>
                     <h2 id="nicobot-title">...</h2>
@@ -300,12 +304,16 @@
                             </ul>
                         </div>
 
-                        <!-- Small visual preview instead of full iframe -->
-                        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; height: 200px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--glass-border);">
-                            <div style="text-align: center;">
-                                <div style="font-size: 2rem; margin-bottom: 10px;">🧪</div>
-                                <div style="color: var(--primary); font-weight: bold;">NiCOBot</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive Tool Preview</div>
+                        <!-- Matching Redox Visual Style -->
+                        <div class="molecule-visual">
+                            <div style="text-align:center;">
+                                <div class="molecule-representation" style="color: var(--primary);">Ni</div>
+                                <div style="color:var(--text-muted); margin-top:10px;">Ni-Catalyst</div>
+                                <div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+                                    <div style="width:20px; height:20px; border-radius:50%; background:var(--primary); box-shadow: 0 0 10px var(--primary);"></div>
+                                    <div style="width:20px; height:20px; border-radius:50%; background:var(--secondary); box-shadow: 0 0 10px var(--secondary);"></div>
+                                    <div style="width:20px; height:20px; border-radius:50%; background:var(--text-muted);"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -313,22 +321,27 @@
             </div>
         </section>
 
-        <!-- Nitrogen Ligands Section (Full Content on Main Page) -->
+        <!-- Nitrogen Ligands Section -->
         <section id="nitrogen">
             <div class="container">
-                <div class="glass-card">
-                    <h2>Nitrogen Ligands in Reductive Coupling</h2>
+                <a href="redox-ligands.html" class="glass-card clickable">
+                    <div class="click-hint">View Project &rarr;</div>
+                    <h2 id="nitrogen-title">...</h2>
                     
                     <div class="two-column">
                         <div>
-                            <h3 id="nitrogen-title-1">...</h3>
-                            <p id="nitrogen-desc-1">...</p>
-
-                            <h3 id="nitrogen-title-2">...</h3>
-                            <p id="nitrogen-desc-2">...</p>
+                            <p id="nitrogen-teaser">...</p>
+                            
+                            <h3>Project Contents:</h3>
+                            <ul class="preview-list">
+                                <li>Nitrogen Ligand Overview</li>
+                                <li>AI-Driven Ligand Optimization</li>
+                                <li>Quantum Chemical Descriptors</li>
+                                <li>Interactive Ligand Database</li>
+                            </ul>
                         </div>
-                        
-                        <div class="nitrogen-visual">
+
+                        <div class="molecule-visual">
                             <div style="text-align:center;">
                                 <div class="molecule-representation">N</div>
                                 <div style="color:var(--text-muted); margin-top:10px;">N-Donor Ligand</div>
@@ -340,7 +353,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </section>
     </main>
@@ -352,11 +365,7 @@
     </footer>
 
     <script>
-        /**
-         * ------------------------------------------------------------------
-         * PART 1: SIMULATED BACKEND DATA (JSON)
-         * ------------------------------------------------------------------
-         */
+        // Data Injection
         const backendData = {
             "hero": {
                 "title": "Accelerating Chemical Discovery",
@@ -364,58 +373,35 @@
             },
             "nicobot": {
                 "sectionTitle": "Nickel Catalyzed C-O Bond Activation (NiCOBot)",
-                "teaser": "NiCOBot utilizes machine learning to predict outcomes in Nickel-catalyzed reactions. Click this card to access the dedicated research portal, live tools, and detailed methodology.",
-                "fullContent": "Transition metal catalysis is a cornerstone of modern organic synthesis..." // Stored but not fully rendered on index
+                "teaser": "NiCOBot utilizes machine learning to predict outcomes in Nickel-catalyzed reactions. Click this card to access the dedicated research portal, live tools, and detailed methodology."
             },
             "nitrogen": {
-                "sectionTitle": "Nitrogen Ligands in Reductive Coupling",
-                "content": [
-                    {
-                        "heading": "The Role of Nitrogen Ligands",
-                        "body": "Nitrogen-based ligands (such as bipyridines, phenanthrolines, and pyridine-oxazolines) play a pivotal role in modulating the electronic and steric environment of the metal center. In reductive coupling reactions, these ligands help stabilize low-valent Ni(0) and Ni(I) intermediates, which are crucial for the reductive cleavage of electrophiles."
-                    },
-                    {
-                        "heading": "AI Optimization of Ligand Properties",
-                        "body": "Using quantum chemical descriptors and graph neural networks, we analyze the spatial and electronic parameters of various nitrogen ligands. Our models predict how ligand modifications influence the rate-determining step of reductive coupling, guiding chemists toward the design of 'super-ligands' that maximize turnover frequency and selectivity."
-                    }
-                ]
+                "sectionTitle": "Redox Active Ligands",
+                "teaser": "Nitrogen-based ligands play a pivotal role in modulating the electronic and steric environment of metal centers. Click to explore our AI-driven ligand optimization research and interactive database."
             }
         };
 
-        /**
-         * ------------------------------------------------------------------
-         * PART 2: FRONTEND LOGIC (Rendering JSON to HTML)
-         * ------------------------------------------------------------------
-         */
         document.addEventListener('DOMContentLoaded', () => {
-            // Render Hero
             document.getElementById('hero-title').innerText = backendData.hero.title;
             document.getElementById('hero-desc').innerText = backendData.hero.description;
-
-            // Render NiCOBot Teaser
             document.getElementById('nicobot-title').innerText = backendData.nicobot.sectionTitle;
             document.getElementById('nicobot-teaser').innerText = backendData.nicobot.teaser;
-
-            // Render Nitrogen Section (Full Content)
-            const nitroContent = backendData.nitrogen.content;
-            document.getElementById('nitrogen-title-1').innerText = nitroContent[0].heading;
-            document.getElementById('nitrogen-desc-1').innerText = nitroContent[0].body;
-            document.getElementById('nitrogen-title-2').innerText = nitroContent[1].heading;
-            document.getElementById('nitrogen-desc-2').innerText = nitroContent[1].body;
+            document.getElementById('nitrogen-title').innerText = backendData.nitrogen.sectionTitle;
+            document.getElementById('nitrogen-teaser').innerText = backendData.nitrogen.teaser;
         });
 
-
-        /**
-         * ------------------------------------------------------------------
-         * PART 3: INTERACTIVE SPIDER WEB BACKGROUND
-         * ------------------------------------------------------------------
-         */
+        // Optimized Canvas Background Animation
         const canvas = document.getElementById('web-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray;
         
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+
+        // Configuration
+        const PARTICLE_DENSITY = 9000;
+        const MOUSE_RADIUS = 150;
+        const CONNECT_DISTANCE = 120;
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
@@ -425,9 +411,8 @@
 
         const mouse = {
             x: null,
-            y: null,
-            radius: 150
-        }
+            y: null
+        };
 
         window.addEventListener('mousemove', (event) => {
             mouse.x = event.x;
@@ -465,21 +450,19 @@
                     this.directionY = -this.directionY;
                 }
 
-                // Interaction (Spider Web Spread)
                 let dx = mouse.x - this.x;
                 let dy = mouse.y - this.y;
                 let distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance < mouse.radius) {
+                if (distance < MOUSE_RADIUS) {
                     const forceDirectionX = dx / distance;
                     const forceDirectionY = dy / distance;
-                    const force = (mouse.radius - distance) / mouse.radius;
+                    const force = (MOUSE_RADIUS - distance) / MOUSE_RADIUS;
                     
-                    // Push away harder when closer
                     const directionX = forceDirectionX * force * this.density;
                     const directionY = forceDirectionY * force * this.density;
 
-                    this.x -= directionX * 5;
+                    this.x -= directionX * 5; 
                     this.y -= directionY * 5;
                 } else {
                     this.x += this.directionX;
@@ -491,11 +474,11 @@
 
         function initParticles() {
             particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            let numberOfParticles = (canvas.height * canvas.width) / PARTICLE_DENSITY;
             for (let i = 0; i < numberOfParticles; i++) {
                 let size = (Math.random() * 2) + 1;
-                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
                 let directionX = (Math.random() * 0.4) - 0.2;
                 let directionY = (Math.random() * 0.4) - 0.2;
                 let color = '#00f2ff'; 
@@ -507,11 +490,12 @@
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
                 for (let b = a; b < particlesArray.length; b++) {
-                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-                        opacityValue = 1 - (distance / 20000);
-                        ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')'; // Purple lines
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) +
+                                   ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                    
+                    if (distance < (CONNECT_DISTANCE * CONNECT_DISTANCE)) {
+                        opacityValue = 1 - (distance / (CONNECT_DISTANCE * CONNECT_DISTANCE));
+                        ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
@@ -524,7 +508,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
             }
@@ -533,7 +517,6 @@
 
         initParticles();
         animate();
-
     </script>
 </body>
 </html>
