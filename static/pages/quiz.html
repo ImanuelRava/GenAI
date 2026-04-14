@@ -369,10 +369,7 @@
             return shuffled.slice(0, count);
         }
 
-        // --- 4. FETCH DATA & START QUIZ ---
-        // Attempting to fetch from the backend. 
-        // Note: If backend is not running, the .catch will trigger theory-only mode.
-        fetch('http://127.0.0.1:5001/api/molecules')
+        fetch('/api/molecules')
             .then(response => {
                 if (!response.ok) throw new Error("Network response was not ok");
                 return response.json();
