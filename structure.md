@@ -22,4 +22,4 @@ chemai-research/
 │       ├── ligand-database.html
 │       ├── methodology_redox.html
 │       └── publications_redox.html
-└── uploads/                  # For PDF uploads (create empty)
+└── uploads/    

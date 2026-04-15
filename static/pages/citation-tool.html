@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Citation Network | AI in Chemistry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Network | NiCOBot - GenAI Research</title>
     <!-- Cytoscape.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <!-- SheetJS (For Excel Download) -->
@@ -25,12 +26,24 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
         
         body { 
-            background: var(--bg-dark); /* Solid background since canvas is removed */
+            background: var(--bg-dark);
             color: var(--text-main); 
             height: 100vh; 
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
+        }
+
+        /* --- Interactive Background Canvas --- */
+        #web-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 95%);
+            pointer-events: none;
         }
 
         /* --- HEADER STYLING --- */
@@ -40,9 +53,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(5, 10, 20, 0.95);
+            background: rgba(5, 10, 20, 0.85);
             backdrop-filter: blur(8px);
-            height: auto; 
             flex-shrink: 0;
         }
 
@@ -71,35 +83,32 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
             text-decoration: none;
-            display: flex;
-            align-items: center;
         }
 
-        /* Back Button Styling */
-        .back-btn {
-            color: var(--primary);
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-main);
             text-decoration: none;
-            border: 1px solid var(--primary);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            background: rgba(0, 242, 255, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
         }
 
-        .back-btn:hover {
-            background: var(--primary);
-            color: var(--bg-dark);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+        nav a:hover, nav a.active {
+            color: var(--primary);
         }
 
         /* --- APP SPECIFIC STYLING --- */
         .app-container { 
             display: flex; 
-            height: calc(100vh - 80px); /* Adjust height based on header */
+            height: calc(100vh - 70px);
             overflow: hidden; 
             position: relative; 
         }
@@ -474,16 +483,29 @@
             background: rgba(255,255,255,0.1); 
             border-radius: 4px; 
         }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .sidebar { width: 280px; }
+            .header-layout { flex-direction: column; gap: 10px; }
+            nav ul { gap: 15px; }
+        }
     </style>
 </head>
 <body>
 
+    <canvas id="web-canvas"></canvas>
+
     <header>
         <div class="container header-layout">
-            <div class="logo">Citation Network</div>
-            <a href="../nicobot.html" class="back-btn">
-                <span>&larr;</span> Back to NiCOBot
-            </a>
+            <a href="../index.html" class="logo">GenAI Research</a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="../redox-ligands.html">Redox Active Ligands</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
@@ -804,10 +826,121 @@
             resetNodeStyles();
         }
 
-        window.cy.on('tap', 'node', function(evt) { focusOnNode(evt.target.id()); });
-        window.cy.on('tap', function(event) {
-            if( event.target === window.cy ){ closeNodeDetails(); resetNodeStyles(); }
-        });
+        // --- PARTICLE BACKGROUND ANIMATION ---
+        (function initParticleBackground() {
+            const canvas = document.getElementById('web-canvas');
+            const ctx = canvas.getContext('2d');
+            let particlesArray;
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initParticles();
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const MOUSE_RADIUS = 150;
+            const CONNECT_DISTANCE = 120;
+
+            const mouse = { x: null, y: null };
+
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = event.x;
+                mouse.y = event.y;
+            });
+
+            window.addEventListener('mouseout', () => {
+                mouse.x = undefined;
+                mouse.y = undefined;
+            });
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                    this.density = (Math.random() * 30) + 1;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < MOUSE_RADIUS) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (MOUSE_RADIUS - distance) / MOUSE_RADIUS;
+                        this.x -= forceDirectionX * force * this.density * 5;
+                        this.y -= forceDirectionY * force * this.density * 5;
+                    } else {
+                        this.x += this.directionX;
+                        this.y += this.directionY;
+                    }
+                    this.draw();
+                }
+            }
+
+            function initParticles() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = Math.random() * (canvas.width - size * 2) + size * 2;
+                    let y = Math.random() * (canvas.height - size * 2) + size * 2;
+                    let directionX = (Math.random() * 0.4) - 0.2;
+                    let directionY = (Math.random() * 0.4) - 0.2;
+                    let color = '#00f2ff';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function connect() {
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) +
+                                       ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                        if (distance < (CONNECT_DISTANCE * CONNECT_DISTANCE)) {
+                            let opacityValue = 1 - (distance / (CONNECT_DISTANCE * CONNECT_DISTANCE));
+                            ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+                connect();
+            }
+
+            initParticles();
+            animate();
+        })();
     </script>
 </body>
 </html>
+            
