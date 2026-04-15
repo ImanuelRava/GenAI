@@ -16,11 +16,15 @@
         body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         
         #web-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 95%); }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 25px; width: 100%; flex: 1; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 25px; width: 100%; flex: 1; }
 
         /* Header */
-        header { padding: 20px 0; border-bottom: 1px solid var(--glass-border); background: rgba(5, 10, 20, 0.9); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 100; }
-        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        header { padding: 20px 0; border-bottom: 1px solid var(--glass-border); background: rgba(5, 10, 20, 0.85); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 100; }
+        .header-layout { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--secondary)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-decoration: none; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: var(--primary); }
         .back-btn { color: var(--text-muted); text-decoration: none; border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; transition: 0.3s; }
         .back-btn:hover { border-color: var(--primary); color: var(--primary); }
 
@@ -127,8 +131,15 @@
     <canvas id="web-canvas"></canvas>
 
     <header>
-        <div class="container nav-flex">
-            <a href="../introduction_nicobot.html" class="back-btn">← Back to Syllabus</a>
+        <div class="container header-layout">
+            <a href="../../../index.html" class="logo">GenAI Research</a>
+            <nav>
+                <ul>
+                    <li><a href="../../../index.html">Home</a></li>
+                    <li><a href="../../nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="../../redox-ligands.html">Redox Active Ligands</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
@@ -254,7 +265,8 @@
                     <p>Palladium generally cycles between 0 and +2 via a two-electron redox process. Nickel is unique because it can access <strong>+1 and +3 oxidation states</strong>. This allows Nickel to engage in <strong>Single Electron Transfer (SET)</strong> mechanisms. Instead of a clean 2e oxidative addition, Ni can undergo a radical pathway (Ni(I) &rarr; Ni(II) &rarr; Ni(III)), enabling it to couple inert alkyl halides and C(sp<sup>3</sup>)-O bonds that Palladium cannot touch.</p>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
+                <div style="text-align: center; margin-top: 40px; padding-bottom: 40px;">
+                    <a href="lecture-2-metal.html" class="back-btn" style="margin-right: 15px;">← Module 2: Metal Role</a>
                     <a href="lecture-3-mechanism.html" class="back-btn" style="background:var(--secondary); color:#fff; font-weight:bold; padding: 10px 30px;">Next Module: Deep Dive Mechanism →</a>
                 </div>
             `
@@ -430,7 +442,7 @@
                     let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
                     let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
                     let dx = (Math.random() * 0.4) - 0.2, dy = (Math.random() * 0.4) - 0.2;
-                    let color = '#7000ff'; 
+                    let color = '#00f2ff'; 
                     particlesArray.push(new Particle(x, y, dx, dy, size, color));
                 }
             }
@@ -441,7 +453,7 @@
                         let dist = ((particlesArray[a].x - particlesArray[b].x)**2 + (particlesArray[a].y - particlesArray[b].y)**2);
                         if (dist < (canvas.width/7)*(canvas.height/7)) {
                             opacityValue = 1 - (dist/20000);
-                            ctx.strokeStyle = 'rgba(0, 242, 255,' + opacityValue + ')';
+                            ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
                             ctx.lineWidth = 1; ctx.beginPath();
                             ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
                             ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
