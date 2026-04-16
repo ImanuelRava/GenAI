@@ -17,5 +17,15 @@ requests>=2.31.0
 # Excel file handling
 openpyxl>=3.1.0
 
+# Data processing
+pandas>=2.0.0
+
+# PDF parsing
+pdfplumber>=0.10.0
+
 # Optional: for serving multiple apps
 werkzeug>=2.3.0
+
+# Optional: for AI chat functionality
+# Uncomment if using the AI SDK
+# z-ai-web-dev-sdk>=0.0.17
