@@ -32,29 +32,29 @@ def get_molecules():
     molecules = {
         "phenyl_boronic": "B(c1ccccc1)(O)O",
         "1_bromopropane": "CCCBr",
-        "tetramethyltin": "C[Sn](C)(C)C",                           # Stille
-        "styrene": "C=Cc1ccccc1",                                   # Heck
-        "phenylacetylene": "C#Cc1ccccc1",                           # Sonogashira
-        "bromobenzene": "Brc1ccccc1",                               # Electrophile
-        "phenylmagnesium_bromide": "Br[Mg]c1ccccc1",                # Kumada
-        "phenylzinc_bromide": "[Zn]Brc1ccccc1",                     # Negishi
-        "tributylphenylstannane": "CCCC[Sn](CCCC)(CCCC)c1ccccc1",   # Stille complex
-        "iodobenzene": "Ic1ccccc1",                                 # Best Electrophile
-        "chlorobenzene": "Clc1ccccc1",                              # Hard Electrophile
-        "trimethylphenylsilane": "C[Si](C)(C)c1ccccc1",             # Hiyama
-        "morpholine": "C1COCCN1",                                   # Buchwald-Hartwig N-source
-        "vinyl_triflate": "C=CC(=O)OS(=O)(=O)C(F)(F)F",             # Alternative Leaving Group
-        "acrylate": "C=CC(=O)O",                                    # Heck Partner (Michael acceptor)
-        "tert_butyl_bromide": "CC(C)(C)Br",                         # Steric Hindrance
-        "ethyl_4_bromobenzoate": "CC(=O)Oc1ccc(Br)cc1",             # Ester compatibility
-        "4_bromoacetophenone": "Cc(=O)c1ccc(Br)cc1",                # Ketone compatibility
-        "4_bromobenzaldehyde": "O=Cc1ccc(Br)cc1",                   # Aldehyde compatibility
-        "4_bromobenzonitrile": "N#Cc1ccc(Br)cc1",                   # Nitrile compatibility
-        "anisole": "COc1ccccc1",                                    # Electron rich
-        "nitrobenzene": "O=[N+]([O-])c1ccccc1",                     # Electron poor
-        "aniline": "Nc1ccccc1",                                     # Catalyst Poisoning
-        "triphenylphosphine": "P(c1ccccc1)(c1ccccc1)c1ccccc1",      # Ligand
-        "phenol": "Oc1ccccc1"                                       # Leaving Group ability
+        "tetramethyltin": "C[Sn](C)(C)C",
+        "styrene": "C=Cc1ccccc1",
+        "phenylacetylene": "C#Cc1ccccc1",
+        "bromobenzene": "Brc1ccccc1",
+        "phenylmagnesium_bromide": "Br[Mg]c1ccccc1",
+        "phenylzinc_bromide": "[Zn]Brc1ccccc1",
+        "tributylphenylstannane": "CCCC[Sn](CCCC)(CCCC)c1ccccc1",
+        "iodobenzene": "Ic1ccccc1",
+        "chlorobenzene": "Clc1ccccc1",
+        "trimethylphenylsilane": "C[Si](C)(C)c1ccccc1",
+        "morpholine": "C1COCCN1",
+        "vinyl_triflate": "C=CC(=O)OS(=O)(=O)C(F)(F)F",
+        "acrylate": "C=CC(=O)O",
+        "tert_butyl_bromide": "CC(C)(C)Br",
+        "ethyl_4_bromobenzoate": "CC(=O)Oc1ccc(Br)cc1",
+        "4_bromoacetophenone": "Cc(=O)c1ccc(Br)cc1",
+        "4_bromobenzaldehyde": "O=Cc1ccc(Br)cc1",
+        "4_bromobenzonitrile": "N#Cc1ccc(Br)cc1",
+        "anisole": "COc1ccccc1",
+        "nitrobenzene": "O=[N+]([O-])c1ccccc1",
+        "aniline": "Nc1ccccc1",
+        "triphenylphosphine": "P(c1ccccc1)(c1ccccc1)c1ccccc1",
+        "phenol": "Oc1ccccc1"
     }
     
     data = {}
