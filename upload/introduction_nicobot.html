@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NiCOBot Learning | ChemAI Research</title>
+    <link rel="stylesheet" href="css/immersive.css">
+    <style>
+        /* NiCOBot page specific styles */
+        .nicobot-layout {
+            display: flex;
+            min-height: calc(100vh - var(--header-height));
+        }
+        
+        .nicobot-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--emerald-600);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: gap 0.2s;
+        }
+        
+        .back-link:hover {
+            gap: 12px;
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .page-desc {
+            font-size: 18px;
+            color: var(--text-slate-400);
+            max-width: 700px;
+            line-height: 1.7;
+        }
+        
+        .modules-section {
+            margin-top: 40px;
+        }
+        
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-slate-500);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 24px;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .module-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .module-card:hover::before {
+            opacity: 1;
+        }
+        
+        .module-card.cyan { --card-accent: var(--primary); }
+        .module-card.purple { --card-accent: var(--secondary); }
+        .module-card.green { --card-accent: var(--accent); }
+        
+        .module-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--card-accent);
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+        
+        .module-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--card-accent);
+            margin-bottom: 12px;
+        }
+        
+        .module-card p {
+            color: var(--text-slate-400);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .module-progress {
+            margin-top: 20px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .module-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--card-accent);
+            transition: width 0.5s ease;
+        }
+        
+        .module-card:hover .module-progress-fill {
+            width: 100%;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(112, 0, 255, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 40px;
+        }
+        
+        .info-card h4 {
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .info-card p {
+            color: var(--text-slate-400);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        @media (max-width: 768px) {
+            .nicobot-content { padding: 20px; }
+            .page-title { font-size: 28px; }
+            .modules-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="web-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="immersive-header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰</button>
+                <a href="index.html" class="header-logo">
+                    <div class="logo-icon">⚛</div>
+                    <div class="logo-text">
+                        <span class="logo-title">ChemAI Research</span>
+                        <span class="logo-subtitle">Immersive Learning</span>
+                    </div>
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Home</a>
+                <a href="introduction_nicobot.html" class="active">NiCOBot</a>
+                <a href="redox-ligands.html">Redox Ligands</a>
+                <a href="citation-tool.html">Citation Network</a>
+            </nav>
+            <div class="header-right">
+                <span class="header-badge">✨ AI Powered</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Layout -->
+    <div class="nicobot-layout">
+        <!-- Sidebar -->
+        <aside class="immersive-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <h2 class="sidebar-title">Course Content</h2>
+                
+                <!-- Progress -->
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-value">2/14</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: 14%"></div>
+                    </div>
+                </div>
+                
+                <!-- Course Navigation -->
+                <nav class="course-nav">
+                    <div class="course-module">
+                        <a href="#" class="module-header">
+                            <span class="module-icon">🧠</span>
+                            <span class="module-title">Introduction</span>
+                        </a>
+                        <div class="module-lessons">
+                            <a href="lectures/lecture-1-basics.html" class="lesson-link">
+                                <span class="lesson-dot completed"></span>
+                                <span>Cross-Coupling Basics</span>
+                            </a>
+                            <a href="lectures/lecture-2-metal.html" class="lesson-link">
+                                <span class="lesson-dot completed"></span>
+                                <span>Transition Metals</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="course-module">
+                        <a href="#" class="module-header">
+                            <span class="module-icon">🧪</span>
+                            <span class="module-title">NiCOBot</span>
+                        </a>
+                        <div class="module-lessons">
+                            <a href="lectures/lecture-3-mechanism.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Catalytic Cycle</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="course-module">
+                        <a href="#" class="module-header">
+                            <span class="module-icon">📊</span>
+                            <span class="module-title">Tools</span>
+                        </a>
+                        <div class="module-lessons">
+                            <a href="citation-tool.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Citation Network</span>
+                            </a>
+                            <a href="data-extraction.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Data Extraction</span>
+                            </a>
+                            <a href="quiz.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Chemistry Quiz</span>
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="nicobot-content">
+            <div class="page-header">
+                <a href="index.html" class="back-link">← Back to Home</a>
+                <h1 class="page-title">Transition Metal Catalysis</h1>
+                <p class="page-desc">Master the fundamentals of cross-coupling reactions and discover how nickel catalysts break strong carbon-oxygen bonds in biomass-derived compounds.</p>
+            </div>
+
+            <section class="modules-section">
+                <h2 class="section-label">Course Modules</h2>
+                
+                <div class="modules-grid">
+                    <!-- Module 1 -->
+                    <a href="lectures/lecture-1-basics.html" class="module-card cyan">
+                        <div class="module-number">01</div>
+                        <h3>The Basics of Cross-Coupling</h3>
+                        <p>Understanding the concept of Cross-Coupling and why we need a catalyst to join molecules together efficiently.</p>
+                        <div class="module-progress"><div class="module-progress-fill"></div></div>
+                    </a>
+
+                    <!-- Module 2 -->
+                    <a href="lectures/lecture-2-metal.html" class="module-card purple">
+                        <div class="module-number">02</div>
+                        <h3>The Role of Transition Metals</h3>
+                        <p>How transition metals like Nickel and Palladium act as "molecular matchmakers" using their unique d-orbital electronics.</p>
+                        <div class="module-progress"><div class="module-progress-fill"></div></div>
+                    </a>
+
+                    <!-- Module 3 -->
+                    <a href="lectures/lecture-3-mechanism.html" class="module-card green">
+                        <div class="module-number">03</div>
+                        <h3>The Catalytic Cycle</h3>
+                        <p>The three fundamental steps: Oxidative Addition, Transmetalation, and Reductive Elimination explained step-by-step.</p>
+                        <div class="module-progress"><div class="module-progress-fill"></div></div>
+                    </a>
+                </div>
+
+                <div class="info-card">
+                    <h4>📚 Learning Path</h4>
+                    <p>Start with Module 1 and progress sequentially. Each module builds upon the previous one, taking you from basic concepts to advanced applications in nickel-catalyzed C-O bond activation. By the end, you'll understand the science behind the NiCOBot AI prediction system.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="immersive-footer footer-full">
+        <p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        // Canvas Animation
+        const canvas = document.getElementById('web-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const PARTICLE_DENSITY = 9000;
+        const MOUSE_RADIUS = 150;
+        const CONNECT_DISTANCE = 120;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        const mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x; this.y = y;
+                this.directionX = directionX; this.directionY = directionY;
+                this.size = size; this.color = color;
+                this.density = (Math.random() * 30) + 1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < MOUSE_RADIUS && mouse.x !== undefined) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (MOUSE_RADIUS - distance) / MOUSE_RADIUS;
+                    this.x -= forceDirectionX * force * this.density * 5;
+                    this.y -= forceDirectionY * force * this.density * 5;
+                } else {
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                }
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / PARTICLE_DENSITY;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                particlesArray.push(new Particle(
+                    (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2),
+                    (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2),
+                    (Math.random() * 0.4) - 0.2,
+                    (Math.random() * 0.4) - 0.2,
+                    size, '#00f2ff'
+                ));
+            }
+        }
+
+        function connect() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) +
+                                   ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                    if (distance < (CONNECT_DISTANCE * CONNECT_DISTANCE)) {
+                        let opacityValue = 1 - (distance / (CONNECT_DISTANCE * CONNECT_DISTANCE));
+                        ctx.strokeStyle = 'rgba(112, 0, 255,' + opacityValue + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) particlesArray[i].update();
+            connect();
+        }
+
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>

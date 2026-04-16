@@ -1,9 +1,0 @@
-flask
-flask-cors
-networkx
-pdfplumber
-requests
-pandas
-numpy
-rdkit
-gunicorn

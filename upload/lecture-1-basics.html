@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 1: Cross-Coupling Basics | ChemAI Research</title>
+    <link rel="stylesheet" href="css/immersive.css">
+    <style>
+        /* Lecture-specific styles */
+        .lecture-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+        }
+        
+        /* Reaction Diagram */
+        .reaction-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            margin: 24px 0;
+        }
+        
+        .reaction-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+        }
+        
+        .chem-box {
+            font-size: 24px;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .chem-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-slate-500);
+        }
+        
+        .op-symbol {
+            font-size: 28px;
+            color: var(--text-slate-400);
+        }
+        
+        .group-nucl .chem-box { background: rgba(0, 242, 255, 0.15); border: 1px solid var(--primary); color: var(--primary); }
+        .group-elec .chem-box { background: rgba(112, 0, 255, 0.15); border: 1px solid var(--secondary); color: var(--secondary); }
+        .group-prod .chem-box { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--accent); color: var(--accent); }
+        .group-waste .chem-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; }
+        
+        /* Cards */
+        .lecture-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .lecture-card.purple { border-left-color: var(--secondary); }
+        .lecture-card.green { border-left-color: var(--accent); }
+        
+        .lecture-card h2 {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .lecture-card p {
+            color: var(--text-slate-400);
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        
+        .lecture-card ul {
+            margin-left: 20px;
+            color: var(--text-slate-400);
+            line-height: 1.8;
+        }
+        
+        .lecture-card strong { color: white; }
+        
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-slate-400);
+            text-align: left;
+        }
+        
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .timeline-item {
+            border-left: 3px solid var(--primary);
+            padding-left: 20px;
+        }
+        
+        .timeline-item.highlight {
+            background: rgba(0, 255, 136, 0.05);
+            border-left-color: var(--accent);
+            padding: 12px 20px;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .timeline-item h4 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .timeline-item.highlight h4 {
+            color: var(--accent);
+        }
+        
+        .timeline-item p {
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .lecture-main { margin-left: 0; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="web-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="immersive-header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰</button>
+                <a href="index.html" class="header-logo">
+                    <div class="logo-icon">⚛</div>
+                    <div class="logo-text">
+                        <span class="logo-title">ChemAI Research</span>
+                        <span class="logo-subtitle">Immersive Learning</span>
+                    </div>
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Home</a>
+                <a href="introduction_nicobot.html" class="active">NiCOBot</a>
+                <a href="redox-ligands.html">Redox Ligands</a>
+            </nav>
+            <div class="header-right">
+                <span class="header-badge">📚 Module 1</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Layout -->
+    <div class="immersive-layout">
+        <!-- Sidebar -->
+        <aside class="immersive-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <h2 class="sidebar-title">Course Content</h2>
+                
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-value">1/3</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: 33%"></div>
+                    </div>
+                </div>
+                
+                <nav class="course-nav">
+                    <div class="course-module">
+                        <a href="#" class="module-header">
+                            <span class="module-icon">📖</span>
+                            <span class="module-title">Lecture Modules</span>
+                        </a>
+                        <div class="module-lessons">
+                            <a href="lecture-1-basics.html" class="lesson-link active">
+                                <span class="lesson-dot completed"></span>
+                                <span>Cross-Coupling Basics</span>
+                            </a>
+                            <a href="lecture-2-metal.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Transition Metals</span>
+                            </a>
+                            <a href="lecture-3-mechanism.html" class="lesson-link">
+                                <span class="lesson-dot"></span>
+                                <span>Catalytic Cycle</span>
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="immersive-main lecture-main">
+            <div class="content-area">
+                <div class="content-wrapper">
+                    
+                    <!-- Lesson Header -->
+                    <div class="lesson-header">
+                        <span class="lesson-badge">Module 1</span>
+                        <h1 class="lesson-title">The Basics: Cross-Coupling Reactions</h1>
+                        <div class="lesson-meta">
+                            <span>🎯 4 Key Concepts</span>
+                            <span>⏱️ 15 min read</span>
+                        </div>
+                    </div>
+
+                    <!-- Introduction Card -->
+                    <div class="lecture-card">
+                        <h2>🔬 What is Cross-Coupling?</h2>
+                        <p><strong>Cross-coupling reactions</strong> are a class of metal-catalyzed reactions where an organic halide (or pseudohalide) and an organometallic compound react to form a new carbon-carbon bond.</p>
+                        <p>Before the advent of these reactions, chemists relied on less selective methods. Cross-coupling provides a powerful method to construct complex organic scaffolds with high chemoselectivity, overcoming the limitations of traditional organometallic reagents.</p>
+                    </div>
+
+                    <!-- General Reaction -->
+                    <div class="lecture-card">
+                        <h2>⚗️ The General Reaction Scheme</h2>
+                        <p>According to the IUPAC definition, cross-coupling follows a generic scheme involving two coupling partners and a metal catalyst.</p>
+                        
+                        <div class="reaction-diagram">
+                            <div class="reaction-group group-nucl">
+                                <div class="chem-box">R-M</div>
+                                <div class="chem-label">Nucleophile</div>
+                            </div>
+                            <span class="op-symbol">+</span>
+                            <div class="reaction-group group-elec">
+                                <div class="chem-box">R'-X</div>
+                                <div class="chem-label">Electrophile</div>
+                            </div>
+                            <span class="op-symbol" style="color: var(--accent);">→</span>
+                            <div class="reaction-group group-prod">
+                                <div class="chem-box">R-R'</div>
+                                <div class="chem-label">Product</div>
+                            </div>
+                            <span class="op-symbol">+</span>
+                            <div class="reaction-group group-waste">
+                                <div class="chem-box">M-X</div>
+                                <div class="chem-label">Byproduct</div>
+                            </div>
+                        </div>
+                        
+                        <ul>
+                            <li><strong>R-M:</strong> The organometallic reagent (e.g., Grignard, Organoboron, Organozinc)</li>
+                            <li><strong>R'-X:</strong> The organic electrophile (e.g., Aryl halide with X = Br, I, OTF)</li>
+                            <li><strong>Catalyst:</strong> Usually Palladium (Pd) or Nickel (Ni)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Key Points -->
+                    <div class="key-points-card">
+                        <h3 class="key-points-title">🎯 Key Takeaways</h3>
+                        <ul class="key-points-list">
+                            <li>
+                                <span class="key-point-number">1</span>
+                                <span>Cross-coupling joins two organic fragments via a metal catalyst</span>
+                            </li>
+                            <li>
+                                <span class="key-point-number">2</span>
+                                <span>The reaction overcomes limitations of traditional organometallic reagents</span>
+                            </li>
+                            <li>
+                                <span class="key-point-number">3</span>
+                                <span>High chemoselectivity enables complex molecule construction</span>
+                            </li>
+                            <li>
+                                <span class="key-point-number">4</span>
+                                <span>2010 Nobel Prize awarded for Pd-catalyzed cross-coupling</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Challenges -->
+                    <div class="lecture-card purple">
+                        <h2>⚠️ Challenges in the Lab</h2>
+                        <p>While the ideal cross-coupling reaction is chemically simple, achieving it in the lab is difficult. Historically, chemists have faced three major hurdles.</p>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">🧪</div>
+                                <div class="feature-title">Functional Group Compatibility</div>
+                                <p class="feature-desc">Traditional reagents like Grignards are too reactive and attack sensitive groups, destroying the molecule.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🌱</div>
+                                <div class="feature-title">Sustainability</div>
+                                <p class="feature-desc">Many processes rely on expensive precious metals and toxic reagents, making them costly and harmful.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-title">Side Reactions</div>
+                                <p class="feature-desc">In alkyl-alkyl couplings, alkene formation is often a major side reaction, reducing yield and selectivity.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="lecture-card green">
+                        <h2>📜 History & The Nobel Prize</h2>
+                        <p>The development of cross-coupling is a landmark achievement in synthetic organic chemistry.</p>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4>1972: The First Step</h4>
+                                <p>Makoto Kumada reports the first cross-coupling using a Nickel catalyst.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>1977: The Palladium Era</h4>
+                                <p>Heck, Negishi, and Suzuki publish seminal papers on Pd-catalyzed couplings.</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <h4>🏆 2010: The Nobel Prize</h4>
+                                <p>The Nobel Prize in Chemistry awarded to <strong>Heck, Negishi, and Suzuki</strong> for palladium-catalyzed cross couplings.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="lesson-nav">
+                        <a href="introduction_nicobot.html" class="nav-btn prev">← Back to Course</a>
+                        <a href="lecture-2-metal.html" class="nav-btn next">Next: Transition Metals →</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="immersive-footer">
+        <p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        // Canvas Animation
+        const canvas = document.getElementById('web-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const PARTICLE_DENSITY = 9000;
+        const MOUSE_RADIUS = 150;
+        const CONNECT_DISTANCE = 120;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        const mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
+
+        class Particle {
+            constructor(x, y, dx, dy, size, color) {
+                this.x = x; this.y = y; this.dx = dx; this.dy = dy;
+                this.size = size; this.color = color;
+                this.density = (Math.random() * 30) + 1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.dx = -this.dx;
+                if (this.y > canvas.height || this.y < 0) this.dy = -this.dy;
+                
+                if (mouse.x !== undefined && mouse.y !== undefined) {
+                    let dx = mouse.x - this.x, dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < MOUSE_RADIUS) {
+                        const force = (MOUSE_RADIUS - distance) / MOUSE_RADIUS;
+                        this.x -= (dx / distance) * force * this.density * 5;
+                        this.y -= (dy / distance) * force * this.density * 5;
+                    } else {
+                        this.x += this.dx; this.y += this.dy;
+                    }
+                } else {
+                    this.x += this.dx; this.y += this.dy;
+                }
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let count = (canvas.height * canvas.width) / PARTICLE_DENSITY;
+            for (let i = 0; i < count; i++) {
+                let size = (Math.random() * 2) + 1;
+                particlesArray.push(new Particle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height,
+                    (Math.random() * 0.4) - 0.2,
+                    (Math.random() * 0.4) - 0.2,
+                    size, '#00f2ff'
+                ));
+            }
+        }
+
+        function connect() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dist = Math.pow(particlesArray[a].x - particlesArray[b].x, 2) +
+                               Math.pow(particlesArray[a].y - particlesArray[b].y, 2);
+                    if (dist < Math.pow(CONNECT_DISTANCE, 2)) {
+                        let opacity = 1 - (dist / Math.pow(CONNECT_DISTANCE, 2));
+                        ctx.strokeStyle = `rgba(112, 0, 255, ${opacity})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let p of particlesArray) p.update();
+            connect();
+        }
+
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>
