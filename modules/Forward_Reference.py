@@ -79,7 +79,7 @@ def build_forward_network(pdf_path, progress_callback=None):
                     cross_ref_count += 1
 
     if progress_callback: progress_callback(f"Found {cross_ref_count} cross-references.")
-   # 1. Get all node data for the Excel file
+    # 1. Get all node data for the Excel file
     all_papers_list = []
     for n in G.nodes():
         data = G.nodes[n]

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NiCOBot Live | NiCOBot - GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* --- Feature List --- */
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-blue-light);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .feature-content h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .feature-content p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- Info Box --- */
+        .info-box {
+            background: linear-gradient(135deg, var(--bg-blue-light) 0%, var(--bg-gray) 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .info-box h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .info-box p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-main);
+        }
+
+        .content-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .content-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .content-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="redox-ligands.html">Redox Ligands</a></li>
+                    <li><a href="artificial-intelligence.html">AI</a></li>
+                    <li><a href="virus-research.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">About NiCOBot Live</div>
+                <p class="sidebar-text">Real-time AI prediction for Nickel-catalyzed C-O bond activation reactions using Graph Neural Networks.</p>
+                
+                <div class="info-box">
+                    <h4>GNN Model</h4>
+                    <p>NiCOBot uses a trained Graph Neural Network to predict the success probability of cross-coupling reactions.</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Key Features</div>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-content">
+                            <h4>Reaction Prediction</h4>
+                            <p>Predict success probability for new substrates</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">⚗️</div>
+                        <div class="feature-content">
+                            <h4>Condition Optimization</h4>
+                            <p>Explore optimal catalyst and ligand combinations</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-content">
+                            <h4>Substrate Scope</h4>
+                            <p>Visualize substrate compatibility heatmaps</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">🔬</div>
+                        <div class="feature-content">
+                            <h4>Mechanistic Insights</h4>
+                            <p>Understand key factors affecting outcomes</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <div class="content-header">
+                <h2>AI Prediction Interface</h2>
+                <p>Interactive Streamlit application for reaction prediction and analysis</p>
+            </div>
+            <div class="iframe-container">
+                <iframe src="https://emsgv7dprevfapvfpcabvf.streamlit.app/?embed=true" allow-scripts allow-same-origin></iframe>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+</body>
+</html>

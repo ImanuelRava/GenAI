@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, send_from_directory
-from flask_cors import CORS # <--- ADD THIS IMPORT
+from flask_cors import CORS
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import base64
@@ -8,7 +8,6 @@ app = Flask(__name__,
             template_folder='../frontend/pages', 
             static_folder='../frontend/pages')
 
-# <--- ADD THIS LINE TO ENABLE CORS ---
 CORS(app) 
 
 def generate_base64_mol(smiles):
@@ -28,7 +27,6 @@ def generate_base64_mol(smiles):
 def home():
     return send_from_directory('../frontend/pages', 'quiz.html')
 
-@app.route('/api/molecules')
 @app.route('/api/molecules')
 def get_molecules():
     molecules = {

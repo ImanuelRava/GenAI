@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Network | NiCOBot - GenAI Research</title>
+    <!-- Cytoscape.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <!-- SheetJS (For Excel Download) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* --- Form Elements --- */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .form-label input[type="radio"] {
+            accent-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .file-drop {
+            border: 2px dashed var(--border-color);
+            background: var(--bg-gray);
+            padding: 20px;
+            text-align: center;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .file-drop:hover {
+            border-color: var(--primary);
+            background: var(--bg-blue-light);
+        }
+
+        .file-drop-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .file-drop-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: none;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-gray);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-success {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* --- Suggestion List --- */
+        .suggestion-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            background: var(--bg-gray);
+            border-left: 3px solid var(--accent);
+            padding: 10px 12px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-blue-light);
+            border-left-color: var(--primary);
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .suggestion-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Graph Container --- */
+        .graph-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-main);
+        }
+
+        #cy {
+            width: 100%;
+            height: 100%;
+        }
+
+        .empty-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* --- Zoom Controls --- */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .zoom-controls label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 120px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        /* --- Loader --- */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 50;
+        }
+
+        .loader-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Info Panel (Right Sidebar) --- */
+        .info-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background: var(--bg-main);
+            border-left: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-panel.open {
+            transform: translateX(0);
+        }
+
+        .info-panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .info-panel-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .info-panel-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .detail-card {
+            margin-bottom: 16px;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-box {
+            background: var(--bg-gray);
+            padding: 12px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 200px;
+            }
+
+            .info-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="redox-ligands.html">Redox Ligands</a></li>
+                    <li><a href="artificial-intelligence.html">AI</a></li>
+                    <li><a href="virus-research.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Settings</div>
+                <div class="form-group">
+                    <label class="form-label"><input type="radio" name="type" value="forward" checked> Forward (PDF)</label>
+                    <label class="form-label"><input type="radio" name="type" value="backward"> Backward (PDF)</label>
+                    <label class="form-label"><input type="radio" name="type" value="cross"> Cross (Excel)</label>
+                </div>
+
+                <div class="file-drop" onclick="document.getElementById('fileInput').click()">
+                    <div class="file-drop-icon">📄</div>
+                    <div class="file-drop-text">Click to upload file</div>
+                    <div class="file-name" id="fileName">No file selected</div>
+                    <input type="file" id="fileInput" style="display: none" onchange="updateFileName(this)">
+                </div>
+
+                <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()">Build Network</button>
+                <button class="btn btn-success" id="downloadBtn" onclick="downloadExcel()" style="display: none; margin-top: 8px;">Download Excel</button>
+            </div>
+
+            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
+                <div class="sidebar-section-title">Top Papers</div>
+                <div class="suggestion-list" id="suggestionsList">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Run analysis to see suggestions...</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Graph Container -->
+            <div class="graph-container">
+                <div id="cy"></div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">🔗</div>
+                    <h3>Network Visualization</h3>
+                    <p>Upload a file and click "Build Network" to visualize citation data.</p>
+                </div>
+                
+                <div class="zoom-controls" id="zoomControls" style="display: none;">
+                    <label>Zoom:</label>
+                    <input type="range" id="zoomSlider" min="0.1" max="3.0" step="0.1" value="1.0">
+                    <span id="zoomLabel">100%</span>
+                </div>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader-overlay" id="loader">
+                <div class="spinner"></div>
+                <p>Processing data...</p>
+            </div>
+
+            <!-- Info Panel -->
+            <aside class="info-panel" id="infoPanel">
+                <div class="info-panel-header">
+                    <h3>Paper Details</h3>
+                    <button class="close-btn" onclick="closeInfoPanel()">&times;</button>
+                </div>
+                <div class="info-panel-content">
+                    <div class="detail-card">
+                        <div class="detail-label">Title</div>
+                        <div class="detail-value" id="detail-title">Select a node to view details</div>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" id="detail-cites">0</div>
+                            <div class="stat-label">Citations</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="detail-year">-</div>
+                            <div class="stat-label">Year</div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Author</div>
+                        <div class="detail-value" id="detail-author">-</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">DOI / ID</div>
+                        <div class="detail-value" id="detail-doi" style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">-</div>
+                    </div>
+                    <a id="detail-link" href="#" target="_blank" class="btn btn-primary" style="display: none; margin-top: 12px;">View Paper (DOI)</a>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <script>
+        // Global variable to store full paper data for download
+        let fullPaperData = [];
+
+        function updateFileName(input) {
+            if(input.files && input.files[0]) {
+                document.getElementById('fileName').innerText = input.files[0].name;
+            }
+        }
+
+        // --- EXCEL DOWNLOAD FUNCTION ---
+        function downloadExcel() {
+            if (!fullPaperData || fullPaperData.length === 0) {
+                alert("No data available to download.");
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(fullPaperData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Papers");
+            XLSX.writeFile(wb, "Citation_Network_Data.xlsx");
+        }
+
+        async function runAnalysis() {
+            const fileInput = document.getElementById('fileInput');
+            const typeInput = document.querySelector('input[name="type"]:checked');
+            const loader = document.getElementById('loader');
+            const list = document.getElementById('suggestionsList');
+            const emptyState = document.getElementById('emptyState');
+            const btn = document.getElementById('runBtn');
+            const dlBtn = document.getElementById('downloadBtn');
+            const zoomControls = document.getElementById('zoomControls');
+
+            if (!fileInput.files[0]) return alert("Please upload a file.");
+
+            btn.disabled = true;
+            loader.classList.add('active');
+            emptyState.style.display = 'none';
+            dlBtn.style.display = 'none';
+            zoomControls.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('type', typeInput.value);
+
+            try {
+                const response = await fetch('/api/network', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error("Backend Error");
+                const data = await response.json();
+
+                fullPaperData = data.all_papers || [];
+                initCytoscape(data.elements);
+
+                list.innerHTML = '';
+                if (data.suggestions.length > 0) {
+                    data.suggestions.forEach((s, i) => {
+                        list.innerHTML += `
+                            <div class="suggestion-item" onclick="focusOnNode('${s.doi}')">
+                                <div class="suggestion-title">${i+1}. ${s.title.substring(0, 40)}...</div>
+                                <div class="suggestion-meta">Source: ${s.source} | Cites: ${s.citations}</div>
+                            </div>`;
+                    });
+                } else {
+                    list.innerHTML = '<p style="font-size:0.8rem; color: var(--text-muted);">No suggestions found.</p>';
+                }
+
+                dlBtn.style.display = 'block';
+                zoomControls.style.display = 'flex';
+
+            } catch (e) {
+                alert("Error: " + e.message);
+                emptyState.style.display = 'block';
+                emptyState.querySelector('h3').innerText = "Connection Failed";
+            } finally {
+                loader.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        function getStableJitter(id, baseVal, scale) {
+            let hash = 0;
+            for (let i = 0; i < id.length; i++) {
+                hash = id.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const normalized = (Math.abs(hash) % 10000) / 5000 - 1.0;
+            return baseVal + (normalized * scale);
+        }
+
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomLabel = document.getElementById('zoomLabel');
+        zoomSlider.addEventListener('input', (e) => {
+            const level = parseFloat(e.target.value);
+            if (window.cy) {
+                window.cy.zoom({ level: level, renderedPosition: { x: window.cy.width() / 2, y: window.cy.height() / 2 } });
+            }
+            zoomLabel.innerText = Math.round(level * 100) + '%';
+        });
+
+        function initCytoscape(elements) {
+            if (window.cy && typeof window.cy.destroy === 'function') {
+                try { window.cy.destroy(); window.cy = null; } catch (e) { console.warn(e); }
+            }
+            if (!elements || !elements.nodes || !elements.edges) {
+                console.error("Invalid graph data:", elements);
+                return;
+            }
+            const nodes = elements.nodes;
+            const edges = elements.edges;
+            let minYear = Infinity, maxYear = -Infinity, maxCites = 0;
+            nodes.forEach(n => {
+                const y = parseInt(n.year) || 0;
+                const c = parseInt(n.citations) || 0;
+                if (y < minYear) minYear = y;
+                if (y > maxYear) maxYear = y;
+                if (c > maxCites) maxCites = c;
+            });
+            const yearRange = (maxYear - minYear) === 0 ? 1 : (maxYear - minYear);
+            const PLOT_WIDTH = 1500;
+            const PLOT_HEIGHT = 1000;
+            const jitterX = PLOT_WIDTH * 0.03;
+            const jitterY = PLOT_HEIGHT * 0.03;
+            const cyElements = {
+                nodes: nodes.map(node => {
+                    const year = parseInt(node.year) || 0;
+                    const cites = parseInt(node.citations) || 0;
+                    let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
+                    let rawY = PLOT_HEIGHT - ((cites / maxCites) * PLOT_HEIGHT);
+                    const xPos = getStableJitter(node.id, rawX, jitterX);
+                    const yPos = getStableJitter(node.id, rawY, jitterY);
+                    return { data: node, position: { x: xPos, y: yPos } };
+                }),
+                edges: edges.map(edge => ({ data: edge }))
+            };
+            try {
+                window.cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: cyElements,
+                    layout: { name: 'preset', fit: true, padding: 100, animate: false },
+                    style: [
+                        { selector: 'node', style: { 'background-color': '#3b82f6', 'width': 15, 'height': 15, 'border-width': 1, 'border-color': '#fff', 'transition-property': 'width, height, background-color', 'transition-duration': '0.2s' } },
+                        { selector: 'node[is_main = "True"]', style: { 'background-color': '#f59e0b', 'width': 30, 'height': 30, 'border-width': 3, 'z-index': 10 } },
+                        { selector: 'node:hover', style: { 'width': 25, 'height': 25, 'border-width': 3, 'border-color': '#fff' } },
+                        { selector: 'edge', style: { 'width': 0.5, 'line-color': 'rgba(59, 130, 246, 0.2)', 'curve-style': 'straight', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'rgba(59, 130, 246, 0.3)', 'arrow-scale': 0.3 } }
+                    ],
+                    zoomingEnabled: true, userZoomingEnabled: false, panningEnabled: true, userPanningEnabled: true
+                });
+                window.cy.on('tap', 'node', function(evt) { const node = evt.target; focusOnNode(node.id()); });
+                window.cy.on('tap', function(event) { if( event.target === window.cy ){ closeInfoPanel(); } });
+            } catch (error) { console.error("Cytoscape Error:", error); }
+        }
+
+        function resetNodeStyles() {
+            if (!window.cy) return;
+            window.cy.nodes().forEach(node => {
+                const isMain = node.data('is_main') === "True";
+                if (isMain) {
+                    node.style('background-color', '#f59e0b');
+                    node.style('width', 30);
+                    node.style('height', 30);
+                    node.style('border-width', 3);
+                } else {
+                    node.style('background-color', '#3b82f6');
+                    node.style('width', 15);
+                    node.style('height', 15);
+                    node.style('border-width', 1);
+                }
+                node.style('border-color', '#fff');
+            });
+            window.cy.edges().forEach(edge => {
+                edge.style('line-color', 'rgba(59, 130, 246, 0.2)');
+                edge.style('target-arrow-color', 'rgba(59, 130, 246, 0.3)');
+            });
+        }
+
+        function focusOnNode(nodeId) {
+            if (!window.cy) return;
+            const node = window.cy.getElementById(nodeId);
+            if (!node) return;
+            resetNodeStyles();
+            node.style('background-color', '#ef4444');
+            node.style('border-color', '#ef4444');
+            node.style('width', 25);
+            node.style('height', 25);
+            const connectedEdges = node.connectedEdges();
+            connectedEdges.style('line-color', '#ef4444');
+            connectedEdges.style('target-arrow-color', '#ef4444');
+            showNodeDetails(node.data());
+            const nodePos = node.position();
+            const targetPan = {
+                x: (window.cy.width() / 2) - nodePos.x,
+                y: (window.cy.height() / 2) - nodePos.y
+            };
+            window.cy.animate({
+                pan: targetPan,
+                zoom: 1,
+                duration: 500,
+                easing: 'ease-out-cubic'
+            });
+            document.getElementById('zoomSlider').value = 1;
+            document.getElementById('zoomLabel').innerText = "100%";
+        }
+
+        function showNodeDetails(data) {
+            document.getElementById('detail-title').innerText = data.title || "No Title";
+            document.getElementById('detail-cites').innerText = data.citations || 0;
+            document.getElementById('detail-year').innerText = data.year || "N/A";
+            document.getElementById('detail-author').innerText = data.author || "Unknown";
+            
+            const doiText = document.getElementById('detail-doi');
+            const doiLink = document.getElementById('detail-link');
+            if (data.id && !data.id.startsWith('ref_')) {
+                doiText.innerText = data.id;
+                doiLink.href = `https://doi.org/${data.id}`;
+                doiLink.style.display = 'block';
+            } else {
+                doiText.innerText = data.id || "N/A";
+                doiLink.style.display = 'none';
+            }
+            document.getElementById('infoPanel').classList.add('open');
+        }
+
+        function closeInfoPanel() { 
+            document.getElementById('infoPanel').classList.remove('open');
+            resetNodeStyles();
+        }
+    </script>
+</body>
+</html>

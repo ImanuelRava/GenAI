@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 2: The Role of Metal | NiCOBot - GenAI Research</title>
+    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { background-color: var(--bg-gray); padding: 12px 0; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .header-layout { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .logo-section { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-icon { width: 40px; height: 40px; }
+        .logo-text { display: flex; flex-direction: column; }
+        .logo-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .logo-subtitle { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        nav ul { display: flex; list-style: none; gap: 20px; }
+        nav a { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.85rem; transition: color 0.2s; }
+        nav a:hover, nav a.active { color: var(--primary); }
+
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; }
+        .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; color: var(--text-secondary); }
+        .sidebar-item:hover { background: var(--bg-gray); color: var(--text-main); }
+        .sidebar-item.active { background: var(--bg-purple-light); color: var(--secondary); border-left-color: var(--secondary); }
+        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar-item-text { font-size: 0.85rem; font-weight: 500; }
+        .sidebar-section { padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color); }
+        .sidebar-section-title { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .content-area { flex: 1; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
+        .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
+        .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .content-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .content-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--secondary); display: inline-block; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--secondary); margin: 16px 0 8px; }
+        h4 { font-size: 1rem; font-weight: 600; color: var(--primary); margin: 12px 0 6px; }
+        p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
+        strong { color: var(--text-main); font-weight: 600; }
+        ul { list-style: none; padding: 0; margin-bottom: 16px; }
+        ul li { padding: 6px 0 6px 20px; position: relative; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; background: var(--secondary); border-radius: 50%; }
+
+        .info-box { background: var(--bg-purple-light); border-left: 4px solid var(--secondary); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px; margin: 16px 0; }
+        .info-box h4 { color: var(--secondary); font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .info-box p { margin-bottom: 0; font-size: 0.9rem; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+        .info-card { background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
+        .info-card:hover { border-color: var(--secondary); box-shadow: var(--shadow); }
+        .info-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .info-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+
+        /* 3D Viewer */
+        .viewer-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 15px; background: var(--bg-gray); border-radius: var(--radius); border: 1px solid var(--border-color); flex-wrap: wrap; }
+        .control-label { color: var(--secondary); font-weight: 600; font-size: 0.85rem; }
+        select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: var(--radius); font-family: inherit; cursor: pointer; }
+        select:focus { outline: none; border-color: var(--secondary); }
+        .viewer-container { width: 100%; height: 280px; background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); position: relative; overflow: hidden; }
+        .viewer-label { position: absolute; bottom: 8px; right: 10px; font-size: 0.7rem; color: var(--text-muted); background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 4px; z-index: 10; }
+
+        /* Oxidation States */
+        .oxi-flow { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px; padding: 20px; background: var(--bg-gray); border-radius: var(--radius); margin: 20px 0; }
+        .oxi-step { text-align: center; }
+        .oxi-state { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--accent); color: var(--accent); display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.1rem; margin: 0 auto 8px; background: var(--bg-green-light); }
+        .oxi-desc { font-size: 0.8rem; color: var(--text-muted); max-width: 120px; }
+        .oxi-arrow { font-size: 1.5rem; color: var(--text-muted); }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 0.9rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; gap: 6px; }
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-primary:hover { background: #6d28d9; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { background: var(--bg-gray); border-color: var(--secondary); color: var(--secondary); }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); flex-wrap: wrap; }
+
+        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
+        footer p { font-size: 0.7rem; color: var(--text-light); }
+
+        @media (max-width: 900px) {
+            .header-layout { flex-direction: column; gap: 8px; }
+            nav ul { justify-content: center; gap: 12px; }
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 150px; }
+            .sidebar-header { display: none; }
+            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px; }
+            .sidebar-item { padding: 6px 10px; border-left: none; border-radius: var(--radius); border: 1px solid var(--border-color); }
+            .sidebar-section { display: none; }
+            .sidebar-item-text { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-layout">
+            <a href="index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="redox-ligands.html">Redox Ligands</a></li>
+                    <li><a href="artificial-intelligence.html">AI</a></li>
+                    <li><a href="virus-research.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Module</span>
+                <div class="sidebar-subtitle">2. The Role of Metal</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="overview">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+            </ul>
+            <div class="sidebar-section"><span class="sidebar-section-title">Sections</span></div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" data-panel="orbitals">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20"/></svg>
+                    <span class="sidebar-item-text">d-Orbitals</span>
+                </li>
+                <li class="sidebar-item" data-panel="splitting">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+                    <span class="sidebar-item-text">Crystal Field</span>
+                </li>
+                <li class="sidebar-item" data-panel="backbond">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    <span class="sidebar-item-text">π-Backbonding</span>
+                </li>
+                <li class="sidebar-item" data-panel="redox">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    <span class="sidebar-item-text">Redox States</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            <div id="overview" class="content-panel active">
+                <div class="content-header">
+                    <h1>The Role of Transition Metals</h1>
+                    <p>Cross-coupling is not merely a matter of mixing reagents; it is a quantum mechanical event orchestrated by the transition metal. The metal's ability to manipulate electrons via its d-orbitals transforms thermodynamically unfavorable reactions into spontaneous processes.</p>
+                </div>
+                <h2>What You'll Learn</h2>
+                <ul>
+                    <li>Electron wavefunctions and d-orbital shapes</li>
+                    <li>Crystal Field Theory and orbital splitting</li>
+                    <li>The Dewar-Chatt-Duncanson model for bond activation</li>
+                    <li>The 18-electron rule and redox flexibility</li>
+                </ul>
+                <div class="info-box">
+                    <h4>Why Nickel?</h4>
+                    <p>Nickel can access oxidation states +1 and +3, enabling Single Electron Transfer (SET) mechanisms. This allows Ni to couple inert alkyl halides and C(sp³)-O bonds that Palladium cannot touch.</p>
+                </div>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-primary" onclick="showPanel('orbitals'); return false;">Start Learning →</a>
+                    <a href="quiz.html" class="btn btn-outline">Take Quiz</a>
+                </div>
+            </div>
+
+            <div id="orbitals" class="content-panel">
+                <div class="content-header">
+                    <h1>Electron Wavefunctions & d-Orbitals</h1>
+                    <p>According to the Schrödinger equation, electrons exist as wavefunctions (Ψ). The shapes we visualize (orbitals) represent regions where the probability of finding an electron is high (Ψ²).</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>Key Concept: Nodes and Phases</h4>
+                    <p>Each lobe of a p or d orbital has a mathematical sign (phase): positive (+) or negative (-). When orbitals overlap during bond formation, "like" phases constructively interfere (bonding), while "opposite" phases destructively interfere (antibonding).</p>
+                </div>
+
+                <div class="viewer-controls">
+                    <span class="control-label">Visualize Orbital:</span>
+                    <select id="orbitalSelector">
+                        <option value="s">s-orbital (Spherical)</option>
+                        <option value="p_x">p-orbital (px)</option>
+                        <option value="p_y">p-orbital (py)</option>
+                        <option value="p_z">p-orbital (pz)</option>
+                        <option value="d_xy" selected>d-orbital (dxy)</option>
+                        <option value="d_x2-y2">d-orbital (dx²-y²)</option>
+                        <option value="d_z2">d-orbital (dz²)</option>
+                    </select>
+                </div>
+
+                <div id="orbitalViewer" class="viewer-container">
+                    <span class="viewer-label">Interactive 3D Viewport</span>
+                </div>
+
+                <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">
+                    Observe the <strong>dxy</strong> orbital. Note the nodal planes along the X and Z axes. The alternating colors represent opposite wavefunction phases.
+                </p>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('overview'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('splitting'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <div id="splitting" class="content-panel">
+                <div class="content-header">
+                    <h1>Crystal Field Theory & d-Orbital Splitting</h1>
+                    <p>In a free ion, all five d-orbitals are degenerate (same energy). However, when ligands approach the metal, they repel the d-electrons, causing the orbitals to split into different energy levels.</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>The Octahedral Splitting (Δoct)</h4>
+                    <p>In an octahedral complex (ML₆), ligands approach along the Cartesian axes (X, Y, Z). Orbitals pointing <strong>directly</strong> at ligands (dx²-y², dz²) experience maximum repulsion and become higher energy (eg set). Orbitals lying <strong>between</strong> the ligands (dxy, dxz, dyz) experience less repulsion and become lower energy (t₂g set).</p>
+                </div>
+
+                <h3>High Spin vs. Low Spin</h3>
+                <p>The energy gap (Δ) determines the electronic configuration. If the ligand field is weak (small Δ), electrons occupy higher orbitals to avoid pairing energy (P) — this is <strong>High Spin</strong>. If the ligand field is strong (large Δ), electrons pair up in lower orbitals — this is <strong>Low Spin</strong>.</p>
+
+                <h3>Impact on Catalysis</h3>
+                <ul>
+                    <li><strong>Stability:</strong> A large Δ (strong field ligands like CO or CN⁻) stabilizes low oxidation states, facilitating Reductive Elimination.</li>
+                    <li><strong>Reactivity:</strong> A small Δ (weak field) keeps the metal in a high-spin state, often making it more labile, which favors Oxidative Addition.</li>
+                </ul>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('orbitals'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('backbond'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <div id="backbond" class="content-panel">
+                <div class="content-header">
+                    <h1>The Dewar-Chatt-Duncanson Model</h1>
+                    <p>In advanced couplings (Stille, Sonogashira), the bond between the metal and the nucleophile is a synergistic two-way street described by the Dewar-Chatt-Duncanson model.</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4 style="color: var(--primary);">σ-Donation</h4>
+                        <p>The filled σ bonding orbital of the ligand (e.g., the C=C π bond) overlaps with an empty hybrid orbital on the metal. This donates electron density <strong>to</strong> the metal.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4 style="color: var(--secondary);">π-Backbonding</h4>
+                        <p>Filled metal d-orbitals overlap with the empty π* antibonding orbital of the ligand. This donates electron density <strong>back</strong> to the ligand, weakening its internal bond.</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Synergy & Bond Activation</h4>
+                    <p>Crucially, populating the ligand's π* orbital weakens the ligand's internal bond. For example, in alkene coordination, the C=C bond lengthens and weakens, effectively "priming" it for the next step in the catalytic cycle.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('splitting'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('redox'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <div id="redox" class="content-panel">
+                <div class="content-header">
+                    <h1>The 18-Electron Rule & Redox States</h1>
+                    <p>Transition metals tend to achieve 18 valence electrons (noble gas configuration). However, <strong>catalysis requires instability</strong> — the metal must oscillate between saturated and unsaturated configurations.</p>
+                </div>
+
+                <h3>Oxidation State Flow</h3>
+                <div class="oxi-flow">
+                    <div class="oxi-step">
+                        <div class="oxi-state">M(0)</div>
+                        <div class="oxi-desc">d¹⁰ config. Stable 18e⁻, often 14e or 16e complex</div>
+                    </div>
+                    <span class="oxi-arrow">➜</span>
+                    <div class="oxi-step">
+                        <div class="oxi-state">M(II)</div>
+                        <div class="oxi-desc">d⁸ config. Square planar. Strong ligands stabilize</div>
+                    </div>
+                    <span class="oxi-arrow">➜</span>
+                    <div class="oxi-step">
+                        <div class="oxi-state">M(IV)</div>
+                        <div class="oxi-desc">d⁶ config. Accessible to Ni. High energy state</div>
+                    </div>
+                </div>
+
+                <h3>The "Chameleonic" Nature of Nickel</h3>
+                <p>Palladium generally cycles between 0 and +2 via a two-electron redox process. Nickel is unique because it can access <strong>+1 and +3 oxidation states</strong>, enabling Single Electron Transfer (SET) mechanisms for coupling inert substrates.</p>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('backbond'); return false;">← Back</a>
+                    <a href="lecture-3-mechanism.html" class="btn btn-primary">Next Module →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer><p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p></footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+        function showPanel(panelId) {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentPanels.forEach(p => p.classList.remove('active'));
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => showPanel(item.getAttribute('data-panel')));
+        });
+
+        // 3D Orbital Viewer
+        let orbitalViewer = null;
+        function drawAxes(v) {
+            const axisLen = 4;
+            v.addCylinder({start: {x:0,y:0,z:0}, end: {x:axisLen,y:0,z:0}, radius: 0.05, color: 'red'});
+            v.addLabel("X", {position: {x:axisLen+0.2, y:0, z:0}, fontColor: 'red', fontSize: 12});
+            v.addCylinder({start: {x:0,y:0,z:0}, end: {x:0,y:axisLen,z:0}, radius: 0.05, color: 'green'});
+            v.addLabel("Y", {position: {x:0, y:axisLen+0.2, z:0}, fontColor: 'green', fontSize: 12});
+            v.addCylinder({start: {x:0,y:0,z:0}, end: {x:0,y:0,z:axisLen}, radius: 0.05, color: 'blue'});
+            v.addLabel("Z", {position: {x:0, y:0, z:axisLen+0.2}, fontColor: 'blue', fontSize: 12});
+        }
+        function drawOrbital(v, type) {
+            v.clear();
+            drawAxes(v);
+            v.addSphere({center: {x:0, y:0, z:0}, radius: 0.4, color: 'white', opacity: 0.9});
+            const lobeRadius = 1.2, baseDist = 1.8, diagDist = baseDist / 1.414;
+            const lobe1 = "#3b82f6", lobe2 = "#7c3aed";
+            switch(type) {
+                case 's': v.addSphere({center: {x:0, y:0, z:0}, radius: 1.5, color: lobe1, opacity: 0.5}); break;
+                case 'p_x':
+                    v.addSphere({center: {x:baseDist, y:0, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:-baseDist, y:0, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    break;
+                case 'p_y':
+                    v.addSphere({center: {x:0, y:baseDist, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:0, y:-baseDist, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    break;
+                case 'p_z':
+                    v.addSphere({center: {x:0, y:0, z:baseDist}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:0, y:0, z:-baseDist}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    break;
+                case 'd_xy':
+                    v.addSphere({center: {x:diagDist, y:diagDist, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:-diagDist, y:-diagDist, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:-diagDist, y:diagDist, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    v.addSphere({center: {x:diagDist, y:-diagDist, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    break;
+                case 'd_x2-y2':
+                    v.addSphere({center: {x:baseDist, y:0, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:-baseDist, y:0, z:0}, radius: lobeRadius, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:0, y:baseDist, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    v.addSphere({center: {x:0, y:-baseDist, z:0}, radius: lobeRadius, color: lobe2, opacity: 0.6});
+                    break;
+                case 'd_z2':
+                    v.addSphere({center: {x:0, y:0, z:2.2}, radius: 1.1, color: lobe1, opacity: 0.6});
+                    v.addSphere({center: {x:0, y:0, z:-2.2}, radius: 1.1, color: lobe1, opacity: 0.6});
+                    for (let i = 0; i < 32; i++) {
+                        const angle = (i / 32) * 2 * Math.PI;
+                        v.addSphere({center: {x: Math.cos(angle) * 1.3, y: Math.sin(angle) * 1.3, z: 0}, radius: 0.35, color: lobe2, opacity: 0.7});
+                    }
+                    break;
+            }
+            v.zoomTo();
+            v.rotate(45, 'x');
+            v.render();
+        }
+        function initOrbitalViewer() {
+            const container = document.getElementById('orbitalViewer');
+            if (!container) return;
+            orbitalViewer = $3Dmol.createViewer(container, { backgroundColor: "transparent" });
+            const selector = document.getElementById('orbitalSelector');
+            drawOrbital(orbitalViewer, selector.value);
+            selector.addEventListener('change', (e) => drawOrbital(orbitalViewer, e.target.value));
+        }
+        setTimeout(initOrbitalViewer, 100);
+    </script>
+</body>
+</html>

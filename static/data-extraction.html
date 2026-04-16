@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Extraction | NiCOBot - GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-green-light: #d1fae5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* --- Step List --- */
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .step-content p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- Info Box --- */
+        .info-box {
+            background: linear-gradient(135deg, var(--bg-green-light) 0%, var(--bg-gray) 100%);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .info-box h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .info-box p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-main);
+        }
+
+        .content-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .content-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .content-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="nicobot.html" class="active">NiCOBot</a></li>
+                    <li><a href="redox-ligands.html">Redox Ligands</a></li>
+                    <li><a href="artificial-intelligence.html">AI</a></li>
+                    <li><a href="virus-research.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">About This Tool</div>
+                <p class="sidebar-text">Automated extraction of chemical reaction data from scientific literature using PDF parsing and natural language processing.</p>
+                
+                <div class="info-box">
+                    <h4>OpenChemie App</h4>
+                    <p>Advanced NLP algorithms and chemical entity recognition to parse PDF documents.</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">How It Works</div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Upload PDF</h4>
+                            <p>Upload your scientific paper or article</p>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>AI Analysis</h4>
+                            <p>NLP extracts chemical entities and data</p>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Extract Data</h4>
+                            <p>Get structured reaction information</p>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Export Results</h4>
+                            <p>Download data in various formats</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Extracted Data</div>
+                <ul class="step-list">
+                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
+                        <div class="step-content">
+                            <h4>Reactants & Products</h4>
+                            <p>Chemical structures and compounds</p>
+                        </div>
+                    </li>
+                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
+                        <div class="step-content">
+                            <h4>Reaction Conditions</h4>
+                            <p>Temperature, time, solvents</p>
+                        </div>
+                    </li>
+                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
+                        <div class="step-content">
+                            <h4>Catalysts & Ligands</h4>
+                            <p>Metal catalysts and ligand systems</p>
+                        </div>
+                    </li>
+                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
+                        <div class="step-content">
+                            <h4>Yields & Selectivity</h4>
+                            <p>Reaction outcomes and metrics</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <div class="content-header">
+                <h2>OpenChemie Extraction Tool</h2>
+                <p>Extract structured chemical data from PDF documents</p>
+            </div>
+            <div class="iframe-container">
+                <iframe src="https://openchemie-app.streamlit.app/?embed=true" allow-scripts allow-same-origin></iframe>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by NiCOBot AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+</body>
+</html>
