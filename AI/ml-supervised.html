@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Supervised Learning | AI Education - GenAI Research</title>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-pink-light: #fce7f3;
+            --bg-cyan-light: #cffafe;
+            --bg-orange-light: #ffedd5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* Main Layout */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; color: var(--text-secondary); }
+        .sidebar-item:hover { background: var(--bg-gray); color: var(--text-main); }
+        .sidebar-item.active { background: var(--bg-blue-light); color: var(--primary); border-left-color: var(--primary); }
+        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar-item-text { font-size: 0.85rem; font-weight: 500; }
+        .sidebar-section { padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color); }
+        .sidebar-section-title { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Content Area */
+        .content-area { flex: 1; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
+        .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
+        .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .content-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .content-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-block; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin: 16px 0 8px; }
+        p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        ul { list-style: none; padding: 0; margin-bottom: 16px; }
+        ul li { padding: 6px 0 6px 20px; position: relative; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .content-panel ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+        /* Info Box */
+        .info-box { background: var(--bg-blue-light); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px; margin: 16px 0; }
+        .info-box h4 { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .info-box p { margin-bottom: 0; font-size: 0.9rem; }
+        .info-box.warning { background: var(--bg-orange-light); border-left-color: var(--warning); }
+        .info-box.warning h4 { color: var(--warning); }
+        .info-box.success { background: var(--bg-green-light); border-left-color: var(--accent); }
+        .info-box.success h4 { color: var(--accent); }
+        .info-box.purple { background: var(--bg-purple-light); border-left-color: var(--secondary); }
+        .info-box.purple h4 { color: var(--secondary); }
+
+        /* Cards Grid */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+        .info-card { background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
+        .info-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .info-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .info-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+        .info-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+
+        /* Formula Box */
+        .formula-box { background: var(--bg-dark); color: #ffffff; padding: 16px 20px; border-radius: var(--radius); font-family: 'Fira Code', 'Courier New', monospace; margin: 16px 0; overflow-x: auto; }
+        .formula-box p { color: #ffffff; margin-bottom: 8px; }
+        .formula-box strong { color: #ffffff; }
+        .formula-box .comment { color: #a0a0a0; }
+        .formula-box .keyword { color: #ff79c6; }
+        .formula-box .function { color: #50fa7b; }
+        .formula-box .string { color: #f1fa8c; }
+        .formula-box .number { color: #bd93f9; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--bg-main); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); }
+        .data-table th { background: var(--primary); color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 0.85rem; }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background: var(--bg-gray); }
+
+        /* Steps */
+        .steps-container { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--accent); }
+        .step-number { width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
+
+        /* Diagram */
+        .diagram-container { background: var(--bg-gray); border-radius: var(--radius); padding: 24px; margin: 16px 0; }
+        .diagram-flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px; }
+        .diagram-box { padding: 12px 20px; border-radius: var(--radius); font-weight: 600; text-align: center; min-width: 100px; }
+        .diagram-box.input { background: var(--bg-blue-light); border: 2px solid var(--primary); color: var(--primary); }
+        .diagram-box.process { background: var(--bg-purple-light); border: 2px solid var(--secondary); color: var(--secondary); }
+        .diagram-box.output { background: var(--bg-green-light); border: 2px solid var(--accent); color: var(--accent); }
+        .diagram-arrow { font-size: 1.5rem; color: var(--text-muted); }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 0.9rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { background: var(--bg-gray); border-color: var(--primary); color: var(--primary); }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+
+        /* Footer */
+        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
+        footer p { font-size: 0.7rem; color: var(--text-light); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .header-layout { flex-direction: column; gap: 8px; }
+            nav ul { justify-content: center; gap: 12px; }
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 150px; }
+            .sidebar-header { display: none; }
+            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px; }
+            .sidebar-item { padding: 6px 10px; border-left: none; border-radius: var(--radius); border: 1px solid var(--border-color); }
+            .sidebar-section { display: none; }
+            .sidebar-item-text { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="./" class="active">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Module</span>
+                <div class="sidebar-subtitle">2. Supervised Learning</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="overview">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-section">
+                <span class="sidebar-section-title">Sections</span>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" data-panel="classification">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span class="sidebar-item-text">Classification</span>
+                </li>
+                <li class="sidebar-item" data-panel="regression">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Regression</span>
+                </li>
+                <li class="sidebar-item" data-panel="trees">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                        <polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                    </svg>
+                    <span class="sidebar-item-text">Decision Trees</span>
+                </li>
+                <li class="sidebar-item" data-panel="evaluation">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="16"/>
+                    </svg>
+                    <span class="sidebar-item-text">Evaluation Metrics</span>
+                </li>
+                <li class="sidebar-item" data-panel="overfitting">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overfitting & Bias</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Panel -->
+            <div id="overview" class="content-panel active">
+                <div class="content-header">
+                    <h1>Supervised Learning</h1>
+                    <p>Supervised learning is the most common type of machine learning, where the algorithm learns from labeled training data to make predictions on new, unseen data. This module covers the fundamental algorithms, evaluation methods, and best practices for building effective supervised learning models.</p>
+                </div>
+
+                <h2>Learning Objectives</h2>
+                <ul>
+                    <li>Understand the difference between classification and regression problems</li>
+                    <li>Master fundamental algorithms: Linear/Logistic Regression, Decision Trees, SVMs</li>
+                    <li>Learn proper model evaluation metrics and validation techniques</li>
+                    <li>Identify and address overfitting and underfitting issues</li>
+                    <li>Apply supervised learning to chemistry and scientific problems</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <div class="diagram-flow">
+                        <div class="diagram-box input">Training Data<br><small>(X, y pairs)</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-box process">Learning<br>Algorithm</div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-box process">Trained<br>Model</div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-box output">Predictions<br><small>ŷ = f(X)</small></div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>The Supervised Learning Paradigm</h4>
+                    <p>In supervised learning, we have input features X and corresponding target labels y. The goal is to learn a mapping function f: X → y that generalizes well to new data. The "supervision" comes from the labeled examples that guide the learning process.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="ml-basics.html" class="btn btn-outline">← Previous Module</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('classification'); return false;">Start Learning →</a>
+                </div>
+            </div>
+
+            <!-- Classification Panel -->
+            <div id="classification" class="content-panel">
+                <div class="content-header">
+                    <h1>Classification Algorithms</h1>
+                    <p>Classification is the task of predicting discrete labels or categories. It's one of the most widely used ML tasks, from spam detection to disease diagnosis.</p>
+                </div>
+
+                <h2>Binary vs Multi-Class Classification</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <div class="icon">🔘</div>
+                        <h4>Binary Classification</h4>
+                        <p>Two possible outcomes (e.g., spam/not spam, toxic/non-toxic molecule). Output is typically a probability that's thresholded at 0.5.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">🎯</div>
+                        <h4>Multi-Class Classification</h4>
+                        <p>Three or more possible categories (e.g., reaction type classification, compound activity level). Uses softmax for probability distribution.</p>
+                    </div>
+                </div>
+
+                <h2>Logistic Regression</h2>
+                <p>Despite its name, logistic regression is used for classification. It models the probability of an instance belonging to a class using the sigmoid function.</p>
+
+                <div class="formula-box">
+                    <p><strong>Sigmoid Function:</strong></p>
+                    $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+                    <p><strong>Logistic Regression Model:</strong></p>
+                    $$P(y=1|x) = \sigma(w \cdot x + b)$$
+                    <p><strong>Cross-Entropy Loss:</strong></p>
+                    $$L = -\sum \left[ y \cdot \log(\hat{y}) + (1-y) \cdot \log(1-\hat{y}) \right]$$
+                </div>
+
+                <h3>Key Properties</h3>
+                <ul>
+                    <li><strong>Probabilistic Output:</strong> Returns probabilities, not just class labels</li>
+                    <li><strong>Interpretable:</strong> Weights indicate feature importance and direction</li>
+                    <li><strong>Linear Decision Boundary:</strong> Can only separate linearly separable classes</li>
+                    <li><strong>Regularization:</strong> L1/L2 penalties prevent overfitting</li>
+                </ul>
+
+                <h2>Support Vector Machines (SVM)</h2>
+                <p>SVMs find the optimal hyperplane that maximizes the margin between classes. They can handle non-linear boundaries using kernel functions.</p>
+                
+                <div class="info-box purple">
+                    <h4>Kernel Trick</h4>
+                    <p>Kernels transform data into higher-dimensional space where it becomes linearly separable. Common kernels: RBF (Gaussian), Polynomial, Sigmoid. The "kernel trick" computes these transformations efficiently without explicitly computing the high-dimensional coordinates.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('overview'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('regression'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Regression Panel -->
+            <div id="regression" class="content-panel">
+                <div class="content-header">
+                    <h1>Regression Algorithms</h1>
+                    <p>Regression predicts continuous numerical values. It's essential for tasks like predicting molecular properties, reaction yields, or binding affinities.</p>
+                </div>
+
+                <h2>Linear Regression</h2>
+                <p>The simplest regression model assumes a linear relationship between input features and the target variable.</p>
+
+                <div class="formula-box">
+                    <p><strong>Simple Linear Regression:</strong></p>
+                    $$y = w \cdot x + b$$
+                    <p><strong>Multiple Linear Regression:</strong></p>
+                    $$y = w_1 x_1 + w_2 x_2 + \cdots + w_n x_n + b$$
+                    <p><strong>Ordinary Least Squares (OLS):</strong></p>
+                    $$\text{minimize} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+                    <p><strong>Gradient Descent Update:</strong></p>
+                    $$w_{\text{new}} = w_{\text{old}} - \alpha \cdot \frac{\partial L}{\partial w}$$
+                </div>
+
+                <h3>Assumptions of Linear Regression</h3>
+                <ul>
+                    <li><strong>Linearity:</strong> Relationship between X and y is linear</li>
+                    <li><strong>Independence:</strong> Observations are independent of each other</li>
+                    <li><strong>Homoscedasticity:</strong> Residuals have constant variance</li>
+                    <li><strong>Normality:</strong> Residuals are normally distributed</li>
+                </ul>
+
+                <h2>Regularized Regression</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Ridge (L2)</h4>
+                        <p>Penalty: $\alpha \sum w^2$. Shrinks coefficients toward zero but never exactly zero. Good for multicollinearity.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Lasso (L1)</h4>
+                        <p>Penalty: $\alpha \sum |w|$. Can drive coefficients to exactly zero, performing feature selection automatically.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Elastic Net</h4>
+                        <p>Combines L1 and L2 penalties. Useful when features are correlated and you want feature selection.</p>
+                    </div>
+                </div>
+
+                <h2>Polynomial Regression</h2>
+                <p>When relationships are non-linear, polynomial features can be added to capture curvature:</p>
+                <div class="formula-box">
+                    $$y = w_0 + w_1 x + w_2 x^2 + w_3 x^3 + \cdots + w_n x^n$$
+                </div>
+
+                <div class="info-box warning">
+                    <h4>Warning: Polynomial Degree</h4>
+                    <p>Higher polynomial degrees can lead to overfitting. The model may fit training data perfectly but generalize poorly. Always use cross-validation to select the optimal degree.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('classification'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('trees'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Trees Panel -->
+            <div id="trees" class="content-panel">
+                <div class="content-header">
+                    <h1>Decision Trees & Ensembles</h1>
+                    <p>Decision trees are intuitive models that split data based on feature values. Ensemble methods combine multiple trees for improved performance.</p>
+                </div>
+
+                <h2>How Decision Trees Work</h2>
+                <p>Decision trees recursively partition the feature space by selecting the best split at each node. The selection criteria differ for classification and regression:</p>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Classification Trees</h4>
+                        <p><strong>Gini Impurity:</strong> Measures the probability of misclassification. A pure node has Gini = 0.</p>
+                        <div class="formula-box" style="margin-top: 8px;">
+                            $$\text{Gini} = 1 - \sum p_i^2$$
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Regression Trees</h4>
+                        <p><strong>Variance Reduction:</strong> Minimizes variance within each split. Predictions are mean values of leaf nodes.</p>
+                        <div class="formula-box" style="margin-top: 8px;">
+                            $$\text{MSE} = \frac{\sum (y_i - \bar{y})^2}{n}$$
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Ensemble Methods</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Random Forest</h4>
+                            <p>Builds many decision trees on random subsets of data and features. Final prediction is the average (regression) or majority vote (classification). Reduces overfitting significantly.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Gradient Boosting</h4>
+                            <p>Builds trees sequentially, where each tree corrects errors of previous ones. Popular implementations: XGBoost, LightGBM, CatBoost. Often wins Kaggle competitions.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>AdaBoost</h4>
+                            <p>Adaptive Boosting focuses on misclassified samples by adjusting their weights. Combines weak learners (often stumps) into a strong classifier.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <h4>Why Trees Work Well for Chemistry</h4>
+                    <p>Decision trees handle mixed data types (categorical and numerical), don't require feature scaling, and provide interpretable decision paths. They naturally handle missing values and are robust to outliers—making them ideal for molecular property prediction and QSAR modeling.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('regression'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('evaluation'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Evaluation Panel -->
+            <div id="evaluation" class="content-panel">
+                <div class="content-header">
+                    <h1>Evaluation Metrics</h1>
+                    <p>Choosing the right evaluation metric is crucial for model selection. Different metrics capture different aspects of model performance.</p>
+                </div>
+
+                <h2>Classification Metrics</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Formula</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Accuracy</strong></td>
+                            <td>(TP + TN) / Total</td>
+                            <td>Balanced classes, equal cost of errors</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Precision</strong></td>
+                            <td>TP / (TP + FP)</td>
+                            <td>When false positives are costly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Recall</strong></td>
+                            <td>TP / (TP + FN)</td>
+                            <td>When false negatives are costly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F1 Score</strong></td>
+                            <td>2 × (P × R) / (P + R)</td>
+                            <td>Balanced precision and recall</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AUC-ROC</strong></td>
+                            <td>Area under ROC curve</td>
+                            <td>Overall ranking performance</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Regression Metrics</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>MAE (Mean Absolute Error)</h4>
+                        <p>Average of absolute errors. Robust to outliers. Same units as target variable.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>MSE (Mean Squared Error)</h4>
+                        <p>Average of squared errors. Penalizes large errors more heavily. Differentiable for optimization.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>RMSE</h4>
+                        <p>Square root of MSE. Same units as target. Most commonly reported metric.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>R² (Coefficient of Determination)</h4>
+                        <p>Fraction of variance explained. 1.0 = perfect fit, 0.0 = baseline, <0 = worse than baseline.</p>
+                    </div>
+                </div>
+
+                <h2>Cross-Validation</h2>
+                <p>Cross-validation provides a more robust estimate of model performance by using multiple train-test splits:</p>
+                <ul>
+                    <li><strong>K-Fold CV:</strong> Split data into K folds, train on K-1, test on 1, repeat K times</li>
+                    <li><strong>Stratified K-Fold:</strong> Maintains class distribution in each fold (for classification)</li>
+                    <li><strong>Leave-One-Out:</strong> K = N (number of samples), computationally expensive but maximum data usage</li>
+                </ul>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('trees'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('overfitting'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Overfitting Panel -->
+            <div id="overfitting" class="content-panel">
+                <div class="content-header">
+                    <h1>Overfitting & Bias-Variance Tradeoff</h1>
+                    <p>Understanding the bias-variance tradeoff is essential for building models that generalize well to new data.</p>
+                </div>
+
+                <h2>The Bias-Variance Decomposition</h2>
+                <div class="formula-box">
+                    $$\text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}$$
+                    <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 12px;">Where: Bias = systematic error (underfitting), Variance = sensitivity to training data (overfitting), Irreducible Error = noise in the data</p>
+                </div>
+
+                <h2>Three Regimes</h2>
+                <div class="cards-grid">
+                    <div class="info-card" style="border-left: 4px solid var(--red);">
+                        <h4>Underfitting (High Bias)</h4>
+                        <p>Model is too simple to capture patterns. High training error and high test error. Solution: Add features, increase model complexity, reduce regularization.</p>
+                    </div>
+                    <div class="info-card" style="border-left: 4px solid var(--accent);">
+                        <h4>Optimal Fit</h4>
+                        <p>Balanced bias and variance. Training error slightly higher than perfect fit, but test error is minimized. This is the goal of model selection.</p>
+                    </div>
+                    <div class="info-card" style="border-left: 4px solid var(--warning);">
+                        <h4>Overfitting (High Variance)</h4>
+                        <p>Model memorizes training data. Low training error, high test error. Solution: More data, regularization, simpler model, early stopping.</p>
+                    </div>
+                </div>
+
+                <h2>Regularization Techniques</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>L1/L2 Regularization</h4>
+                            <p>Add penalty terms to the loss function. L1 (Lasso) encourages sparsity, L2 (Ridge) shrinks weights smoothly.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Dropout (Neural Networks)</h4>
+                            <p>Randomly zero out neurons during training. Forces network to learn redundant representations.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Early Stopping</h4>
+                            <p>Stop training when validation error starts increasing. Prevents model from memorizing training data.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Data Augmentation</h4>
+                            <p>Create additional training examples through transformations. Particularly useful for image and molecular data.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Key Takeaway</h4>
+                    <p>The goal is not to minimize training error, but to minimize generalization error. Always evaluate on held-out test data, and use validation sets for hyperparameter tuning. A model that performs perfectly on training data but poorly on test data has failed its purpose.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('evaluation'); return false;">← Back</a>
+                    <a href="ml-deeplearning.html" class="btn btn-primary">Next Module →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        function showPanel(panelId) {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentPanels.forEach(p => p.classList.remove('active'));
+            
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const panelId = item.getAttribute('data-panel');
+                showPanel(panelId);
+            });
+        });
+    </script>
+</body>
+</html>

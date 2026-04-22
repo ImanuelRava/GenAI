@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Graph | TMC - GenAI Research</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --pink: #ec4899;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Right Panel --- */
+        .right-panel {
+            width: 320px;
+            background: var(--bg-main);
+            border-left: 1px solid var(--border-color);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .right-panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-gray);
+        }
+
+        .right-panel-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .right-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .ai-explanation-box {
+            background: linear-gradient(135deg, var(--bg-blue-light) 0%, #f0f9ff 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .ai-explanation-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-explanation-content {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        .ai-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .ai-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .ai-placeholder-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .selected-node-info {
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .selected-node-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .selected-node-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* --- Topic Input --- */
+        .topic-input-section {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .topic-input-section label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .topic-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .topic-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            background: var(--bg-main);
+            transition: border-color 0.2s;
+        }
+
+        .topic-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-generate {
+            padding: 10px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-generate:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-generate:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* --- LLM Toggle --- */
+        .llm-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* --- LLM Badge --- */
+        .llm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .llm-badge.active {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            color: white;
+        }
+
+        .llm-badge.fallback {
+            background: var(--bg-gray);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- Quick Topics --- */
+        .quick-topics {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quick-topics-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .quick-topic-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 4px 4px 4px 0;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-topic-btn:hover {
+            background: var(--bg-blue-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* --- PDF Upload Section --- */
+        .pdf-upload-section {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pdf-upload-section label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .pdf-drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-gray);
+        }
+
+        .pdf-drop-zone:hover,
+        .pdf-drop-zone.dragover {
+            border-color: var(--primary);
+            background: var(--bg-blue-light);
+        }
+
+        .pdf-drop-zone.has-file {
+            border-color: var(--accent);
+            background: var(--bg-green-light);
+        }
+
+        .pdf-drop-zone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .pdf-drop-zone-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .pdf-drop-zone-text strong {
+            color: var(--primary);
+        }
+
+        .pdf-file-info {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-green-light);
+            border-radius: var(--radius);
+            margin-top: 8px;
+        }
+
+        .pdf-file-info.show {
+            display: flex;
+        }
+
+        .pdf-file-name {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pdf-file-remove {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .pdf-file-remove:hover {
+            color: var(--red);
+        }
+
+        #pdfInput {
+            display: none;
+        }
+
+        /* --- Status Section --- */
+        .status-section {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .llm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 12px;
+        }
+
+        .llm-badge.active {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            color: white;
+        }
+
+        .llm-badge.fallback {
+            background: var(--bg-gray);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- Legend --- */
+        .legend {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-gray);
+        }
+
+        .legend-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 8px 4px 0;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* --- Graph Area --- */
+        .graph-area {
+            flex: 1;
+            background: var(--bg-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- Graph Styles --- */
+        .node {
+            cursor: pointer;
+        }
+
+        .node circle {
+            stroke-width: 2px;
+            transition: all 0.2s;
+        }
+
+        .node:hover circle {
+            stroke-width: 3px;
+            filter: brightness(1.1);
+        }
+
+        .node.selected circle {
+            stroke-width: 4px;
+            stroke: var(--text-main);
+        }
+
+        .node text {
+            font-size: 11px;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .edge {
+            stroke: var(--border-color);
+            stroke-width: 1.5px;
+            fill: none;
+        }
+
+        .edge-label {
+            font-size: 9px;
+            fill: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* --- Loading Overlay --- */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- Graph Area --- */
+        .graph-area {
+            flex: 1;
+            background: var(--bg-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node circle {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .node:hover circle {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+
+        .node.selected circle {
+            stroke-width: 3px;
+            stroke: #fbbf24;
+        }
+
+        .node text {
+            font-size: 10px;
+            font-weight: 600;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .edge {
+            fill: none;
+            stroke: #9ca3af;
+            stroke-width: 1.5px;
+        }
+
+        .edge-label {
+            font-size: 9px;
+            fill: #6b7280;
+            pointer-events: none;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.7rem;
+            margin-right: 8px;
+            color: var(--text-muted);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 200px;
+            }
+
+            .right-panel {
+                display: none;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .topic-input-section,
+            .quick-topics,
+            .node-info-panel,
+            .legend {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">AI Feature</span>
+                <div class="sidebar-subtitle">Knowledge Graph</div>
+            </div>
+
+            <!-- Topic Input -->
+            <div class="topic-input-section">
+                <label>Explore a Topic</label>
+                <div class="topic-input-wrapper">
+                    <input type="text" class="topic-input" id="topicInput" placeholder="e.g., Suzuki coupling..." value="cross-coupling">
+                    <button class="btn-generate" id="generateBtn" onclick="generateGraph()">Generate</button>
+                </div>
+                <div class="llm-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="llmToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">AI-Powered Generation</span>
+                </div>
+            </div>
+
+            <!-- Quick Topics -->
+            <div class="quick-topics">
+                <div class="quick-topics-title">Quick Topics</div>
+                <button class="quick-topic-btn" onclick="setTopic('Suzuki')">Suzuki</button>
+                <button class="quick-topic-btn" onclick="setTopic('Heck')">Heck</button>
+                <button class="quick-topic-btn" onclick="setTopic('Nickel')">Nickel</button>
+                <button class="quick-topic-btn" onclick="setTopic('cross-coupling')">Cross-Coupling</button>
+                <button class="quick-topic-btn" onclick="setTopic('oxidative addition')">Oxidative Addition</button>
+                <button class="quick-topic-btn" onclick="setTopic('palladium')">Palladium</button>
+                <button class="quick-topic-btn" onclick="setTopic('C-H activation')">C-H Activation</button>
+            </div>
+
+            <!-- PDF Upload Section -->
+            <div class="pdf-upload-section">
+                <label>Upload PDF Document</label>
+                <div class="pdf-drop-zone" id="pdfDropZone" onclick="document.getElementById('pdfInput').click()">
+                    <div class="pdf-drop-zone-icon">📄</div>
+                    <div class="pdf-drop-zone-text">
+                        <strong>Click to upload</strong> or drag & drop
+                        <br><span style="font-size: 0.75rem;">PDF files only (max 10MB)</span>
+                    </div>
+                </div>
+                <input type="file" id="pdfInput" accept=".pdf" onchange="handlePdfUpload(event)">
+                <div class="pdf-file-info" id="pdfFileInfo">
+                    <span>📑</span>
+                    <span class="pdf-file-name" id="pdfFileName"></span>
+                    <span class="pdf-file-remove" onclick="clearPdfFile()">✕</span>
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="status-section" id="statusSection">
+                <div class="status-icon">✨</div>
+                <div class="status-text">
+                    Enter a topic or upload a PDF to generate a knowledge graph.
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-title">Node Types</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--primary);"></div> Reaction</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--secondary);"></div> Catalyst</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--accent);"></div> Reagent</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--warning);"></div> Mechanism</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--pink);"></div> Product</div>
+                <div class="legend-item"><div class="legend-dot" style="background: #4f46e5;"></div> Ligand</div>
+            </div>
+        </aside>
+
+        <!-- Graph Area -->
+        <main class="graph-area">
+            <svg id="graph-svg"></svg>
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Generating knowledge graph...</div>
+            </div>
+        </main>
+
+        <!-- Right Panel - AI Explanation -->
+        <aside class="right-panel">
+            <div class="right-panel-header">
+                <span class="right-panel-title">✨ AI Explanation</span>
+            </div>
+            <div class="right-panel-content" id="aiExplanationPanel">
+                <div class="ai-placeholder">
+                    <div class="ai-placeholder-icon">💡</div>
+                    <p class="ai-placeholder-text">
+                        Click on any node in the graph to get an AI-powered explanation.
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by LLM Knowledge Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <script>
+        // Node type colors
+        const typeColors = {
+            'reaction': '#3b82f6',
+            'catalyst': '#7c3aed',
+            'reagent': '#10b981',
+            'mechanism': '#f59e0b',
+            'product': '#ec4899',
+            'ligand': '#4f46e5',
+            'property': '#9333ea'
+        };
+
+        // State
+        let simulation = null;
+        let currentGraph = null;
+        let selectedNode = null;
+        let uploadedPdfFile = null;
+
+        // Set topic from quick buttons
+        function setTopic(topic) {
+            document.getElementById('topicInput').value = topic;
+            clearPdfFile();
+            generateGraph();
+        }
+
+        // PDF Upload Handling
+        function handlePdfUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a PDF file.');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB.');
+                return;
+            }
+
+            uploadedPdfFile = file;
+            
+            // Update UI
+            const dropZone = document.getElementById('pdfDropZone');
+            const fileInfo = document.getElementById('pdfFileInfo');
+            const fileName = document.getElementById('pdfFileName');
+            
+            dropZone.classList.add('has-file');
+            fileInfo.classList.add('show');
+            fileName.textContent = file.name;
+            
+            // Clear topic input
+            document.getElementById('topicInput').value = '';
+            
+            // Generate graph from PDF
+            generateGraphFromPdf(file);
+        }
+
+        // Drag and Drop
+        const dropZone = document.getElementById('pdfDropZone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('pdfInput').files = e.dataTransfer.files;
+                handlePdfUpload({ target: { files: [file] } });
+            }
+        });
+
+        function clearPdfFile() {
+            uploadedPdfFile = null;
+            document.getElementById('pdfInput').value = '';
+            document.getElementById('pdfDropZone').classList.remove('has-file');
+            document.getElementById('pdfFileInfo').classList.remove('show');
+        }
+
+        // Generate graph from PDF
+        async function generateGraphFromPdf(file) {
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loadingOverlay');
+            const statusSection = document.getElementById('statusSection');
+
+            btn.disabled = true;
+            loading.style.display = 'flex';
+            loading.querySelector('.loading-text').textContent = 'Extracting knowledge from PDF...';
+
+            try {
+                const formData = new FormData();
+                formData.append('pdf', file);
+
+                let graphData;
+                let llmUsed = false;
+
+                try {
+                    const response = await fetch('/api/knowledge-graph/pdf', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        graphData = data.graph;
+                        llmUsed = data.llm_used || true;
+                    } else {
+                        throw new Error('API error');
+                    }
+                } catch (e) {
+                    // Fallback to mock data
+                    graphData = getMockGraph('cross-coupling');
+                    llmUsed = false;
+                }
+
+                currentGraph = graphData;
+                renderGraph(graphData);
+
+                // Update status
+                const badgeClass = llmUsed ? 'active' : 'fallback';
+                const badgeText = llmUsed ? '✨ AI Generated' : '📚 Predefined';
+                statusSection.innerHTML = `
+                    <div class="status-icon">✅</div>
+                    <div class="status-text">
+                        Knowledge graph generated from PDF!
+                    </div>
+                    <span class="llm-badge ${badgeClass}">${badgeText}</span>
+                `;
+
+                // Reset AI explanation panel
+                document.getElementById('aiExplanationPanel').innerHTML = `
+                    <div class="ai-placeholder">
+                        <div class="ai-placeholder-icon">💡</div>
+                        <p class="ai-placeholder-text">
+                            Click on any node in the graph to get an AI-powered explanation.
+                        </p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error generating graph from PDF:', error);
+                alert('Failed to generate knowledge graph from PDF. Please try again.');
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // Generate knowledge graph
+        async function generateGraph() {
+            const topic = document.getElementById('topicInput').value.trim();
+            if (!topic) return;
+
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loadingOverlay');
+            const useLLM = document.getElementById('llmToggle').checked;
+
+            btn.disabled = true;
+            loading.style.display = 'flex';
+
+            // Update loading text based on LLM toggle
+            const loadingText = loading.querySelector('.loading-text');
+            if (useLLM) {
+                loadingText.textContent = 'AI is generating knowledge graph...';
+            } else {
+                loadingText.textContent = 'Loading knowledge graph...';
+            }
+
+            try {
+                // Try to call the backend API
+                let graphData;
+                let llmUsed = false;
+                try {
+                    const response = await fetch('/api/knowledge-graph', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ topic: topic, use_llm: useLLM })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        graphData = data.graph;
+                        llmUsed = data.llm_used || false;
+                    } else {
+                        throw new Error('API error');
+                    }
+                } catch (e) {
+                    // Use local mock data if API not available
+                    graphData = getMockGraph(topic);
+                    llmUsed = false;
+                }
+
+                currentGraph = graphData;
+                renderGraph(graphData);
+
+                // Reset node info panel with LLM badge
+                const badgeClass = llmUsed ? 'active' : 'fallback';
+                const badgeText = llmUsed ? '✨ AI Generated' : '📚 Predefined';
+                document.getElementById('statusSection').innerHTML = `
+                    <div class="status-icon">✅</div>
+                    <div class="status-text">
+                        Knowledge graph generated successfully!
+                    </div>
+                    <span class="llm-badge ${badgeClass}">${badgeText}</span>
+                `;
+
+                // Reset AI explanation panel
+                document.getElementById('aiExplanationPanel').innerHTML = `
+                    <div class="ai-placeholder">
+                        <div class="ai-placeholder-icon">💡</div>
+                        <p class="ai-placeholder-text">
+                            Click on any node in the graph to get an AI-powered explanation.
+                        </p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error generating graph:', error);
+                alert('Failed to generate knowledge graph. Please try again.');
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // Mock graph data for fallback
+        function getMockGraph(topic) {
+            const topicLower = topic.toLowerCase();
+            
+            if (topicLower.includes('suzuki')) {
+                return {
+                    nodes: [
+                        {id: "suzuki", label: "Suzuki-Miyaura", type: "reaction", description: "Pd-catalyzed cross-coupling between organoboron and organic halide"},
+                        {id: "palladium", label: "Pd Catalyst", type: "catalyst", description: "Palladium(0) complex essential for Suzuki reaction"},
+                        {id: "boronic", label: "Organoboron", type: "reagent", description: "R-B(OH)2 nucleophilic partner"},
+                        {id: "halide", label: "Organic Halide", type: "reagent", description: "R'-X electrophilic partner"},
+                        {id: "base", label: "Base", type: "reagent", description: "Required for transmetalation"},
+                        {id: "oxidative", label: "Oxidative Addition", type: "mechanism", description: "Pd inserts into C-X bond"},
+                        {id: "transmetalation", label: "Transmetalation", type: "mechanism", description: "R group transfers to Pd"},
+                        {id: "reductive", label: "Reductive Elimination", type: "mechanism", description: "C-C bond formation"},
+                        {id: "biaryl", label: "Biaryl Product", type: "product", description: "R-R' coupled product"}
+                    ],
+                    edges: [
+                        {source: "suzuki", target: "palladium", label: "catalyzed by"},
+                        {source: "suzuki", target: "boronic", label: "uses"},
+                        {source: "suzuki", target: "halide", label: "uses"},
+                        {source: "oxidative", target: "transmetalation", label: "→"},
+                        {source: "transmetalation", target: "reductive", label: "→"},
+                        {source: "reductive", target: "biaryl", label: "produces"}
+                    ]
+                };
+            }
+            
+            if (topicLower.includes('heck')) {
+                return {
+                    nodes: [
+                        {id: "heck", label: "Heck Reaction", type: "reaction", description: "Pd-catalyzed coupling of aryl halide with alkene"},
+                        {id: "palladium", label: "Pd Catalyst", type: "catalyst", description: "Pd(0)/Pd(II) catalytic cycle"},
+                        {id: "aryl_halide", label: "Aryl Halide", type: "reagent", description: "Ar-X electrophile"},
+                        {id: "alkene", label: "Alkene", type: "reagent", description: "C=C partner"},
+                        {id: "migratory", label: "Migratory Insertion", type: "mechanism", description: "Alkene inserts into Pd-Ar bond"},
+                        {id: "beta_hydride", label: "β-Hydride Elim.", type: "mechanism", description: "Forms substituted alkene"},
+                        {id: "styrene", label: "Styrene Product", type: "product", description: "Ar-CH=CH2 type product"}
+                    ],
+                    edges: [
+                        {source: "heck", target: "palladium", label: "catalyzed by"},
+                        {source: "heck", target: "aryl_halide", label: "uses"},
+                        {source: "heck", target: "alkene", label: "uses"},
+                        {source: "migratory", target: "beta_hydride", label: "→"},
+                        {source: "beta_hydride", target: "styrene", label: "produces"}
+                    ]
+                };
+            }
+            
+            if (topicLower.includes('nickel')) {
+                return {
+                    nodes: [
+                        {id: "nickel", label: "Nickel Catalysis", type: "catalyst", description: "Cost-effective alternative to Pd"},
+                        {id: "c_o", label: "C-O Activation", type: "mechanism", description: "Ni activates C-O bonds in biomass"},
+                        {id: "c_cl", label: "C-Cl Activation", type: "mechanism", description: "Ni activates aryl chlorides"},
+                        {id: "biomass", label: "Biomass", type: "reagent", description: "Sustainable feedstocks"},
+                        {id: "redox_ligand", label: "Redox-Active Ligand", type: "ligand", description: "Participates in electron transfer"},
+                        {id: "low_cost", label: "Cost Advantage", type: "property", description: "~1000x cheaper than Pd"}
+                    ],
+                    edges: [
+                        {source: "nickel", target: "c_o", label: "enables"},
+                        {source: "nickel", target: "c_cl", label: "enables"},
+                        {source: "c_o", target: "biomass", label: "activates"},
+                        {source: "nickel", target: "redox_ligand", label: "uses"},
+                        {source: "nickel", target: "low_cost", label: "has"}
+                    ]
+                };
+            }
+            
+            // Default cross-coupling graph
+            return {
+                nodes: [
+                    {id: "cross_coupling", label: "Cross-Coupling", type: "reaction", description: "Metal-catalyzed C-C bond formation"},
+                    {id: "oxidative_addition", label: "Oxidative Addition", type: "mechanism", description: "M(0) → M(II), inserts into C-X"},
+                    {id: "transmetalation", label: "Transmetalation", type: "mechanism", description: "Exchange of ligands"},
+                    {id: "reductive_elim", label: "Reductive Elimination", type: "mechanism", description: "M(II) → M(0), forms product"},
+                    {id: "palladium", label: "Palladium", type: "catalyst", description: "Most common catalyst"},
+                    {id: "nickel", label: "Nickel", type: "catalyst", description: "Cheaper alternative"},
+                    {id: "ligand", label: "Ligand", type: "ligand", description: "Controls reactivity"},
+                    {id: "product", label: "C-C Product", type: "product", description: "Coupled molecule"}
+                ],
+                edges: [
+                    {source: "cross_coupling", target: "oxidative_addition", label: "step 1"},
+                    {source: "oxidative_addition", target: "transmetalation", label: "step 2"},
+                    {source: "transmetalation", target: "reductive_elim", label: "step 3"},
+                    {source: "reductive_elim", target: "product", label: "produces"},
+                    {source: "cross_coupling", target: "palladium", label: "catalyzed by"},
+                    {source: "cross_coupling", target: "nickel", label: "catalyzed by"},
+                    {source: "palladium", target: "ligand", label: "requires"},
+                    {source: "nickel", target: "ligand", label: "requires"}
+                ]
+            };
+        }
+
+        // Render graph with D3
+        function renderGraph(data) {
+            const svg = d3.select('#graph-svg');
+            svg.selectAll('*').remove();
+
+            const container = document.querySelector('.graph-area');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            svg.attr('viewBox', [0, 0, width, height]);
+
+            // Create a group for zooming
+            const g = svg.append('g');
+
+            // Add zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.3, 3])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+
+            // Create arrow marker
+            svg.append('defs').append('marker')
+                .attr('id', 'arrowhead')
+                .attr('viewBox', '-0 -5 10 10')
+                .attr('refX', 20)
+                .attr('refY', 0)
+                .attr('orient', 'auto')
+                .attr('markerWidth', 6)
+                .attr('markerHeight', 6)
+                .append('path')
+                .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                .attr('fill', '#9ca3af');
+
+            // Create force simulation
+            simulation = d3.forceSimulation(data.nodes)
+                .force('link', d3.forceLink(data.edges).id(d => d.id).distance(120))
+                .force('charge', d3.forceManyBody().strength(-400))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(50));
+
+            // Draw edges
+            const edge = g.append('g')
+                .selectAll('path')
+                .data(data.edges)
+                .join('path')
+                .attr('class', 'edge')
+                .attr('marker-end', 'url(#arrowhead)');
+
+            // Draw edge labels
+            const edgeLabel = g.append('g')
+                .selectAll('text')
+                .data(data.edges)
+                .join('text')
+                .attr('class', 'edge-label')
+                .attr('text-anchor', 'middle')
+                .attr('dy', -5)
+                .text(d => d.label);
+
+            // Draw nodes
+            const node = g.append('g')
+                .selectAll('g')
+                .data(data.nodes)
+                .join('g')
+                .attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended))
+                .on('click', (event, d) => showNodeInfo(d));
+
+            // Add circles
+            node.append('circle')
+                .attr('r', 30)
+                .attr('fill', d => typeColors[d.type] || '#6b7280')
+                .attr('stroke', d => d3.color(typeColors[d.type] || '#6b7280').darker(0.5));
+
+            // Add labels
+            node.append('text')
+                .attr('dy', 4)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .text(d => d.label.length > 12 ? d.label.substring(0, 10) + '...' : d.label);
+
+            // Update positions on tick
+            simulation.on('tick', () => {
+                edge.attr('d', d => {
+                    const dx = d.target.x - d.source.x;
+                    const dy = d.target.y - d.source.y;
+                    return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+                });
+
+                edgeLabel.attr('transform', d => {
+                    const midX = (d.source.x + d.target.x) / 2;
+                    const midY = (d.source.y + d.target.y) / 2;
+                    return `translate(${midX}, ${midY})`;
+                });
+
+                node.attr('transform', d => `translate(${d.x}, ${d.y})`);
+            });
+
+            // Drag functions
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        // Show node info
+        function showNodeInfo(node) {
+            // Remove previous selection
+            d3.selectAll('.node').classed('selected', false);
+
+            // Add selection to clicked node
+            d3.selectAll('.node')
+                .filter(d => d.id === node.id)
+                .classed('selected', true);
+
+            selectedNode = node;
+
+            // Update right panel with loading state
+            const rightPanel = document.getElementById('aiExplanationPanel');
+            rightPanel.innerHTML = `
+                <div class="selected-node-info">
+                    <div class="selected-node-name">${node.label}</div>
+                    <div class="selected-node-type">${node.type}</div>
+                </div>
+                <div class="ai-explanation-box" style="background: var(--bg-gray);">
+                    <div class="ai-explanation-header">Loading...</div>
+                    <div class="ai-explanation-content" style="color: var(--text-muted);">AI is analyzing this concept...</div>
+                </div>
+            `;
+
+            // Fetch LLM explanation
+            fetch('/api/knowledge-graph/explain', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ node: node.label, context: node.description })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.explanation) {
+                    rightPanel.innerHTML = `
+                        <div class="selected-node-info">
+                            <div class="selected-node-name">${node.label}</div>
+                            <div class="selected-node-type">${node.type}</div>
+                        </div>
+                        <div class="ai-explanation-box">
+                            <div class="ai-explanation-header">✨ AI Explanation</div>
+                            <div class="ai-explanation-content">${data.explanation}</div>
+                        </div>
+                    `;
+                } else {
+                    rightPanel.innerHTML = `
+                        <div class="selected-node-info">
+                            <div class="selected-node-name">${node.label}</div>
+                            <div class="selected-node-type">${node.type}</div>
+                        </div>
+                        <div class="ai-placeholder">
+                            <p class="ai-placeholder-text">No explanation available.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(() => {
+                rightPanel.innerHTML = `
+                    <div class="selected-node-info">
+                        <div class="selected-node-name">${node.label}</div>
+                        <div class="selected-node-type">${node.type}</div>
+                    </div>
+                    <div class="ai-placeholder">
+                        <p class="ai-placeholder-text">Failed to load explanation.</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize with default graph
+        window.addEventListener('load', () => {
+            generateGraph();
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (currentGraph) {
+                renderGraph(currentGraph);
+            }
+        });
+
+        // Handle Enter key
+        document.getElementById('topicInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateGraph();
+            }
+        });
+    </script>
+</body>
+</html>

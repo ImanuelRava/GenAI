@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI | GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-gray);
+            color: var(--text-main);
+        }
+
+        .sidebar-item.active {
+            background: var(--bg-blue-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            background: var(--bg-gray);
+        }
+
+        .content-panel {
+            display: none;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            min-height: 400px;
+        }
+
+        .content-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .content-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .content-body h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 24px 0 12px;
+        }
+
+        .content-body p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .content-body ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .content-body ul li {
+            padding: 10px 0;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .content-body ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* --- Highlight Box --- */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--bg-blue-light) 0%, var(--bg-gray) 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box.purple {
+            background: linear-gradient(135deg, var(--bg-purple-light) 0%, var(--bg-gray) 100%);
+            border-color: var(--secondary);
+        }
+
+        .highlight-box.purple h4 {
+            color: var(--secondary);
+        }
+
+        .highlight-box.green {
+            background: linear-gradient(135deg, var(--bg-green-light) 0%, var(--bg-gray) 100%);
+            border-color: var(--accent);
+        }
+
+        .highlight-box.green h4 {
+            color: var(--accent);
+        }
+
+        /* --- Stats Grid --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* --- Action Button --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-gray);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Welcome Panel --- */
+        .welcome-panel {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .welcome-panel h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .welcome-panel p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        /* --- Module Cards --- */
+        .module-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .module-card {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .module-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .module-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .module-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-beginner {
+            background: var(--bg-green-light);
+            color: var(--accent);
+        }
+
+        .badge-intermediate {
+            background: var(--bg-blue-light);
+            color: var(--primary);
+        }
+
+        .badge-advanced {
+            background: var(--bg-purple-light);
+            color: var(--secondary);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            nav ul {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 12px 0;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 0 12px;
+            }
+
+            .sidebar-item {
+                padding: 10px 16px;
+                border-left: none;
+                border-radius: var(--radius);
+                border: 1px solid var(--border-color);
+            }
+
+            .sidebar-item.active {
+                border-color: var(--primary);
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .content-panel {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar-item-text {
+                display: none;
+            }
+
+            .sidebar-item {
+                padding: 10px;
+            }
+
+            .sidebar-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="./" class="active">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Machine Learning</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="module1">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 1: ML Basics</span>
+                </li>
+                <li class="sidebar-item" data-panel="module2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 2: Supervised</span>
+                </li>
+                <li class="sidebar-item" data-panel="module3">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 3: Deep Learning</span>
+                </li>
+                <li class="sidebar-item" data-panel="visualizations">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Visualizations</span>
+                </li>
+                <li class="sidebar-item" data-panel="coming-soon">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Coming Soon</span>
+                </li>
+                <li class="sidebar-item" data-panel="resources">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    <span class="sidebar-item-text">Resources</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Welcome Panel -->
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">🧠</div>
+                    <h2>Machine Learning Education</h2>
+                    <p>Master the fundamentals of machine learning and artificial intelligence with our comprehensive, interactive modules designed for scientific applications.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Select a module from the sidebar to begin your learning journey.</p>
+                </div>
+            </div>
+
+            <!-- Module 1 Panel -->
+            <div id="module1" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 1: Introduction to Machine Learning</h2>
+                    <p>Learn the fundamental concepts, types, and applications of machine learning in modern science.</p>
+                </div>
+                <div class="content-body">
+                    <p>This foundational module introduces you to the core concepts of machine learning, from basic definitions to real-world applications in chemistry and scientific research.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Topics</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Beginner</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li>What is Machine Learning and how it differs from traditional programming</li>
+                        <li>Types of ML: Supervised, Unsupervised, and Reinforcement Learning</li>
+                        <li>The standard ML workflow from data collection to deployment</li>
+                        <li>Real-world applications in drug discovery and materials science</li>
+                        <li>Essential mathematical foundations (linear algebra, calculus, statistics)</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Prerequisites</h4>
+                        <p style="margin-bottom: 0;">Basic Python programming knowledge. Familiarity with NumPy and Pandas is helpful but not required.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-basics.html" class="btn btn-primary">Start Module 1 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module 2 Panel -->
+            <div id="module2" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 2: Supervised Learning</h2>
+                    <p>Master classification and regression algorithms with hands-on examples and evaluation techniques.</p>
+                </div>
+                <div class="content-body">
+                    <p>Supervised learning is the most widely used type of machine learning. This module covers essential algorithms for prediction tasks, from simple linear models to powerful ensemble methods.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Algorithms</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Beginner</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Topics Covered</h3>
+                    <ul>
+                        <li>Classification: Logistic Regression, Support Vector Machines</li>
+                        <li>Regression: Linear, Polynomial, Ridge, Lasso, Elastic Net</li>
+                        <li>Decision Trees and Random Forests</li>
+                        <li>Gradient Boosting (XGBoost, LightGBM)</li>
+                        <li>Evaluation metrics and cross-validation techniques</li>
+                        <li>Bias-variance tradeoff and regularization</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>Hands-On Projects</h4>
+                        <p style="margin-bottom: 0;">Build a molecular property predictor and a reaction yield prediction model using real chemical datasets.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-supervised.html" class="btn btn-primary">Start Module 2 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module 3 Panel -->
+            <div id="module3" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 3: Deep Learning</h2>
+                    <p>Dive into neural networks and modern architectures powering today's AI revolution.</p>
+                </div>
+                <div class="content-body">
+                    <p>Deep learning has transformed artificial intelligence, enabling breakthroughs in computer vision, natural language processing, and scientific discovery. This module covers the architectures you need to know.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">7</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Architectures</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Intermediate</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Architectures Covered</h3>
+                    <ul>
+                        <li>Feedforward Neural Networks and activation functions</li>
+                        <li>Backpropagation and optimization algorithms (SGD, Adam)</li>
+                        <li>Convolutional Neural Networks (CNNs) for image analysis</li>
+                        <li>Recurrent Neural Networks (RNNs, LSTMs, GRUs) for sequences</li>
+                        <li>Transformers and attention mechanisms (BERT, GPT)</li>
+                        <li>Graph Neural Networks for molecular data</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>Chemistry Applications</h4>
+                        <p style="margin-bottom: 0;">Learn how Graph Neural Networks predict molecular properties and how Transformers are used in drug discovery.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-deeplearning.html" class="btn btn-primary">Start Module 3 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualizations Panel -->
+            <div id="visualizations" class="content-panel">
+                <div class="content-header">
+                    <h2>Interactive Visualizations</h2>
+                    <p>Explore machine learning concepts through interactive visualizations. These demos help you understand algorithms and techniques intuitively.</p>
+                </div>
+                <div class="content-body">
+                    <div class="module-cards">
+                        <a href="visualization-gnn.html" class="module-card">
+                            <span class="module-badge badge-intermediate">Interactive</span>
+                            <h4>Graph Neural Networks</h4>
+                            <p>Visualize message passing, node embeddings, and molecular graph representations. See how GNNs process graph-structured data step by step.</p>
+                        </a>
+                        <a href="visualization-pca.html" class="module-card">
+                            <span class="module-badge badge-beginner">Interactive</span>
+                            <h4>Principal Component Analysis</h4>
+                            <p>Understand dimensionality reduction through interactive projections. See scree plots, variance explained, and chemistry applications.</p>
+                        </a>
+                    </div>
+
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li><strong>GNN Visualization:</strong> Message passing mechanisms, node aggregation, and molecular property prediction</li>
+                        <li><strong>PCA Visualization:</strong> Data projection, eigenvalue decomposition, and variance explained</li>
+                        <li><strong>Interactive Controls:</strong> Adjust parameters and see real-time effects on algorithms</li>
+                        <li><strong>Chemistry Examples:</strong> Real molecular datasets and chemical applications</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>Why Visualize?</h4>
+                        <p style="margin-bottom: 0;">Interactive visualizations bridge the gap between theory and intuition. By manipulating data and parameters in real-time, you develop a deeper understanding of how algorithms work and why they make certain decisions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coming Soon Panel -->
+            <div id="coming-soon" class="content-panel">
+                <div class="content-header">
+                    <h2>Coming Soon</h2>
+                    <p>Additional modules currently in development.</p>
+                </div>
+                <div class="content-body">
+                    <p>We're continuously expanding our machine learning curriculum. Here's what's coming next:</p>
+
+                    <div class="module-cards">
+                        <div class="module-card">
+                            <span class="module-badge badge-intermediate">Intermediate</span>
+                            <h4>Unsupervised Learning</h4>
+                            <p>Clustering algorithms (K-means, DBSCAN), dimensionality reduction (PCA, t-SNE, UMAP), and anomaly detection methods.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-advanced">Advanced</span>
+                            <h4>Natural Language Processing</h4>
+                            <p>Text preprocessing, word embeddings, sentiment analysis, and fine-tuning language models for your tasks.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-advanced">Advanced</span>
+                            <h4>ML for Chemistry</h4>
+                            <p>Molecular representations, property prediction, reaction prediction, and drug discovery applications.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-advanced">Advanced</span>
+                            <h4>Generative Models</h4>
+                            <p>GANs, VAEs, diffusion models, and their applications in molecular generation and drug design.</p>
+                        </div>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Stay Updated</h4>
+                        <p style="margin-bottom: 0;">Check back regularly for new content. We release new modules every month.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Panel -->
+            <div id="resources" class="content-panel">
+                <div class="content-header">
+                    <h2>Learning Resources</h2>
+                    <p>Additional materials to support your machine learning journey.</p>
+                </div>
+                <div class="content-body">
+                    <h3>Recommended Tools</h3>
+                    <ul>
+                        <li><strong>Python:</strong> The primary language for ML. Install via Anaconda or Miniconda.</li>
+                        <li><strong>Jupyter Notebooks:</strong> Interactive development environment for experimentation.</li>
+                        <li><strong>Scikit-learn:</strong> Essential library for classical ML algorithms.</li>
+                        <li><strong>PyTorch / TensorFlow:</strong> Deep learning frameworks for neural networks.</li>
+                        <li><strong>RDKit:</strong> Chemistry toolkit for molecular machine learning.</li>
+                    </ul>
+
+                    <h3>External Resources</h3>
+                    <ul>
+                        <li><strong>Coursera:</strong> Andrew Ng's Machine Learning and Deep Learning specializations</li>
+                        <li><strong>Fast.ai:</strong> Practical deep learning courses with a top-down approach</li>
+                        <li><strong>Kaggle:</strong> Competitions and datasets for hands-on practice</li>
+                        <li><strong>Papers With Code:</strong> Latest research papers with implementation code</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>Community</h4>
+                        <p style="margin-bottom: 0;">Join our Discord server to discuss ML topics, ask questions, and connect with other learners in the chemistry and AI community.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                contentPanels.forEach(p => p.classList.remove('active'));
+
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Show corresponding panel
+                const panelId = item.getAttribute('data-panel');
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

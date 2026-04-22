@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNN Visualization | AI Education - GenAI Research</title>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-dark: #1f2937;
+            --bg-darker: #111827;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+/* Main Layout */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; color: var(--text-secondary); }
+        .sidebar-item:hover { background: var(--bg-gray); color: var(--text-main); }
+        .sidebar-item.active { background: var(--bg-blue-light); color: var(--primary); border-left-color: var(--primary); }
+        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar-item-text { font-size: 0.85rem; font-weight: 500; }
+
+        /* Content Area */
+        .content-area { flex: 1; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
+        .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
+        .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .content-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .content-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-block; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin: 16px 0 8px; }
+        p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        ul { list-style: none; padding: 0; margin-bottom: 16px; }
+        ul li { padding: 6px 0 6px 20px; position: relative; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .content-panel ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+        /* Info Box */
+        .info-box { background: var(--bg-blue-light); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px; margin: 16px 0; }
+        .info-box h4 { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .info-box p { margin-bottom: 0; font-size: 0.9rem; }
+        .info-box.success { background: var(--bg-green-light); border-left-color: var(--accent); }
+        .info-box.success h4 { color: var(--accent); }
+        .info-box.purple { background: var(--bg-purple-light); border-left-color: var(--secondary); }
+        .info-box.purple h4 { color: var(--secondary); }
+
+        /* Formula Box */
+        .formula-box { background: var(--bg-dark); color: #ffffff; padding: 16px 20px; border-radius: var(--radius); font-family: 'Fira Code', 'Courier New', monospace; margin: 16px 0; overflow-x: auto; }
+        .formula-box p { color: #ffffff; margin-bottom: 8px; }
+        .formula-box strong { color: #ffffff; }
+
+        /* Cards Grid */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+        .info-card { background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
+        .info-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .info-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .info-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+
+        /* Visualization Layout */
+        .viz-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; margin: 16px 0; }
+        @media (max-width: 1000px) {
+            .viz-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Visualization Container */
+        .viz-container { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; }
+        .viz-canvas { width: 100%; height: 450px; background: var(--bg-darker); border-radius: var(--radius); position: relative; overflow: hidden; }
+
+        /* Graph Visualization */
+        #gnn-canvas { width: 100%; height: 450px; display: block; }
+
+        /* Controls */
+        .controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        .control-group { display: flex; align-items: center; gap: 6px; }
+        .control-group label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .control-group select { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.85rem; background: var(--bg-main); }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; font-size: 0.85rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; gap: 5px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-secondary:hover { background: #6d28d9; }
+        .btn-success { background: var(--accent); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { background: var(--bg-gray); border-color: var(--primary); color: var(--primary); }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+
+        /* Side Panel */
+        .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Legend Box */
+        .legend-box { background: var(--bg-gray); border-radius: var(--radius); padding: 16px; }
+        .legend-box h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px; }
+        .legend { display: flex; flex-direction: column; gap: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
+        .legend-line { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+        /* Message Display */
+        .message-box { background: var(--bg-gray); border-radius: var(--radius); padding: 16px; flex: 1; min-height: 200px; }
+        .message-box h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px; }
+        .message-display { font-family: 'Fira Code', monospace; font-size: 0.8rem; }
+        .message-step { margin-bottom: 10px; padding: 10px; border-radius: 6px; background: var(--bg-main); border-left: 3px solid transparent; }
+        .message-step.active { background: var(--bg-blue-light); border-left-color: var(--primary); }
+        .message-step .label { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 4px; }
+        .message-step .value { color: var(--text-main); font-weight: 600; }
+        .message-step .formula { color: var(--secondary); }
+
+        /* Feature change animation */
+        .feature-change { display: flex; align-items: center; gap: 8px; }
+        .feature-old { color: var(--text-muted); text-decoration: line-through; }
+        .feature-new { color: var(--accent); font-weight: 700; }
+        .feature-arrow { color: var(--warning); }
+
+        /* Progress indicator */
+        .progress-box { background: var(--bg-gray); border-radius: var(--radius); padding: 16px; }
+        .progress-box h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px; }
+        .progress-bar { height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+        .progress-text { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Footer */
+        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
+        footer p { font-size: 0.7rem; color: var(--text-light); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .header-layout { flex-direction: column; gap: 8px; }
+            nav ul { justify-content: center; gap: 12px; }
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 150px; }
+            .sidebar-header { display: none; }
+            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px; }
+            .sidebar-item { padding: 6px 10px; border-left: none; border-radius: var(--radius); border: 1px solid var(--border-color); }
+            .sidebar-item-text { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="./" class="active">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Visualization</span>
+                <div class="sidebar-subtitle">Graph Neural Networks</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="overview">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-section" style="padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color);">
+                <span class="sidebar-title">Interactive Demo</span>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" data-panel="message-passing">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/>
+                        <line x1="6" y1="9" x2="6" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/>
+                        <line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="18" x2="15" y2="18"/>
+                    </svg>
+                    <span class="sidebar-item-text">Message Passing</span>
+                </li>
+                <li class="sidebar-item" data-panel="applications">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="sidebar-item-text">Applications</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Panel -->
+            <div id="overview" class="content-panel active">
+                <div class="content-header">
+                    <h1>Graph Neural Networks Visualization</h1>
+                    <p>Explore how Graph Neural Networks process graph-structured data through interactive visualizations. Understand message passing, node embeddings, and graph representations.</p>
+                </div>
+
+                <h2>What are Graph Neural Networks?</h2>
+                <p>Graph Neural Networks (GNNs) are deep learning architectures designed to work directly with graph-structured data. They have revolutionized social network analysis, recommendation systems, knowledge graphs, and many other domains by learning representations that respect the relational structure of data.</p>
+
+                <h2>Key Concepts</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Nodes & Edges</h4>
+                        <p>Graphs consist of nodes (vertices) representing entities and edges representing relationships between them. Nodes could be users, items, or any entities.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Node Features</h4>
+                        <p>Each node has associated features that describe its properties. These features are transformed through message passing to create richer representations.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Message Passing</h4>
+                        <p>Nodes aggregate information from their neighbors, then update their own representations. This process is repeated across multiple layers to propagate information.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Graph Readout</h4>
+                        <p>After message passing, node representations are aggregated into a graph-level representation for tasks like classification or regression.</p>
+                    </div>
+                </div>
+
+                <h2>Message Passing: The Core Operation</h2>
+                <div class="formula-box">
+                    <p><strong>Message Passing Framework:</strong></p>
+                    <p style="color: #9ca3af; margin-bottom: 8px;">For each layer $k$, each node $i$ performs:</p>
+                    <p style="margin-bottom: 12px;"><strong>Step 1 - Aggregate:</strong> Collect messages from neighbors</p>
+                    $$m_i^{(k)} = \sum_{j \in \mathcal{N}(i)} \text{MSG}(h_j^{(k-1)})$$
+                    <p style="margin-top: 12px; margin-bottom: 8px;"><strong>Step 2 - Update:</strong> Combine with own representation</p>
+                    $$h_i^{(k)} = \text{UPDATE}(h_i^{(k-1)}, m_i^{(k)})$$
+                </div>
+
+                <div class="info-box purple">
+                    <h4>Why GNNs?</h4>
+                    <p>Many real-world problems have natural graph structures: social networks, citation networks, knowledge graphs, and biological networks. GNNs can learn powerful representations directly from these structures without hand-crafted features, respecting the graph's topology and capturing complex relationships.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="ml-deeplearning.html" class="btn btn-outline">← Back to Deep Learning</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('message-passing'); return false;">Start Interactive Demo →</a>
+                </div>
+            </div>
+
+            <!-- Message Passing Panel -->
+            <div id="message-passing" class="content-panel">
+                <div class="content-header">
+                    <h1>Message Passing Visualization</h1>
+                    <p>Watch how information flows through a graph during message passing. Each node aggregates features from its neighbors and updates its own representation.</p>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="stepForward()">▶ Step Forward</button>
+                    <button class="btn btn-success" id="auto-btn" onclick="toggleAutoPlay()">⏯ Auto Play</button>
+                    <button class="btn btn-secondary" onclick="resetGraph()">↺ Reset</button>
+                    <button class="btn btn-outline" onclick="fetchNewGraph()">New Graph</button>
+                    <div class="control-group">
+                        <label>Nodes:</label>
+                        <select id="node-count" onchange="updateNodeCount()">
+                            <option value="4">4</option>
+                            <option value="6" selected>6</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="viz-layout">
+                    <div class="viz-container">
+                        <canvas id="gnn-canvas" class="viz-canvas"></canvas>
+                    </div>
+                    
+                    <div class="side-panel">
+                        <div class="progress-box">
+                            <h4>Progress</h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="progress-step">Step 0 / 0</span>
+                                <span id="progress-status">Ready</span>
+                            </div>
+                        </div>
+
+                        <div class="legend-box">
+                            <h4>Legend</h4>
+                            <div class="legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #3b82f6;"></div>
+                                    <span>Unvisited Node</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #7c3aed;"></div>
+                                    <span>Currently Processing</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #10b981;"></div>
+                                    <span>Updated Node</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-line" style="background: #f59e0b;"></div>
+                                    <span>Message Flow (neighbors → node)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-box">
+                            <h4>Current Step Details</h4>
+                            <div class="message-display" id="message-log">
+                                <div class="message-step">
+                                    <div class="label">Instructions</div>
+                                    <div class="value">Click "Step Forward" or "Auto Play" to begin the message passing simulation.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <h4>What's Happening?</h4>
+                    <p><strong>Message Passing</strong> is the core operation of GNNs. Each node collects information from its neighbors, aggregates it (typically by sum or mean), and updates its own feature vector. After several rounds, each node contains information from its local neighborhood. The visualization shows this process step-by-step.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('overview'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('applications'); return false;">Applications →</a>
+                </div>
+            </div>
+
+            <!-- Applications Panel -->
+            <div id="applications" class="content-panel">
+                <div class="content-header">
+                    <h1>GNN Applications</h1>
+                    <p>Graph Neural Networks are used across many domains. Here are some key application areas and how GNNs are applied in each.</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Social Network Analysis</h4>
+                        <p>Predict user behavior, detect communities, recommend connections. Nodes represent users, edges represent friendships or interactions.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Recommendation Systems</h4>
+                        <p>Users and items form a bipartite graph. GNNs learn user preferences and item characteristics through collaborative filtering.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Knowledge Graphs</h4>
+                        <p>Reason over structured knowledge. Complete missing facts, answer queries, discover new relationships between entities.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Traffic Prediction</h4>
+                        <p>Road networks are spatial graphs. GNNs predict traffic flow by considering spatial dependencies between road segments.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Citation Networks</h4>
+                        <p>Papers cite other papers forming a graph. GNNs classify papers, predict citations, and discover research trends.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Fraud Detection</h4>
+                        <p>Transactions and users form graphs. GNNs detect anomalous patterns that indicate fraudulent activity.</p>
+                    </div>
+                </div>
+
+                <h2>Popular GNN Architectures</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>GCN (Graph Convolutional Network)</h4>
+                        <p>Spectral approach. Normalizes adjacency matrix and applies linear transformation. Simple and effective for many tasks.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>GAT (Graph Attention Network)</h4>
+                        <p>Uses attention mechanism to weight neighbor contributions differently. Learns which neighbors are most relevant.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>GraphSAGE</h4>
+                        <p>Inductive learning approach. Samples neighbors and aggregates using mean, LSTM, or pooling. Scales to large graphs.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Message Passing Neural Networks</h4>
+                        <p>General framework encompassing many GNN variants. Flexible message and update functions.</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Choosing the Right Architecture</h4>
+                    <p>The choice depends on your data and task. GCN is a good starting point. GAT is useful when neighbors have varying importance. GraphSAGE scales to large graphs and supports inductive learning on unseen nodes.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('message-passing'); return false;">← Back</a>
+                    <a href="visualization-pca.html" class="btn btn-primary">PCA Visualization →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+        
+        let graphViz = null;
+        let autoPlayInterval = null;
+
+        function showPanel(panelId) {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentPanels.forEach(p => p.classList.remove('active'));
+            
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+            
+            // Stop auto play when switching panels
+            stopAutoPlay();
+            
+            // Initialize visualizations when panel becomes active
+            if (panelId === 'message-passing') {
+                const initCanvas = () => {
+                    if (!graphViz) {
+                        graphViz = new GraphVisualization('gnn-canvas');
+                    }
+                    graphViz.resize();
+                    graphViz.createSampleGraph(parseInt(document.getElementById('node-count').value));
+                };
+                
+                // Wait for CSS animation and layout to settle
+                // Use multiple attempts with increasing delays
+                setTimeout(() => requestAnimationFrame(initCanvas), 100);
+                setTimeout(() => requestAnimationFrame(() => graphViz && graphViz.resize()), 300);
+                setTimeout(() => requestAnimationFrame(() => graphViz && graphViz.resize()), 600);
+            }
+        }
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const panelId = item.getAttribute('data-panel');
+                showPanel(panelId);
+            });
+        });
+
+        // GNN Visualization Class
+        class GraphVisualization {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.nodes = [];
+                this.edges = [];
+                this.currentStep = 0;
+                this.animationFrame = null;
+                this.displayWidth = 600;
+                this.displayHeight = 450;
+                
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                const dpr = window.devicePixelRatio || 1;
+                
+                // Get the canvas container (viz-container)
+                const container = this.canvas.parentElement;
+                const containerRect = container.getBoundingClientRect();
+                
+                // Use container width minus padding (16px each side = 32px)
+                let displayWidth = Math.max(containerRect.width - 32, 300);
+                // Keep fixed height of 450px as defined in CSS
+                let displayHeight = 450;
+                
+                // Set canvas buffer size to match display size (accounting for pixel ratio)
+                this.canvas.width = Math.floor(displayWidth * dpr);
+                this.canvas.height = Math.floor(displayHeight * dpr);
+                
+                // Set explicit CSS dimensions
+                this.canvas.style.width = displayWidth + 'px';
+                this.canvas.style.height = displayHeight + 'px';
+                
+                // Reset transform and scale the context to account for pixel ratio
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                
+                // Store display dimensions for drawing calculations
+                this.displayWidth = displayWidth;
+                this.displayHeight = displayHeight;
+                
+                // Update node positions if graph exists
+                if (this.nodes.length > 0) {
+                    this.updateNodePositions();
+                    this.draw();
+                }
+            }
+            
+            updateNodePositions() {
+                const centerX = this.displayWidth / 2;
+                const centerY = this.displayHeight / 2;
+                const radius = Math.min(this.displayWidth, this.displayHeight) * 0.32;
+                const nodeCount = this.nodes.length;
+                
+                // Recalculate positions while keeping the same features
+                this.nodes.forEach((node, i) => {
+                    const angle = (i / nodeCount) * Math.PI * 2 - Math.PI / 2;
+                    node.x = centerX + Math.cos(angle) * radius;
+                    node.y = centerY + Math.sin(angle) * radius;
+                });
+            }
+
+            createSampleGraph(nodeCount = 6) {
+                const centerX = this.displayWidth / 2;
+                const centerY = this.displayHeight / 2;
+                const radius = Math.min(this.displayWidth, this.displayHeight) * 0.32;
+                
+                this.nodes = [];
+                this.edges = [];
+                
+                // Create nodes in a circle
+                for (let i = 0; i < nodeCount; i++) {
+                    const angle = (i / nodeCount) * Math.PI * 2 - Math.PI / 2;
+                    this.nodes.push({
+                        id: i,
+                        x: centerX + Math.cos(angle) * radius,
+                        y: centerY + Math.sin(angle) * radius,
+                        state: 'default',
+                        feature: Math.random() * 0.8 + 0.1,  // Random feature 0.1-0.9
+                        oldFeature: null,
+                        neighbors: [],
+                        pulsePhase: 0
+                    });
+                }
+                
+                // Create edges - ring + cross connections
+                for (let i = 0; i < nodeCount; i++) {
+                    this.edges.push({ source: i, target: (i + 1) % nodeCount, active: false });
+                    // Add cross edges for more interesting message passing
+                    if (i < nodeCount / 2) {
+                        this.edges.push({ source: i, target: i + Math.floor(nodeCount / 2), active: false });
+                    }
+                }
+                
+                // Build neighbor lists
+                this.edges.forEach(edge => {
+                    this.nodes[edge.source].neighbors.push(edge.target);
+                    this.nodes[edge.target].neighbors.push(edge.source);
+                });
+                
+                this.currentStep = 0;
+                this.updateProgress();
+                this.draw();
+            }
+
+            updateProgress() {
+                const total = this.nodes.length;
+                const current = Math.min(this.currentStep, total);
+                const percent = total > 0 ? (current / total) * 100 : 0;
+                
+                document.getElementById('progress-fill').style.width = percent + '%';
+                document.getElementById('progress-step').textContent = `Step ${current} / ${total}`;
+                document.getElementById('progress-status').textContent = 
+                    this.currentStep >= total ? 'Complete!' : (this.currentStep === 0 ? 'Ready' : 'Processing...');
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                
+                // Draw subtle grid
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < this.displayWidth; x += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, this.displayHeight);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < this.displayHeight; y += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(this.displayWidth, y);
+                    ctx.stroke();
+                }
+                
+                // Draw edges
+                this.edges.forEach(edge => {
+                    const source = this.nodes[edge.source];
+                    const target = this.nodes[edge.target];
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(source.x, source.y);
+                    ctx.lineTo(target.x, target.y);
+                    
+                    if (edge.active) {
+                        // Active edge with glow effect
+                        ctx.strokeStyle = '#f59e0b';
+                        ctx.lineWidth = 4;
+                        ctx.shadowColor = '#f59e0b';
+                        ctx.shadowBlur = 10;
+                    } else {
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                        ctx.lineWidth = 2;
+                        ctx.shadowBlur = 0;
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw arrows on active edges (showing direction)
+                    if (edge.active) {
+                        const angle = Math.atan2(target.y - source.y, target.x - source.x);
+                        const arrowX = target.x - 35 * Math.cos(angle);
+                        const arrowY = target.y - 35 * Math.sin(angle);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(arrowX, arrowY);
+                        ctx.lineTo(arrowX - 12 * Math.cos(angle - 0.4), arrowY - 12 * Math.sin(angle - 0.4));
+                        ctx.lineTo(arrowX - 12 * Math.cos(angle + 0.4), arrowY - 12 * Math.sin(angle + 0.4));
+                        ctx.closePath();
+                        ctx.fillStyle = '#f59e0b';
+                        ctx.fill();
+                    }
+                });
+                
+                // Draw nodes
+                this.nodes.forEach(node => {
+                    // Outer glow for processing node
+                    if (node.state === 'processing') {
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 35, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(124, 58, 237, 0.3)';
+                        ctx.fill();
+                    }
+                    
+                    // Main node circle
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, 28, 0, Math.PI * 2);
+                    
+                    switch (node.state) {
+                        case 'processing': 
+                            ctx.fillStyle = '#7c3aed'; 
+                            break;
+                        case 'updated': 
+                            ctx.fillStyle = '#10b981'; 
+                            break;
+                        default: 
+                            ctx.fillStyle = '#3b82f6';
+                    }
+                    ctx.fill();
+                    
+                    // Node border
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Node ID
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 16px Segoe UI';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(node.id, node.x, node.y - 4);
+                    
+                    // Feature value below node
+                    ctx.fillStyle = node.state === 'processing' ? '#fbbf24' : 
+                                    node.state === 'updated' ? '#6ee7b7' : '#93c5fd';
+                    ctx.font = 'bold 12px Segoe UI';
+                    ctx.fillText(`h = ${node.feature.toFixed(2)}`, node.x, node.y + 14);
+                    
+                    // Show old feature if just updated
+                    if (node.oldFeature !== null && node.state === 'updated') {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.font = '10px Segoe UI';
+                        ctx.fillText(`was ${node.oldFeature.toFixed(2)}`, node.x, node.y + 50);
+                    }
+                });
+                
+                // Draw title
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'left';
+                ctx.fillText('Message Passing Visualization', 15, 25);
+            }
+
+            stepForward() {
+                if (this.nodes.length === 0) return;
+                
+                // Clear all edge states
+                this.edges.forEach(e => e.active = false);
+                
+                // Reset if completed
+                if (this.currentStep >= this.nodes.length) {
+                    this.currentStep = 0;
+                    this.nodes.forEach(n => {
+                        n.state = 'default';
+                        n.oldFeature = null;
+                        n.feature = Math.random() * 0.8 + 0.1;
+                    });
+                }
+                
+                const node = this.nodes[this.currentStep];
+                node.state = 'processing';
+                node.oldFeature = node.feature;
+                
+                // Collect features from neighbors
+                let message = 0;
+                const neighborFeatures = [];
+                
+                node.neighbors.forEach(neighborIdx => {
+                    const neighbor = this.nodes[neighborIdx];
+                    message += neighbor.feature;
+                    neighborFeatures.push(`h${neighborIdx}=${neighbor.feature.toFixed(2)}`);
+                    
+                    // Mark edges as active
+                    this.edges.forEach(e => {
+                        if ((e.source === node.id && e.target === neighborIdx) ||
+                            (e.target === node.id && e.source === neighborIdx)) {
+                            e.active = true;
+                        }
+                    });
+                });
+                
+                // Calculate new feature (mean aggregation)
+                const newFeature = message / node.neighbors.length;
+                
+                // Update message log
+                const log = document.getElementById('message-log');
+                log.innerHTML = `
+                    <div class="message-step active">
+                        <div class="label">Processing Node</div>
+                        <div class="value">Node ${node.id}</div>
+                    </div>
+                    <div class="message-step">
+                        <div class="label">Neighbors</div>
+                        <div class="value">[${node.neighbors.join(', ')}]</div>
+                    </div>
+                    <div class="message-step">
+                        <div class="label">Aggregate (Sum)</div>
+                        <div class="formula">${neighborFeatures.join(' + ')} = ${message.toFixed(2)}</div>
+                    </div>
+                    <div class="message-step">
+                        <div class="label">New Feature (Mean)</div>
+                        <div class="feature-change">
+                            <span class="feature-old">${node.feature.toFixed(2)}</span>
+                            <span class="feature-arrow">→</span>
+                            <span class="feature-new">${newFeature.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Render MathJax if available
+                if (window.MathJax) {
+                    MathJax.typesetPromise([log]);
+                }
+                
+                // Animate the update
+                setTimeout(() => {
+                    node.feature = newFeature;
+                    node.state = 'updated';
+                    this.currentStep++;
+                    this.updateProgress();
+                    this.draw();
+                }, 600);
+                
+                this.draw();
+            }
+
+            reset() {
+                this.currentStep = 0;
+                this.nodes.forEach(n => {
+                    n.state = 'default';
+                    n.feature = Math.random() * 0.8 + 0.1;
+                    n.oldFeature = null;
+                });
+                this.edges.forEach(e => e.active = false);
+                this.updateProgress();
+                document.getElementById('message-log').innerHTML = `
+                    <div class="message-step">
+                        <div class="label">Instructions</div>
+                        <div class="value">Click "Step Forward" or "Auto Play" to begin the message passing simulation.</div>
+                    </div>
+                `;
+                this.draw();
+            }
+        }
+
+        // Global functions for buttons
+        function stepForward() {
+            if (graphViz) graphViz.stepForward();
+        }
+
+        function resetGraph() {
+            stopAutoPlay();
+            if (graphViz) graphViz.reset();
+        }
+
+        function fetchNewGraph() {
+            stopAutoPlay();
+            if (graphViz) {
+                graphViz.currentStep = 0;
+                graphViz.createSampleGraph(parseInt(document.getElementById('node-count').value));
+            }
+        }
+
+        function updateNodeCount() {
+            stopAutoPlay();
+            if (graphViz) {
+                graphViz.currentStep = 0;
+                graphViz.createSampleGraph(parseInt(document.getElementById('node-count').value));
+            }
+        }
+
+        function toggleAutoPlay() {
+            const btn = document.getElementById('auto-btn');
+            if (autoPlayInterval) {
+                stopAutoPlay();
+            } else {
+                btn.textContent = '⏸ Pause';
+                btn.style.background = '#dc2626';
+                autoPlayInterval = setInterval(() => {
+                    if (graphViz && graphViz.currentStep < graphViz.nodes.length) {
+                        graphViz.stepForward();
+                    } else {
+                        stopAutoPlay();
+                    }
+                }, 1500);
+            }
+        }
+
+        function stopAutoPlay() {
+            const btn = document.getElementById('auto-btn');
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            btn.textContent = '⏯ Auto Play';
+            btn.style.background = '';
+        }
+    </script>
+</body>
+</html>

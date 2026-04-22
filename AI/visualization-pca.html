@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCA Visualization | AI Education - GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-dark: #1f2937;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --radius: 8px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; }
+
+        /* Header */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+/* Playground Layout */
+        .playground-wrapper { flex: 1; display: flex; overflow: hidden; }
+        
+        /* Control Panel */
+        .control-panel { 
+            width: 260px; 
+            background: var(--bg-main); 
+            border-right: 1px solid var(--border-color); 
+            padding: 16px; 
+            overflow-y: auto; 
+            flex-shrink: 0;
+        }
+        
+        .control-section { margin-bottom: 20px; }
+        .control-section h3 { 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .control-row label { font-size: 0.8rem; color: var(--text-secondary); }
+        
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; font-size: 0.8rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; border: none; gap: 4px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-block { width: 100%; margin-bottom: 8px; }
+        
+        /* Toggle Buttons */
+        .toggle-group { display: flex; gap: 4px; flex-wrap: wrap; }
+        .toggle-btn { 
+            padding: 5px 10px; 
+            font-size: 0.75rem; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-main); 
+            border-radius: var(--radius); 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover { background: var(--bg-gray); }
+        .toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        /* Stats */
+        .stats-box { background: var(--bg-gray); border-radius: var(--radius); padding: 10px; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.8rem; }
+        .stat-label { color: var(--text-muted); }
+        .stat-value { font-weight: 600; color: var(--primary); }
+        
+        /* Select & Input */
+        select, input[type="number"] { padding: 5px 8px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.8rem; background: var(--bg-main); width: 90px; }
+        
+        /* Canvas Area */
+        .canvas-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        
+        .canvas-container { flex: 1; position: relative; overflow: hidden; }
+        
+        #main-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: grab; }
+        #main-canvas:active { cursor: grabbing; }
+        
+        /* Info Panel */
+        .info-panel { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(31, 41, 55, 0.9); 
+            padding: 12px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .legend-inline { display: flex; gap: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: white; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; }
+        .legend-line { width: 20px; height: 3px; border-radius: 2px; }
+        
+        .info-text { font-size: 0.8rem; color: var(--text-muted); }
+        
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+        }
+        
+        /* Footer */
+        footer { background: var(--bg-dark); color: #9ca3af; padding: 6px 20px; text-align: center; font-size: 0.7rem; border-top: 1px solid #374151; }
+
+        @media (max-width: 800px) {
+            .playground-wrapper { flex-direction: column; }
+            .control-panel { width: 100%; max-height: 200px; display: flex; flex-wrap: wrap; gap: 10px; }
+            .control-section { flex: 1; min-width: 150px; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="./" class="active">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Playground -->
+    <div class="playground-wrapper">
+        <!-- Controls -->
+        <aside class="control-panel">
+            <div class="control-section">
+                <h3>Dataset</h3>
+                <div class="toggle-group" id="dataset-btns">
+                    <button class="toggle-btn active" data-type="clusters">Clusters</button>
+                    <button class="toggle-btn" data-type="linear">Linear</button>
+                    <button class="toggle-btn" data-type="gaussian">Gaussian</button>
+                    <button class="toggle-btn" data-type="random">Random</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Parameters</h3>
+                <div class="control-row">
+                    <label>Samples:</label>
+                    <input type="number" id="num-samples" value="100" min="20" max="500">
+                </div>
+                <div class="control-row">
+                    <label>Noise:</label>
+                    <select id="noise-level">
+                        <option value="0">None</option>
+                        <option value="0.1" selected>Low</option>
+                        <option value="0.3">Medium</option>
+                        <option value="0.5">High</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Display</h3>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="toggle-pc1">PC1</button>
+                    <button class="toggle-btn active" id="toggle-pc2">PC2</button>
+                    <button class="toggle-btn active" id="toggle-proj">Projection</button>
+                    <button class="toggle-btn" id="toggle-grid">Grid</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Variance Explained</h3>
+                <div class="stats-box">
+                    <div class="stat-row"><span class="stat-label">PC1:</span><span class="stat-value" id="stat-pc1">0%</span></div>
+                    <div class="stat-row"><span class="stat-label">PC2:</span><span class="stat-value" id="stat-pc2">0%</span></div>
+                    <div class="stat-row"><span class="stat-label">Total:</span><span class="stat-value" id="stat-total">0%</span></div>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Actions</h3>
+                <button class="btn btn-primary btn-block" id="btn-regen">Regenerate Data</button>
+                <button class="btn btn-outline btn-block" id="btn-animate">Animate Rotation</button>
+                <button class="btn btn-secondary btn-block" id="btn-reset">Reset View</button>
+            </div>
+            
+            <div class="control-section">
+                <h3>Navigation</h3>
+                <a href="visualization-gnn.html" class="btn btn-outline btn-block">← GNN Visualization</a>
+                <a href="ml-supervised.html" class="btn btn-outline btn-block">Supervised Learning →</a>
+            </div>
+        </aside>
+
+        <!-- Canvas -->
+        <div class="canvas-area">
+            <div class="canvas-container">
+                <canvas id="main-canvas"></canvas>
+            </div>
+            <div class="info-panel">
+                <div class="legend-inline">
+                    <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div><span>Data Points</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div><span>Projection</span></div>
+                    <div class="legend-item"><div class="legend-line" style="background: #10b981;"></div><span>PC1</span></div>
+                    <div class="legend-item"><div class="legend-line" style="background: #f59e0b;"></div><span>PC2</span></div>
+                </div>
+                <span class="info-text" id="info-hint">Drag to rotate principal components</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+    
+    <footer>
+        <p>Powered by GenAI Research | PCA Interactive Playground</p>
+    </footer>
+
+    <script>
+        // Canvas
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        
+        // State
+        let data = [];
+        let originalData = [];
+        let pc1 = { x: 1, y: 0 };
+        let pc2 = { x: 0, y: 1 };
+        let variancePC1 = 50;
+        let variancePC2 = 50;
+        let currentDataset = 'clusters';
+        let displayOptions = { pc1: true, pc2: true, projection: true, grid: false };
+        let animating = false;
+        let manualAngle = 0;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        
+        // Resize
+        function resize() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            if (data.length > 0) {
+                recalculatePositions();
+                draw();
+            }
+        }
+        window.addEventListener('resize', resize);
+        
+        // Generate data
+        function generateData(type, numSamples, noise) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) * 0.35;
+            const noiseScale = parseFloat(noise);
+            
+            originalData = [];
+            data = [];
+            
+            if (type === 'clusters') {
+                for (let i = 0; i < numSamples / 2; i++) {
+                    originalData.push({
+                        x: -0.5 + (Math.random() - 0.5) * 0.4,
+                        y: -0.3 + (Math.random() - 0.5) * 0.4,
+                        label: 0
+                    });
+                }
+                for (let i = 0; i < numSamples / 2; i++) {
+                    originalData.push({
+                        x: 0.5 + (Math.random() - 0.5) * 0.4,
+                        y: 0.3 + (Math.random() - 0.5) * 0.4,
+                        label: 1
+                    });
+                }
+            } else if (type === 'linear') {
+                for (let i = 0; i < numSamples; i++) {
+                    const t = (Math.random() - 0.5) * 1.5;
+                    originalData.push({
+                        x: t + (Math.random() - 0.5) * 0.15 * (1 + noiseScale),
+                        y: t * 0.6 + (Math.random() - 0.5) * 0.25 * (1 + noiseScale),
+                        label: 0
+                    });
+                }
+            } else if (type === 'gaussian') {
+                for (let i = 0; i < numSamples; i++) {
+                    const r = Math.sqrt(-2 * Math.log(Math.random())) * 0.4;
+                    const theta = Math.random() * Math.PI * 2;
+                    originalData.push({
+                        x: r * Math.cos(theta) * (1 + noiseScale * 0.5),
+                        y: r * Math.sin(theta) * (1 + noiseScale * 0.5),
+                        label: 0
+                    });
+                }
+            } else {
+                for (let i = 0; i < numSamples; i++) {
+                    originalData.push({
+                        x: (Math.random() - 0.5) * 1.8,
+                        y: (Math.random() - 0.5) * 1.8,
+                        label: Math.floor(Math.random() * 3)
+                    });
+                }
+            }
+            
+            manualAngle = 0;
+            recalculatePositions();
+            computePCA();
+        }
+        
+        function recalculatePositions() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) * 0.35;
+            
+            data = originalData.map(p => ({
+                x: centerX + p.x * scale,
+                y: centerY + p.y * scale,
+                label: p.label
+            }));
+        }
+        
+        // Compute PCA
+        function computePCA() {
+            if (data.length === 0) return;
+            
+            const meanX = data.reduce((s, p) => s + p.x, 0) / data.length;
+            const meanY = data.reduce((s, p) => s + p.y, 0) / data.length;
+            
+            let covXX = 0, covXY = 0, covYY = 0;
+            data.forEach(p => {
+                const dx = p.x - meanX;
+                const dy = p.y - meanY;
+                covXX += dx * dx;
+                covXY += dx * dy;
+                covYY += dy * dy;
+            });
+            covXX /= data.length;
+            covXY /= data.length;
+            covYY /= data.length;
+            
+            // Apply manual rotation to covariance
+            const cos = Math.cos(manualAngle);
+            const sin = Math.sin(manualAngle);
+            const rotCovXX = covXX * cos * cos + covYY * sin * sin - 2 * covXY * cos * sin;
+            const rotCovYY = covXX * sin * sin + covYY * cos * cos + 2 * covXY * cos * sin;
+            const rotCovXY = (covXX - covYY) * cos * sin + covXY * (cos * cos - sin * sin);
+            
+            covXX = rotCovXX;
+            covYY = rotCovYY;
+            covXY = rotCovXY;
+            
+            const trace = covXX + covYY;
+            const det = covXX * covYY - covXY * covXY;
+            const sqrtDisc = Math.sqrt(Math.max(0, trace * trace / 4 - det));
+            
+            const lambda1 = trace / 2 + sqrtDisc;
+            const lambda2 = trace / 2 - sqrtDisc;
+            
+            const totalVar = lambda1 + lambda2;
+            variancePC1 = totalVar > 0 ? (lambda1 / totalVar * 100) : 50;
+            variancePC2 = totalVar > 0 ? (lambda2 / totalVar * 100) : 50;
+            
+            if (Math.abs(covXY) > 0.0001) {
+                pc1 = { x: lambda1 - covYY, y: covXY };
+            } else {
+                pc1 = covXX > covYY ? { x: 1, y: 0 } : { x: 0, y: 1 };
+            }
+            
+            const len = Math.sqrt(pc1.x * pc1.x + pc1.y * pc1.y);
+            if (len > 0) {
+                pc1.x /= len;
+                pc1.y /= len;
+            }
+            pc2 = { x: -pc1.y, y: pc1.x };
+            
+            updateStats();
+            draw();
+        }
+        
+        function updateStats() {
+            document.getElementById('stat-pc1').textContent = variancePC1.toFixed(1) + '%';
+            document.getElementById('stat-pc2').textContent = variancePC2.toFixed(1) + '%';
+            document.getElementById('stat-total').textContent = (variancePC1 + variancePC2).toFixed(1) + '%';
+        }
+        
+        // Draw
+        function draw() {
+            if (!canvas.width || !canvas.height) return;
+            
+            ctx.fillStyle = '#1f2937';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const lineLen = Math.min(canvas.width, canvas.height) * 0.38;
+            
+            // Grid
+            if (displayOptions.grid) {
+                ctx.strokeStyle = '#374151';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < canvas.width; x += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < canvas.height; y += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+            
+            if (data.length === 0) return;
+            
+            const meanX = data.reduce((s, p) => s + p.x, 0) / data.length;
+            const meanY = data.reduce((s, p) => s + p.y, 0) / data.length;
+            
+            // Projection lines (clamped to PC1 axis bounds)
+            if (displayOptions.projection) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                data.forEach(p => {
+                    const dx = p.x - meanX;
+                    const dy = p.y - meanY;
+                    const proj = dx * pc1.x + dy * pc1.y;
+                    // Clamp projection to lineLen bounds
+                    const clampedProj = Math.max(-lineLen, Math.min(lineLen, proj));
+                    const projX = meanX + clampedProj * pc1.x;
+                    const projY = meanY + clampedProj * pc1.y;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(projX, projY);
+                    ctx.stroke();
+                });
+                
+                // Projected points (clamped to PC1 axis bounds)
+                data.forEach(p => {
+                    const dx = p.x - meanX;
+                    const dy = p.y - meanY;
+                    const proj = dx * pc1.x + dy * pc1.y;
+                    // Clamp projection to lineLen bounds
+                    const clampedProj = Math.max(-lineLen, Math.min(lineLen, proj));
+                    const projX = meanX + clampedProj * pc1.x;
+                    const projY = meanY + clampedProj * pc1.y;
+                    ctx.beginPath();
+                    ctx.arc(projX, projY, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fill();
+                });
+            }
+            
+            // PC1
+            if (displayOptions.pc1) {
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(centerX - pc1.x * lineLen, centerY - pc1.y * lineLen);
+                ctx.lineTo(centerX + pc1.x * lineLen, centerY + pc1.y * lineLen);
+                ctx.stroke();
+                
+                const endX = centerX + pc1.x * lineLen;
+                const endY = centerY + pc1.y * lineLen;
+                const angle = Math.atan2(pc1.y, pc1.x);
+                
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(endX - 12 * Math.cos(angle - 0.3), endY - 12 * Math.sin(angle - 0.3));
+                ctx.lineTo(endX - 12 * Math.cos(angle + 0.3), endY - 12 * Math.sin(angle + 0.3));
+                ctx.closePath();
+                ctx.fillStyle = '#10b981';
+                ctx.fill();
+                
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 14px Segoe UI';
+                ctx.fillText('PC1', endX + 10, endY + 4);
+            }
+            
+            // PC2
+            if (displayOptions.pc2) {
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(centerX - pc2.x * lineLen * 0.7, centerY - pc2.y * lineLen * 0.7);
+                ctx.lineTo(centerX + pc2.x * lineLen * 0.7, centerY + pc2.y * lineLen * 0.7);
+                ctx.stroke();
+                
+                const endX = centerX + pc2.x * lineLen * 0.7;
+                const endY = centerY + pc2.y * lineLen * 0.7;
+                const angle = Math.atan2(pc2.y, pc2.x);
+                
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(endX - 10 * Math.cos(angle - 0.3), endY - 10 * Math.sin(angle - 0.3));
+                ctx.lineTo(endX - 10 * Math.cos(angle + 0.3), endY - 10 * Math.sin(angle + 0.3));
+                ctx.closePath();
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+                
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = 'bold 14px Segoe UI';
+                ctx.fillText('PC2', endX + 10, endY + 4);
+            }
+            
+            // Data points
+            const colors = ['#3b82f6', '#7c3aed', '#ef4444', '#10b981'];
+            data.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = colors[p.label % colors.length];
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+            
+            // Center
+            ctx.beginPath();
+            ctx.arc(meanX, meanY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+        }
+        
+        // Event handlers
+        document.querySelectorAll('#dataset-btns .toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#dataset-btns .toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentDataset = btn.dataset.type;
+                regenerateData();
+            });
+        });
+        
+        document.getElementById('toggle-pc1').addEventListener('click', () => {
+            displayOptions.pc1 = !displayOptions.pc1;
+            document.getElementById('toggle-pc1').classList.toggle('active');
+            draw();
+        });
+        
+        document.getElementById('toggle-pc2').addEventListener('click', () => {
+            displayOptions.pc2 = !displayOptions.pc2;
+            document.getElementById('toggle-pc2').classList.toggle('active');
+            draw();
+        });
+        
+        document.getElementById('toggle-proj').addEventListener('click', () => {
+            displayOptions.projection = !displayOptions.projection;
+            document.getElementById('toggle-proj').classList.toggle('active');
+            draw();
+        });
+        
+        document.getElementById('toggle-grid').addEventListener('click', () => {
+            displayOptions.grid = !displayOptions.grid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+            draw();
+        });
+        
+        document.getElementById('btn-regen').addEventListener('click', regenerateData);
+        
+        document.getElementById('btn-animate').addEventListener('click', () => {
+            if (animating) {
+                animating = false;
+                return;
+            }
+            animating = true;
+            function animate() {
+                if (!animating) return;
+                manualAngle += 0.02;
+                computePCA();
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+        
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            animating = false;
+            manualAngle = 0;
+            regenerateData();
+        });
+        
+        function regenerateData() {
+            const numSamples = parseInt(document.getElementById('num-samples').value) || 100;
+            const noise = document.getElementById('noise-level').value;
+            generateData(currentDataset, numSamples, noise);
+        }
+        
+        // Mouse interaction
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStart = { x: e.clientX, y: e.clientY };
+            animating = false;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - dragStart.x;
+                manualAngle -= dx * 0.008;  // Inverted: drag left = rotate left
+                dragStart = { x: e.clientX, y: e.clientY };
+                computePCA();
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => isDragging = false);
+        canvas.addEventListener('mouseleave', () => isDragging = false);
+        
+        // Initialize
+        resize();
+        regenerateData();
+    </script>
+</body>
+</html>

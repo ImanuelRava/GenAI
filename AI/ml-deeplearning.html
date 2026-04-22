@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Deep Learning | AI Education - GenAI Research</title>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-purple-light: #ede9fe;
+            --bg-green-light: #d1fae5;
+            --bg-pink-light: #fce7f3;
+            --bg-cyan-light: #cffafe;
+            --bg-orange-light: #ffedd5;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* --- Main Layout --- */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; color: var(--text-secondary); }
+        .sidebar-item:hover { background: var(--bg-gray); color: var(--text-main); }
+        .sidebar-item.active { background: var(--bg-blue-light); color: var(--primary); border-left-color: var(--primary); }
+        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar-item-text { font-size: 0.85rem; font-weight: 500; }
+        .sidebar-section { padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color); }
+        .sidebar-section-title { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Content Area */
+        .content-area { flex: 1; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
+        .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
+        .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .content-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .content-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-block; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin: 16px 0 8px; }
+        p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
+        strong { color: var(--text-main); font-weight: 600; }
+
+        ul { list-style: none; padding: 0; margin-bottom: 16px; }
+        ul li { padding: 6px 0 6px 20px; position: relative; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .content-panel ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+        /* Info Box */
+        .info-box { background: var(--bg-blue-light); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px; margin: 16px 0; }
+        .info-box h4 { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .info-box p { margin-bottom: 0; font-size: 0.9rem; }
+        .info-box.warning { background: var(--bg-orange-light); border-left-color: var(--warning); }
+        .info-box.warning h4 { color: var(--warning); }
+        .info-box.success { background: var(--bg-green-light); border-left-color: var(--accent); }
+        .info-box.success h4 { color: var(--accent); }
+        .info-box.purple { background: var(--bg-purple-light); border-left-color: var(--secondary); }
+        .info-box.purple h4 { color: var(--secondary); }
+        .info-box.pink { background: var(--bg-pink-light); border-left-color: var(--pink); }
+        .info-box.pink h4 { color: var(--pink); }
+
+        /* Cards Grid */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+        .info-card { background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
+        .info-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .info-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .info-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+        .info-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+
+        /* Formula Box */
+        .formula-box { background: var(--bg-dark); color: #ffffff; padding: 16px 20px; border-radius: var(--radius); font-family: 'Fira Code', 'Courier New', monospace; margin: 16px 0; overflow-x: auto; }
+        .formula-box p { color: #ffffff; margin-bottom: 8px; }
+        .formula-box strong { color: #ffffff; }
+        .formula-box .comment { color: #a0a0a0; }
+        .formula-box .keyword { color: #ff79c6; }
+        .formula-box .function { color: #50fa7b; }
+        .formula-box .string { color: #f1fa8c; }
+        .formula-box .number { color: #bd93f9; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--bg-main); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); }
+        .data-table th { background: var(--primary); color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 0.85rem; }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background: var(--bg-gray); }
+
+        /* Steps */
+        .steps-container { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--accent); }
+        .step-number { width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
+
+        /* Diagram */
+        .diagram-container { background: var(--bg-gray); border-radius: var(--radius); padding: 24px; margin: 16px 0; }
+        .diagram-flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px; }
+        .diagram-box { padding: 12px 20px; border-radius: var(--radius); font-weight: 600; text-align: center; min-width: 100px; }
+        .diagram-box.input { background: var(--bg-blue-light); border: 2px solid var(--primary); color: var(--primary); }
+        .diagram-box.process { background: var(--bg-purple-light); border: 2px solid var(--secondary); color: var(--secondary); }
+        .diagram-box.output { background: var(--bg-green-light); border: 2px solid var(--accent); color: var(--accent); }
+        .diagram-arrow { font-size: 1.5rem; color: var(--text-muted); }
+
+        /* Network Diagram */
+        .network-diagram { display: flex; align-items: center; justify-content: center; gap: 30px; padding: 30px; background: var(--bg-gray); border-radius: var(--radius); margin: 16px 0; flex-wrap: wrap; }
+        .layer { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .neuron { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; }
+        .neuron.input { background: var(--bg-blue-light); border: 2px solid var(--primary); color: var(--primary); }
+        .neuron.hidden { background: var(--bg-purple-light); border: 2px solid var(--secondary); color: var(--secondary); }
+        .neuron.output { background: var(--bg-green-light); border: 2px solid var(--accent); color: var(--accent); }
+        .layer-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 0.9rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline:hover { background: var(--bg-gray); border-color: var(--primary); color: var(--primary); }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+
+        /* Footer */
+        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
+        footer p { font-size: 0.7rem; color: var(--text-light); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .header-layout { flex-direction: column; gap: 8px; }
+            nav ul { justify-content: center; gap: 12px; }
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 150px; }
+            .sidebar-header { display: none; }
+            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px; }
+            .sidebar-item { padding: 6px 10px; border-left: none; border-radius: var(--radius); border: 1px solid var(--border-color); }
+            .sidebar-section { display: none; }
+            .sidebar-item-text { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="./" class="active">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Module</span>
+                <div class="sidebar-subtitle">3. Deep Learning</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="overview">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-section">
+                <span class="sidebar-section-title">Sections</span>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" data-panel="neurons">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><circle cx="12" cy="4" r="2"/>
+                        <circle cx="12" cy="20" r="2"/><circle cx="4" cy="12" r="2"/>
+                        <circle cx="20" cy="12" r="2"/><line x1="12" y1="6" x2="12" y2="9"/>
+                        <line x1="12" y1="15" x2="12" y2="18"/><line x1="6" y1="12" x2="9" y2="12"/>
+                        <line x1="15" y1="12" x2="18" y2="12"/>
+                    </svg>
+                    <span class="sidebar-item-text">Neural Networks</span>
+                </li>
+                <li class="sidebar-item" data-panel="backprop">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/>
+                        <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+                    </svg>
+                    <span class="sidebar-item-text">Backpropagation</span>
+                </li>
+                <li class="sidebar-item" data-panel="cnn">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span class="sidebar-item-text">CNNs</span>
+                </li>
+                <li class="sidebar-item" data-panel="rnn">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                    <span class="sidebar-item-text">RNNs & LSTMs</span>
+                </li>
+                <li class="sidebar-item" data-panel="transformers">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="sidebar-item-text">Transformers</span>
+                </li>
+                <li class="sidebar-item" data-panel="gnn">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/>
+                        <line x1="6" y1="9" x2="6" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/>
+                        <line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="18" x2="15" y2="18"/>
+                    </svg>
+                    <span class="sidebar-item-text">Graph Neural Nets</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Panel -->
+            <div id="overview" class="content-panel active">
+                <div class="content-header">
+                    <h1>Deep Learning Fundamentals</h1>
+                    <p>Deep learning is a subset of machine learning based on artificial neural networks with multiple layers. These architectures have revolutionized AI, enabling breakthroughs in computer vision, natural language processing, and scientific discovery.</p>
+                </div>
+
+                <h2>Learning Objectives</h2>
+                <ul>
+                    <li>Understand the architecture and components of neural networks</li>
+                    <li>Master backpropagation and gradient-based optimization</li>
+                    <li>Learn specialized architectures: CNNs for images, RNNs for sequences</li>
+                    <li>Understand the Transformer architecture behind modern AI</li>
+                    <li>Apply Graph Neural Networks for molecular data</li>
+                </ul>
+
+                <div class="network-diagram">
+                    <div class="layer">
+                        <div class="neuron input">x₁</div>
+                        <div class="neuron input">x₂</div>
+                        <div class="neuron input">x₃</div>
+                        <div class="layer-label">Input</div>
+                    </div>
+                    <div class="layer">
+                        <div class="neuron hidden">h₁</div>
+                        <div class="neuron hidden">h₂</div>
+                        <div class="neuron hidden">h₃</div>
+                        <div class="neuron hidden">h₄</div>
+                        <div class="layer-label">Hidden</div>
+                    </div>
+                    <div class="layer">
+                        <div class="neuron hidden">h₅</div>
+                        <div class="neuron hidden">h₆</div>
+                        <div class="neuron hidden">h₇</div>
+                        <div class="layer-label">Hidden</div>
+                    </div>
+                    <div class="layer">
+                        <div class="neuron output">y</div>
+                        <div class="layer-label">Output</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Why "Deep" Learning?</h4>
+                    <p>Deep networks have multiple hidden layers between input and output. Each layer learns increasingly abstract representations. Early layers might detect edges, middle layers detect shapes, and final layers recognize objects. This hierarchical learning is inspired by the visual cortex.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="ml-supervised.html" class="btn btn-outline">← Previous Module</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('neurons'); return false;">Start Learning →</a>
+                </div>
+            </div>
+
+            <!-- Neurons Panel -->
+            <div id="neurons" class="content-panel">
+                <div class="content-header">
+                    <h1>Neural Network Basics</h1>
+                    <p>Neural networks are composed of interconnected nodes (neurons) organized in layers. Each neuron performs a simple computation, but the collective behavior enables complex pattern recognition.</p>
+                </div>
+
+                <h2>The Artificial Neuron</h2>
+                <p>A single neuron computes a weighted sum of its inputs, adds a bias, and applies an activation function:</p>
+
+                <div class="formula-box">
+                    <p><strong>Single Neuron Computation:</strong></p>
+                    $$z = \sum_i w_i x_i + b \quad \text{(Weighted sum + bias)}$$
+                    $$a = f(z) \quad \text{(Activation function)}$$
+                    <p><strong>Vectorized Form:</strong></p>
+                    $$a = f(W \cdot x + b)$$
+                </div>
+
+                <h2>Activation Functions</h2>
+                <p>Activation functions introduce non-linearity, enabling networks to learn complex patterns:</p>
+
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>ReLU</h4>
+                        <p>$f(x) = \max(0, x)$. Most popular choice. Computationally efficient. Solves vanishing gradient for positive values.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Sigmoid</h4>
+                        <p>$\sigma(x) = \frac{1}{1+e^{-x}}$. Output in [0,1]. Used for binary classification output. Suffers from vanishing gradients.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Tanh</h4>
+                        <p>$\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$. Output in [-1,1]. Zero-centered. Still has vanishing gradient issue.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Softmax</h4>
+                        <p>$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_j e^{x_j}}$. Converts vector to probability distribution. Used for multi-class classification output. Sum outputs to 1.</p>
+                    </div>
+                </div>
+
+                <h2>Feedforward Networks</h2>
+                <p>In a feedforward network, information flows in one direction from input to output through hidden layers:</p>
+
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Forward Pass</h4>
+                            <p>Input data propagates through each layer. Each layer: $z = W \cdot a_{\text{prev}} + b$, then $a = f(z)$. Final layer produces predictions.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Loss Computation</h4>
+                            <p>Compare predictions to true labels using a loss function (MSE for regression, cross-entropy for classification).</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Backward Pass</h4>
+                            <p>Compute gradients of loss with respect to all weights and biases using backpropagation.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Weight Update</h4>
+                            <p>Adjust weights in the opposite direction of the gradient: $W_{\text{new}} = W_{\text{old}} - \alpha \cdot \frac{\partial L}{\partial W}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('overview'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('backprop'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Backpropagation Panel -->
+            <div id="backprop" class="content-panel">
+                <div class="content-header">
+                    <h1>Backpropagation & Optimization</h1>
+                    <p>Backpropagation is the algorithm for computing gradients efficiently in neural networks. Combined with gradient descent, it enables training of deep networks.</p>
+                </div>
+
+                <h2>The Chain Rule</h2>
+                <p>Backpropagation applies the chain rule recursively from output to input:</p>
+
+                <div class="formula-box">
+                    <p><strong>Chain Rule for Composition:</strong></p>
+                    $$\frac{\partial L}{\partial w} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial w}$$
+                    <p><strong>For layer $l$:</strong></p>
+                    $$\delta^l = \frac{\partial L}{\partial z^l} = (W^{l+1})^T \cdot \delta^{l+1} \odot f'(z^l)$$
+                    <p><strong>Weight gradients:</strong></p>
+                    $$\frac{\partial L}{\partial W^l} = \delta^l \cdot (a^{l-1})^T$$
+                    $$\frac{\partial L}{\partial b^l} = \delta^l$$
+                </div>
+
+                <h2>Optimization Algorithms</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>SGD</h4>
+                        <p>Stochastic Gradient Descent. Uses single samples or mini-batches. Simple but can be slow and stuck in local minima.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Momentum</h4>
+                        <p>Accumulates velocity in consistent gradient directions. Helps escape local minima and accelerate convergence.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Adam</h4>
+                        <p>Combines momentum with adaptive learning rates per parameter. Most popular optimizer. Good default choice.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Learning Rate Scheduling</h4>
+                        <p>Decrease learning rate over time. Warmup then decay. Helps fine-tune in later training stages.</p>
+                    </div>
+                </div>
+
+                <h2>The Vanishing/Exploding Gradient Problem</h2>
+                <div class="info-box warning">
+                    <h4>Why Deep Networks Were Hard to Train</h4>
+                    <p>In deep networks, gradients are multiplied many times during backpropagation. With activation functions like sigmoid (max derivative 0.25), gradients shrink exponentially—vanishing gradients. With large weights, they explode. Solutions: ReLU activation, batch normalization, residual connections, and careful initialization (Xavier/He).</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('neurons'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('cnn'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- CNN Panel -->
+            <div id="cnn" class="content-panel">
+                <div class="content-header">
+                    <h1>Convolutional Neural Networks</h1>
+                    <p>CNNs are specialized for processing data with spatial structure, such as images. They use convolution operations to detect local patterns efficiently.</p>
+                </div>
+
+                <h2>Key Components</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <div class="icon">🔲</div>
+                        <h4>Convolution Layer</h4>
+                        <p>Sliding filters (kernels) across input. Each filter detects a specific pattern (edge, texture). Parameters: kernel size, stride, padding.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">⬇️</div>
+                        <h4>Pooling Layer</h4>
+                        <p>Reduces spatial dimensions. Max pooling takes maximum in each window. Provides translation invariance and reduces computation.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">📐</div>
+                        <h4>Batch Normalization</h4>
+                        <p>Normalizes activations within a batch. Stabilizes training, allows higher learning rates, provides regularization effect.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">🔗</div>
+                        <h4>Fully Connected</h4>
+                        <p>Final layers that combine features for classification. Often preceded by flattening or global average pooling.</p>
+                    </div>
+                </div>
+
+                <h2>Why CNNs Work</h2>
+                <ul>
+                    <li><strong>Local Connectivity:</strong> Each neuron connects only to a small region, reducing parameters dramatically</li>
+                    <li><strong>Parameter Sharing:</strong> Same filter applied across entire image—learns pattern detectors</li>
+                    <li><strong>Translation Equivariance:</strong> Patterns detected regardless of position</li>
+                    <li><strong>Hierarchical Features:</strong> Early layers: edges/textures; Middle: shapes/parts; Final: objects</li>
+                </ul>
+
+                <h3>Famous Architectures</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Architecture</th>
+                            <th>Year</th>
+                            <th>Key Innovation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>LeNet-5</td>
+                            <td>1998</td>
+                            <td>First successful CNN for digit recognition</td>
+                        </tr>
+                        <tr>
+                            <td>AlexNet</td>
+                            <td>2012</td>
+                            <td>ReLU, Dropout, GPU training; started deep learning revolution</td>
+                        </tr>
+                        <tr>
+                            <td>VGGNet</td>
+                            <td>2014</td>
+                            <td>Small 3×3 filters, very deep (16-19 layers)</td>
+                        </tr>
+                        <tr>
+                            <td>ResNet</td>
+                            <td>2015</td>
+                            <td>Skip connections enabled 100+ layer networks</td>
+                        </tr>
+                        <tr>
+                            <td>EfficientNet</td>
+                            <td>2019</td>
+                            <td>Compound scaling of depth, width, resolution</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('backprop'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('rnn'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- RNN Panel -->
+            <div id="rnn" class="content-panel">
+                <div class="content-header">
+                    <h1>Recurrent Neural Networks</h1>
+                    <p>RNNs process sequential data by maintaining a hidden state that captures information from previous time steps. They're essential for text, time series, and biological sequences.</p>
+                </div>
+
+                <h2>Basic RNN Architecture</h2>
+                <div class="formula-box">
+                    <p><strong>RNN Forward Pass at time $t$:</strong></p>
+                    $$h_t = f(W_{hh} \cdot h_{t-1} + W_{xh} \cdot x_t + b_h)$$
+                    $$y_t = W_{hy} \cdot h_t + b_y$$
+                    <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 12px;">The hidden state $h_t$ carries information from past. Same weights ($W$) shared across all time steps.</p>
+                </div>
+
+                <h2>The Vanishing Gradient Problem in RNNs</h2>
+                <p>Standard RNNs struggle with long sequences because gradients vanish or explode over many time steps. The network "forgets" early inputs.</p>
+
+                <h2>LSTM: Long Short-Term Memory</h2>
+                <p>LSTMs solve the long-term dependency problem with gating mechanisms:</p>
+
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Forget Gate</h4>
+                            <p>Decides what information to discard from cell state. Output: $f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Input Gate</h4>
+                            <p>Decides what new information to store. Creates candidate values. $i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Cell State Update</h4>
+                            <p>Combine forget and input: $C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t$. The cell state is the "memory" that flows through.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Output Gate</h4>
+                            <p>Decides what to output based on cell state. $o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$; $h_t = o_t \odot \tanh(C_t)$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <h4>GRU: Gated Recurrent Unit</h4>
+                    <p>A simpler alternative to LSTM with fewer parameters. Combines forget and input gates into an "update gate." Often performs similarly to LSTM with faster training. Good choice when data is limited.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('cnn'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('transformers'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- Transformers Panel -->
+            <div id="transformers" class="content-panel">
+                <div class="content-header">
+                    <h1>Transformers & Attention</h1>
+                    <p>Transformers have become the dominant architecture for NLP and are expanding to other domains. The key innovation is the self-attention mechanism that captures relationships regardless of distance.</p>
+                </div>
+
+                <h2>Self-Attention Mechanism</h2>
+                <p>Self-attention allows each position to attend to all other positions in the sequence:</p>
+
+                <div class="formula-box">
+                    <p><strong>Scaled Dot-Product Attention:</strong></p>
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+                    <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 12px;"><strong>Where:</strong><br>
+                    $Q$ (Query): What am I looking for?<br>
+                    $K$ (Key): What do I contain?<br>
+                    $V$ (Value): What do I provide?<br>
+                    $d_k$: Dimension of keys (scaling factor)</p>
+                    <p style="margin-top: 16px;"><strong>Multi-Head Attention:</strong></p>
+                    $$\text{MultiHead}(Q,K,V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O$$
+                    $$\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$
+                </div>
+
+                <h2>Key Components</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Positional Encoding</h4>
+                        <p>Since attention has no notion of order, positional encodings are added to embeddings. Sinusoidal functions or learned embeddings.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Layer Normalization</h4>
+                        <p>Normalizes across features for each sample. Stabilizes training in deep transformers. Often applied before sublayers (Pre-LN).</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Feed-Forward Network</h4>
+                        <p>Two linear layers with ReLU/GELU between. Applied to each position independently. Expands then contracts dimensions.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Residual Connections</h4>
+                        <p>Add input to output of each sublayer. Enables gradient flow in very deep networks. Essential for training transformers.</p>
+                    </div>
+                </div>
+
+                <h2>Encoder-Decoder Variants</h2>
+                <ul>
+                    <li><strong>BERT (Encoder-only):</strong> Bidirectional understanding, masked language modeling. Great for classification, NER, question answering.</li>
+                    <li><strong>GPT (Decoder-only):</strong> Autoregressive generation, causal attention. Powers ChatGPT, text generation, code completion.</li>
+                    <li><strong>T5/BART (Encoder-Decoder):</strong> Full sequence-to-sequence model. Good for translation, summarization, generation tasks.</li>
+                </ul>
+
+                <div class="info-box pink">
+                    <h4>The Scale Revolution</h4>
+                    <p>Transformer performance scales remarkably with model size and data. GPT-3 (175B parameters) showed emergent capabilities. Key insight: simple architecture + massive scale → powerful AI. This has driven the race to larger models.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('rnn'); return false;">← Back</a>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('gnn'); return false;">Continue →</a>
+                </div>
+            </div>
+
+            <!-- GNN Panel -->
+            <div id="gnn" class="content-panel">
+                <div class="content-header">
+                    <h1>Graph Neural Networks</h1>
+                    <p>GNNs operate on graph-structured data, making them ideal for molecular modeling, social networks, and biological systems. They learn representations by aggregating information from neighboring nodes.</p>
+                </div>
+
+                <h2>Why Graphs for Chemistry?</h2>
+                <p>Molecules are naturally represented as graphs where atoms are nodes and bonds are edges. GNNs can learn molecular representations directly from this structure without hand-crafted features.</p>
+
+                <div class="formula-box">
+                    <p><strong>Message Passing Framework:</strong></p>
+                    <p style="color: #6272a4; margin-bottom: 8px;">For $k = 1$ to $K$ layers:</p>
+                    $$m_i^{(k)} = \sum_{j \in \mathcal{N}(i)} \text{MSG}(h_i^{(k-1)}, h_j^{(k-1)}, e_{ij})$$
+                    $$h_i^{(k)} = \text{UPDATE}(h_i^{(k-1)}, m_i^{(k)})$$
+                    <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 12px;"><strong>Final Readout:</strong> $y = \text{READOUT}(\{h_i^{(K)}\})$ for graph-level prediction</p>
+                </div>
+
+                <h2>Popular GNN Variants</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>GCN (Graph Convolutional)</h4>
+                        <p>Spectral-inspired approach. Averages neighbor features with normalized adjacency. Simple and effective for homogeneous graphs.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>GAT (Graph Attention)</h4>
+                        <p>Uses attention to weight neighbors differently. Learns which neighbors are most relevant. Handles varying importance of neighbors.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Message Passing Neural Network</h4>
+                        <p>General framework for chemistry. Edge features (bond types) incorporated into messages. Basis for many molecular GNNs.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>SchNet / DimeNet</h4>
+                        <p>3D-aware GNNs for molecules. Incorporates spatial information (distances, angles). Essential for property prediction.</p>
+                    </div>
+                </div>
+
+                <h2>Applications in Chemistry</h2>
+                <ul>
+                    <li><strong>Molecular Property Prediction:</strong> Predicting solubility, toxicity, binding affinity from structure</li>
+                    <li><strong>Reaction Prediction:</strong> Predicting products, reagents, and conditions</li>
+                    <li><strong>Molecule Generation:</strong> De novo drug design with desired properties</li>
+                    <li><strong>Retrosynthesis:</strong> Planning synthetic routes to target molecules</li>
+                    <li><strong>Protein-Ligand Binding:</strong> Predicting binding poses and affinities</li>
+                </ul>
+
+                <div class="info-box success">
+                    <h4>Key Insight for Chemistry</h4>
+                    <p>GNNs respect molecular symmetry (permutation invariance). Rotating or renumbering atoms doesn't change the learned representation—critical for physical property prediction. Combined with proper training, GNNs can learn quantum mechanical properties from data.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" class="btn btn-outline" onclick="showPanel('transformers'); return false;">← Back</a>
+                    <a href="index.html" class="btn btn-primary">Back to AI Section →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        function showPanel(panelId) {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentPanels.forEach(p => p.classList.remove('active'));
+            
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const panelId = item.getAttribute('data-panel');
+                showPanel(panelId);
+            });
+        });
+    </script>
+</body>
+</html>

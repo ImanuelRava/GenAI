@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction | TMC - GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --pink: #ec4899;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-gray);
+            color: var(--text-main);
+        }
+
+        .sidebar-item.active {
+            background: var(--bg-blue-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar-section {
+            padding: 8px 16px;
+            margin-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            background: var(--bg-gray);
+            overflow-y: auto;
+        }
+
+        .content-panel {
+            display: none;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            height: 100%;
+        }
+
+        .content-panel.active {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-header {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .content-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .content-body h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 16px 0 8px;
+        }
+
+        .content-body p {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .content-body ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 16px;
+        }
+
+        .content-body ul li {
+            padding: 6px 0;
+            padding-left: 16px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .content-body ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* --- Module Card in Content --- */
+        .module-card {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .module-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .module-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            opacity: 0.3;
+            color: var(--primary);
+        }
+
+        .module-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 4px 0;
+        }
+
+        .module-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .module-card.cyan .module-number { color: var(--primary); }
+        .module-card.purple .module-number { color: var(--secondary); }
+        .module-card.green .module-number { color: var(--accent); }
+
+        /* --- Highlight Box --- */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--bg-blue-light) 0%, var(--bg-gray) 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+        }
+
+        /* --- Action Button --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: none;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-gray);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* --- Welcome Panel --- */
+        .welcome-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .welcome-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-panel p {
+            color: var(--text-muted);
+            max-width: 400px;
+            margin-bottom: 16px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 8px 0;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                padding: 0 8px;
+            }
+
+            .sidebar-item {
+                padding: 6px 10px;
+                border-left: none;
+                border-radius: var(--radius);
+                border: 1px solid var(--border-color);
+            }
+
+            .sidebar-section {
+                display: none;
+            }
+
+            .content-area {
+                padding: 12px;
+            }
+
+            .content-panel {
+                padding: 16px;
+            }
+
+            .sidebar-item-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Course</span>
+                <div class="sidebar-subtitle">Transition Metal Catalysis</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="overview">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-section">
+                <span class="sidebar-section-title">Modules</span>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" data-panel="module1">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <text x="12" y="16" text-anchor="middle" font-size="10" fill="#3b82f6">1</text>
+                    </svg>
+                    <span class="sidebar-item-text">Cross-Coupling Basics</span>
+                </li>
+                <li class="sidebar-item" data-panel="module2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <text x="12" y="16" text-anchor="middle" font-size="10" fill="#7c3aed">2</text>
+                    </svg>
+                    <span class="sidebar-item-text">Transition Metals</span>
+                </li>
+                <li class="sidebar-item" data-panel="module3">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <text x="12" y="16" text-anchor="middle" font-size="10" fill="#10b981">3</text>
+                    </svg>
+                    <span class="sidebar-item-text">Catalytic Cycle</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Panel -->
+            <div id="overview" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">⚗️</div>
+                    <h2>Transition Metal Catalysis</h2>
+                    <p>Master the fundamentals of cross-coupling reactions and discover how nickel catalysts break strong carbon-oxygen bonds in biomass-derived compounds.</p>
+                    <a href="#" class="btn btn-primary" onclick="showPanel('module1'); return false;">Start Learning →</a>
+                </div>
+            </div>
+
+            <!-- Module 1 Panel -->
+            <div id="module1" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 1: The Basics of Cross-Coupling</h2>
+                    <p>Understanding the concept of Cross-Coupling and why we need a catalyst to join molecules together efficiently.</p>
+                </div>
+                <div class="content-body">
+                    <p>Cross-coupling reactions represent one of the most powerful tools in modern organic synthesis, enabling chemists to form carbon-carbon and carbon-heteroatom bonds with remarkable precision. These reactions have revolutionized pharmaceutical development, materials science, and fine chemical production.</p>
+                    
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li>Definition and importance of cross-coupling reactions</li>
+                        <li>Historical development and Nobel Prize significance</li>
+                        <li>Basic reaction components: electrophiles, nucleophiles, and catalysts</li>
+                        <li>Why catalysts are essential for efficient bond formation</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Key Insight</h4>
+                        <p>Cross-coupling reactions allow chemists to selectively join two different organic fragments, creating complex molecules from simpler building blocks.</p>
+                    </div>
+
+                    <h3>Quick Quiz</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Test your understanding after completing this module.</p>
+                    <a href="lecture-1-basics.html" class="btn btn-primary btn-small">Open Full Lecture</a>
+                </div>
+            </div>
+
+            <!-- Module 2 Panel -->
+            <div id="module2" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 2: The Role of Transition Metals</h2>
+                    <p>How transition metals like Nickel and Palladium act as "molecular matchmakers" using their unique d-orbital electronics.</p>
+                </div>
+                <div class="content-body">
+                    <p>Transition metals possess unique electronic configurations that make them ideal catalysts for cross-coupling reactions. Their partially filled d-orbitals can accept and donate electrons, facilitating bond-breaking and bond-forming processes that would otherwise require extreme conditions.</p>
+                    
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li>Electronic structure of transition metals</li>
+                        <li>D-orbital participation in catalytic cycles</li>
+                        <li>Oxidation states and their importance</li>
+                        <li>Comparing Nickel vs. Palladium catalysis</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Why Nickel?</h4>
+                        <p>Nickel offers unique reactivity for C-O bond activation, enabling transformations that are difficult or impossible with palladium catalysts.</p>
+                    </div>
+
+                    <h3>Quick Quiz</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Test your understanding after completing this module.</p>
+                    <a href="lecture-2-metal.html" class="btn btn-primary btn-small">Open Full Lecture</a>
+                </div>
+            </div>
+
+            <!-- Module 3 Panel -->
+            <div id="module3" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 3: The Catalytic Cycle</h2>
+                    <p>The three fundamental steps: Oxidative Addition, Transmetalation, and Reductive Elimination explained step-by-step.</p>
+                </div>
+                <div class="content-body">
+                    <p>Every catalytic cross-coupling reaction follows a fundamental three-step cycle. Understanding this cycle is crucial for predicting reaction outcomes, optimizing conditions, and troubleshooting failed reactions.</p>
+                    
+                    <h3>The Three Steps</h3>
+                    <ul>
+                        <li><strong>Oxidative Addition:</strong> The catalyst inserts into the substrate bond</li>
+                        <li><strong>Transmetalation:</strong> Exchange of ligands between metal centers</li>
+                        <li><strong>Reductive Elimination:</strong> Product formation and catalyst regeneration</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Catalyst Regeneration</h4>
+                        <p>The beauty of catalysis lies in the regeneration of the active catalyst after each cycle, allowing small amounts of metal to process large amounts of substrate.</p>
+                    </div>
+
+                    <h3>Quick Quiz</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Test your understanding after completing this module.</p>
+                    <a href="lecture-3-mechanism.html" class="btn btn-primary btn-small">Open Full Lecture</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        function showPanel(panelId) {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentPanels.forEach(p => p.classList.remove('active'));
+            
+            document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const panelId = item.getAttribute('data-panel');
+                showPanel(panelId);
+            });
+        });
+    </script>
+</body>
+</html>

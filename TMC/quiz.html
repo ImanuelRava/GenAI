@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Quiz | TMC - GenAI Research</title>
+    <!-- 3Dmol.js for chemical structure visualization -->
+    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 16px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .progress-section {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .question-nav {
+            flex: 1;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            align-content: start;
+        }
+
+        .question-dot {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .question-dot:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .question-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .question-dot.correct {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .question-dot.wrong {
+            background: var(--red);
+            border-color: var(--red);
+            color: white;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            background: var(--bg-gray);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-panel {
+            display: none;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .quiz-panel.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quiz-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .quiz-header p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .viewer-container {
+            width: 100%;
+            height: 220px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viewer-container.hidden {
+            display: none;
+        }
+
+        .viewer-container canvas {
+            position: absolute !important;
+            top: 0;
+            left: 0;
+        }
+
+        .viewer-label {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        /* --- Reaction Diagram Styles --- */
+        .reaction-container {
+            width: 100%;
+            min-height: 140px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .reaction-container.hidden {
+            display: none;
+        }
+
+        .reaction-container img {
+            max-width: 100%;
+            max-height: 140px;
+            object-fit: contain;
+        }
+
+        .reaction-label {
+            position: absolute;
+            bottom: 6px;
+            right: 10px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .reaction-info {
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            font-size: 0.7rem;
+            color: var(--secondary);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .reaction-conditions {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .option-btn {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--bg-blue-light);
+            border-color: var(--primary);
+            color: var(--text-main);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .status-icon {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* --- Score Panel --- */
+        .score-panel {
+            display: none;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            text-align: center;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-panel.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .score-message {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: none;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-gray);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* --- Loading Spinner --- */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            nav ul {
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 150px;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .question-nav {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Quiz</span>
+                <div class="sidebar-subtitle">Cross-Coupling Reactions</div>
+            </div>
+
+            <div class="progress-section">
+                <span class="sidebar-title">Progress</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text"><span id="answeredCount">0</span> of 50 questions</div>
+            </div>
+
+            <div class="question-nav" id="questionNav"></div>
+
+            <div class="sidebar-footer" style="padding: 12px 16px; border-top: 1px solid var(--border-color); margin-top: auto;">
+                <button id="finishSidebarBtn" class="btn btn-primary" style="width: 100%;" onclick="showResults()">Finish Quiz</button>
+                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; text-align: center;">Answer all questions or finish early</p>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Quiz Panel -->
+            <div id="quizPanel" class="quiz-panel active">
+                <div class="quiz-header">
+                    <h2 id="questionNumber">Question 1</h2>
+                    <p id="questionType">Loading...</p>
+                </div>
+
+                <div id="reactionContainer" class="reaction-container hidden">
+                    <span class="reaction-label">RDKit Reaction Diagram</span>
+                </div>
+
+                <div id="viewerContainer" class="viewer-container hidden">
+                    <span class="viewer-label">Interactive 3D Viewport</span>
+                </div>
+
+                <div class="question-text" id="questionText">Loading question...</div>
+
+                <div class="options-grid" id="optionsGrid"></div>
+
+                <div class="btn-group">
+                    <button id="prevBtn" class="btn btn-outline" style="display: none;" onclick="prevQuestion()">← Previous</button>
+                    <button id="nextBtn" class="btn btn-primary" style="display: none;" onclick="nextQuestion()">Next Question →</button>
+                    <button id="finishBtn" class="btn btn-primary" style="display: none;" onclick="showResults()">Finish Quiz</button>
+                </div>
+            </div>
+
+            <!-- Score Panel -->
+            <div id="scorePanel" class="score-panel">
+                <h2 style="margin-bottom: 16px; font-size: 1.5rem;">Assessment Complete</h2>
+                <div class="score-circle" id="scoreCircle">0%</div>
+                <p class="score-message" id="scoreMessage">Calculating results...</p>
+                <div class="btn-group">
+                    <button class="btn btn-outline" onclick="location.reload()">Retry Quiz</button>
+                    <a href="./" class="btn btn-primary">Back to TMC →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by TMC AI Engine | RDKit Molecular Visualization</p>
+    </footer>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let viewer = null;
+        let molData = {};
+        let rxnData = {};
+        let quizData = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let answers = [];
+        let selectedAnswers = []; // Store which option was selected for each question
+
+        // --- FULL QUESTION BANK (50 Questions) ---
+        // Questions focus on reactivity and coupling partners for molecular questions
+        const fullQuestionBank = [
+            // --- REACTION TYPE QUESTIONS (1-10) ---
+            { id: 1, type: "reaction", question: "What type of reaction is shown in the diagram above?", options: ["Suzuki-Miyaura Coupling", "Heck Reaction", "Sonogashira Coupling", "Buchwald-Hartwig Amination"], correct: 0, rxnKey: "suzuki" },
+            { id: 2, type: "reaction", question: "Which reaction forms a C-C bond between an alkene and an aryl halide?", options: ["Suzuki Coupling", "Heck Reaction", "Stille Coupling", "Negishi Coupling"], correct: 1, rxnKey: "heck" },
+            { id: 3, type: "reaction", question: "What is the product when phenylboronic acid reacts with bromobenzene via Suzuki coupling?", options: ["Benzene", "Biphenyl", "Diphenyl ether", "Phenol"], correct: 1, rxnKey: "suzuki" },
+            { id: 4, type: "reaction", question: "Which coupling reaction specifically forms C-N bonds?", options: ["Heck Reaction", "Sonogashira Coupling", "Buchwald-Hartwig Amination", "Stille Coupling"], correct: 2, rxnKey: "buchwald" },
+            { id: 5, type: "reaction", question: "What type of reaction is shown in the diagram above?", options: ["Suzuki Coupling", "Stille Coupling", "Sonogashira Coupling", "Negishi Coupling"], correct: 2, rxnKey: "sonogashira" },
+            { id: 6, type: "reaction", question: "Which reaction uses an organotin compound as the coupling partner?", options: ["Suzuki Coupling", "Heck Reaction", "Stille Coupling", "Kumada Coupling"], correct: 2, rxnKey: "stille" },
+            { id: 7, type: "reaction", question: "What type of organometallic reagent is used in the Negishi coupling?", options: ["Organoboron", "Organomagnesium", "Organozinc", "Organotin"], correct: 2, rxnKey: "negishi" },
+            { id: 8, type: "reaction", question: "Which reaction uses a Grignard reagent as the nucleophile?", options: ["Suzuki Coupling", "Kumada Coupling", "Negishi Coupling", "Stille Coupling"], correct: 1, rxnKey: "kumada" },
+            { id: 9, type: "reaction", question: "What is formed when an aldehyde reacts with a Grignard reagent followed by hydrolysis?", options: ["A ketone", "A primary alcohol", "A secondary alcohol", "An ester"], correct: 2, rxnKey: "grignard" },
+            { id: 10, type: "reaction", question: "Which reaction uses organosilicon compounds as coupling partners?", options: ["Hiyama Coupling", "Suzuki Coupling", "Stille Coupling", "Negishi Coupling"], correct: 0, rxnKey: "hiyama" },
+
+            // --- MECHANISM QUESTIONS (11-20) ---
+            { id: 11, type: "reaction", question: "In which step of the catalytic cycle does the metal oxidation state increase?", options: ["Transmetalation", "Reductive Elimination", "Oxidative Addition", "Ligand Exchange"], correct: 2, rxnKey: "catalytic_cycle" },
+            { id: 12, type: "reaction", question: "What happens during the transmetalation step?", options: ["Metal is oxidized", "Organic group transfers to the metal", "Metal is reduced", "Halide leaves the substrate"], correct: 1, rxnKey: "catalytic_cycle" },
+            { id: 13, type: "reaction", question: "During reductive elimination, the metal center is:", options: ["Oxidized by 2 units", "Reduced by 2 units", "Unchanged", "Converted to a radical"], correct: 1, rxnKey: "catalytic_cycle" },
+            { id: 14, type: "reaction", question: "What is the role of base in Suzuki coupling?", options: ["Reduce the metal catalyst", "Activate the boronic acid", "Remove the halide", "Neutralize the product"], correct: 1, rxnKey: "suzuki" },
+            { id: 15, type: "reaction", question: "Why does beta-hydride elimination occur with alkyl halides?", options: ["Metal prefers sp2 carbons", "Beta-hydrogens can transfer to metal", "Alkyl groups are too small", "The halide is too reactive"], correct: 1, rxnKey: "beta_hydride" },
+            { id: 16, type: "reaction", question: "What is the correct order of steps in a typical cross-coupling cycle?", options: ["Reductive Elimination → Oxidative Addition → Transmetalation", "Oxidative Addition → Transmetalation → Reductive Elimination", "Transmetalation → Oxidative Addition → Reductive Elimination", "Oxidative Addition → Reductive Elimination → Transmetalation"], correct: 1, rxnKey: "catalytic_cycle" },
+            { id: 17, type: "reaction", question: "In Sonogashira coupling, what is the role of copper?", options: ["Primary catalyst", "Co-catalyst for transmetalation", "Base activator", "Reducing agent"], correct: 1, rxnKey: "sonogashira" },
+            { id: 18, type: "reaction", question: "Which step is rate-determining for electron-rich aryl halides?", options: ["Oxidative Addition", "Transmetalation", "Reductive Elimination", "Ligand Dissociation"], correct: 0, rxnKey: "catalytic_cycle" },
+            { id: 19, type: "reaction", question: "What prevents unwanted side reactions in cross-coupling?", options: ["High temperature", "Appropriate ligand choice", "Excess catalyst", "Water solvent"], correct: 1 },
+            { id: 20, type: "reaction", question: "The Heck reaction proceeds through which key intermediate?", options: ["Alkyl-Pd complex", "Alkenyl-Pd complex", "Aryl-Pd-H complex", "All of these at different stages"], correct: 3, rxnKey: "heck" },
+
+            // --- REACTIVITY & COUPLING PARTNER QUESTIONS (21-30) ---
+            { id: 21, type: "structure", question: "What is the best coupling partner for this molecule in a Suzuki reaction?", options: ["Phenylboronic acid", "Phenylmagnesium bromide", "Phenylzinc bromide", "Tributylphenyltin"], correct: 0, molKey: "bromobenzene" },
+            { id: 22, type: "structure", question: "This molecule can act as which coupling partner?", options: ["Electrophile (aryl halide)", "Nucleophile (boronic acid)", "Catalyst ligand", "Base"], correct: 1, molKey: "phenyl_boronic" },
+            { id: 23, type: "structure", question: "Which reaction type is this molecule best suited for as a nucleophile?", options: ["Suzuki Coupling", "Heck Reaction", "Kumada Coupling", "Sonogashira Coupling"], correct: 2, molKey: "phenylmagnesium_bromide" },
+            { id: 24, type: "structure", question: "What is the reactivity order of this halide in oxidative addition?", options: ["Most reactive (I)", "Moderately reactive (Br)", "Less reactive (Cl)", "Least reactive (F)"], correct: 0, molKey: "iodobenzene" },
+            { id: 25, type: "structure", question: "This molecule would be most reactive in which type of coupling?", options: ["Suzuki with Pd catalyst", "Heck with Pd catalyst", "Kumada with Ni catalyst", "Stille coupling"], correct: 2, molKey: "phenylmagnesium_bromide" },
+            { id: 26, type: "structure", question: "What coupling partner would react with this molecule in Sonogashira coupling?", options: ["Aryl halide + base", "Alkene", "Boronic acid", "Organotin"], correct: 0, molKey: "phenylacetylene" },
+            { id: 27, type: "structure", question: "This molecule is a suitable substrate for which reaction?", options: ["Suzuki coupling (as electrophile)", "Heck reaction (with alkene)", "Both reactions", "Neither reaction"], correct: 2, molKey: "iodobenzene" },
+            { id: 28, type: "structure", question: "What makes this molecule less reactive in cross-coupling?", options: ["Electron-withdrawing group", "Steric hindrance", "C-F bond strength", "All of the above"], correct: 2, molKey: "chlorobenzene" },
+            { id: 29, type: "structure", question: "This coupling partner is best used with which catalyst system?", options: ["Pd(PPh3)4, mild conditions", "Ni catalyst, activated conditions", "Cu-only catalyst", "No catalyst needed"], correct: 1, molKey: "phenylzinc_bromide" },
+            { id: 30, type: "structure", question: "What is the major toxicity concern with this coupling reagent?", options: ["Skin irritation", "Tin toxicity (highly toxic)", "Flammability", "No significant toxicity"], correct: 1, molKey: "tetramethyltin" },
+
+            // --- REACTIVITY PREDICTION QUESTIONS (31-40) ---
+            { id: 31, type: "structure", question: "How would electron-withdrawing groups affect this molecule's reactivity?", options: ["Speed up oxidative addition", "Slow down oxidative addition", "No effect", "Prevent reaction entirely"], correct: 0, molKey: "nitrobenzene" },
+            { id: 32, type: "structure", question: "Is this molecule a good substrate for Heck reaction? Why?", options: ["Yes - good Michael acceptor", "No - electron-rich alkene", "No - steric hindrance", "Only with special catalysts"], correct: 0, molKey: "acrylate" },
+            { id: 33, type: "structure", question: "What is this molecule's role in Sonogashira coupling?", options: ["Electrophilic substrate", "Nucleophilic coupling partner", "Catalyst ligand", "Side product"], correct: 1, molKey: "phenylacetylene" },
+            { id: 34, type: "structure", question: "Will the ketone survive under Suzuki coupling conditions?", options: ["Yes - ketones are stable", "No - will be reduced", "No - will be deprotonated", "Only with specific bases"], correct: 0, molKey: "4_bromoacetophenone" },
+            { id: 35, type: "structure", question: "Is this substrate prone to beta-hydride elimination in cross-coupling?", options: ["Yes - has beta-hydrogens", "No - no beta-hydrogens", "Only with Pd catalysts", "Only at high temperature"], correct: 0, molKey: "1_bromopropane" },
+            { id: 36, type: "structure", question: "How does steric hindrance affect this substrate's reactivity?", options: ["Slows oxidative addition significantly", "No effect", "Accelerates reaction", "Prevents transmetalation only"], correct: 0, molKey: "tert_butyl_bromide" },
+            { id: 37, type: "structure", question: "Is the aldehyde group compatible with standard Suzuki conditions?", options: ["Yes - aldehydes are stable", "No - reacts with organometallics", "No - oxidizes easily", "Only with protecting groups"], correct: 0, molKey: "4_bromobenzaldehyde" },
+            { id: 38, type: "structure", question: "How does this amine affect Pd catalyst performance?", options: ["Poisons catalyst via coordination", "Enhances catalysis", "No effect", "Only affects Ni catalysts"], correct: 0, molKey: "aniline" },
+            { id: 39, type: "structure", question: "What is the role of this molecule in cross-coupling reactions?", options: ["Catalyst ligand (PPh3)", "Coupling substrate", "Base additive", "Solvent"], correct: 0, molKey: "triphenylphosphine" },
+            { id: 40, type: "structure", question: "How reactive is the triflate group in this molecule for cross-coupling?", options: ["Excellent leaving group", "Poor leaving group", "Moderate reactivity", "Not reactive"], correct: 0, molKey: "vinyl_triflate" },
+
+            // --- REACTION CONDITIONS & APPLICATIONS (41-50) ---
+            { id: 41, type: "reaction", question: "What solvent is commonly used for Suzuki coupling?", options: ["Hexane", "Dioxane/Water mixture", "Concentrated acid", "Anhydrous ammonia"], correct: 1, rxnKey: "suzuki" },
+            { id: 42, type: "reaction", question: "Which base is typically used in Suzuki-Miyaura coupling?", options: ["Sodium hydroxide only", "Potassium carbonate", "Sulfuric acid", "No base needed"], correct: 1, rxnKey: "suzuki" },
+            { id: 43, type: "reaction", question: "Why are bulky phosphine ligands like SPhos preferred for difficult couplings?", options: ["They are cheaper", "They accelerate reductive elimination", "They are colorful", "They increase solubility"], correct: 1 },
+            { id: 44, type: "reaction", question: "What temperature range is typical for Pd-catalyzed cross-coupling?", options: ["0°C to room temperature", "50-100°C", "200-300°C", "Below freezing"], correct: 1 },
+            { id: 45, type: "reaction", question: "Why might Nickel be preferred over Palladium for some reactions?", options: ["Nickel is more expensive", "Nickel activates stronger bonds (C-Cl, C-O)", "Nickel is less toxic", "Nickel works without ligands"], correct: 1, rxnKey: "nickel" },
+            { id: 46, type: "reaction", question: "What is a common indicator of catalyst deactivation?", options: ["Color change to dark/black", "Increased temperature", "Gas evolution", "Crystallization"], correct: 0 },
+            { id: 47, type: "reaction", question: "Air-free techniques are important for cross-coupling because:", options: ["Catalysts are air-sensitive", "Products are unstable", "Solvents are flammable", "Ligands are volatile"], correct: 0 },
+            { id: 48, type: "reaction", question: "What is the advantage of using a vinyl triflate over a vinyl halide?", options: ["Lower cost", "Better leaving group, no halide", "More stable storage", "Higher solubility"], correct: 1, rxnKey: "triflate" },
+            { id: 49, type: "reaction", question: "Which cross-coupling is most commonly used in pharmaceutical synthesis?", options: ["Stille (toxic reagents)", "Suzuki (mild, selective)", "Kumada (air sensitive)", "None are used"], correct: 1, rxnKey: "suzuki" },
+            { id: 50, type: "reaction", question: "The 2010 Nobel Prize in Chemistry was awarded for the development of:", options: ["Olefin metathesis", "Palladium-catalyzed cross couplings", "Asymmetric hydrogenation", "Click chemistry"], correct: 1 }
+        ];
+
+        // --- INITIALIZE QUIZ ---
+        async function initQuiz() {
+            try {
+                // Load reaction diagrams from RDKit backend
+                const rxnResponse = await fetch('/api/reactions');
+                if (rxnResponse.ok) {
+                    rxnData = await rxnResponse.json();
+                    console.log('Loaded reaction diagrams:', Object.keys(rxnData));
+                }
+
+                // Load molecule data for 3D visualization
+                const molResponse = await fetch('/api/molecules');
+                if (molResponse.ok) {
+                    molData = await molResponse.json();
+                    console.log('Loaded molecule data:', Object.keys(molData));
+                }
+
+                // Shuffle and select questions
+                quizData = [...fullQuestionBank];
+                answers = new Array(quizData.length).fill(null);
+                selectedAnswers = new Array(quizData.length).fill(null);
+
+                // Build navigation
+                buildQuestionNav();
+
+                // Load first question
+                loadQuestion();
+
+            } catch (error) {
+                console.error('Error initializing quiz:', error);
+                // Fallback: load questions without reaction images
+                quizData = [...fullQuestionBank];
+                answers = new Array(quizData.length).fill(null);
+                selectedAnswers = new Array(quizData.length).fill(null);
+                buildQuestionNav();
+                loadQuestion();
+            }
+        }
+
+        // --- BUILD QUESTION NAVIGATION ---
+        function buildQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+
+            for (let i = 0; i < quizData.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'question-dot';
+                dot.textContent = i + 1;
+                dot.onclick = () => goToQuestion(i);
+                nav.appendChild(dot);
+            }
+        }
+
+        // --- LOAD QUESTION ---
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1}`;
+            document.getElementById('questionType').textContent = q.type === 'reaction' ? 'Reaction Question' : 'Reactivity & Coupling Partner';
+            document.getElementById('questionText').textContent = q.question;
+
+            // Update progress
+            document.getElementById('progressBar').style.width = `${(currentQuestion / quizData.length) * 100}%`;
+            document.getElementById('answeredCount').textContent = answers.filter(a => a !== null).length;
+
+            // Update nav dots
+            document.querySelectorAll('.question-dot').forEach((dot, i) => {
+                dot.classList.remove('active');
+                if (i === currentQuestion) dot.classList.add('active');
+                if (answers[i] === true) dot.classList.add('correct');
+                if (answers[i] === false) dot.classList.add('wrong');
+            });
+
+            // Load reaction diagram from RDKit (hide name so student identifies reaction)
+            const reactionContainer = document.getElementById('reactionContainer');
+            if (q.rxnKey && rxnData[q.rxnKey]) {
+                reactionContainer.classList.remove('hidden');
+                const rxn = rxnData[q.rxnKey];
+                reactionContainer.innerHTML = `
+                    <img src="data:image/png;base64,${rxn.image}" alt="Reaction diagram" />
+                    <span class="reaction-label">Reaction Scheme</span>
+                `;
+            } else {
+                reactionContainer.classList.add('hidden');
+            }
+
+            // Load 3D viewer if structure question
+            const viewerContainer = document.getElementById('viewerContainer');
+            if (q.type === 'structure' && q.molKey && molData[q.molKey]) {
+                viewerContainer.classList.remove('hidden');
+                init3DViewer(molData[q.molKey]);
+            } else {
+                viewerContainer.classList.add('hidden');
+                if (viewer) {
+                    viewer.clear();
+                    viewer = null;
+                }
+            }
+
+            // Build options
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+
+            // Check if this question was already answered
+            const wasAnswered = answers[currentQuestion] !== null;
+            const wasCorrect = answers[currentQuestion] === true;
+            // Store selected answer index for previously answered questions
+            const selectedAnswer = window.selectedAnswers ? window.selectedAnswers[currentQuestion] : null;
+
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${String.fromCharCode(65 + i)}. ${opt}</span><span class="status-icon"></span>`;
+                
+                if (wasAnswered) {
+                    // Disable all buttons for answered questions
+                    btn.disabled = true;
+                    // Show the answer status
+                    if (i === selectedAnswer) {
+                        btn.classList.add(wasCorrect ? 'correct' : 'wrong');
+                        btn.querySelector('.status-icon').textContent = wasCorrect ? '✓' : '✗';
+                    }
+                    if (i === q.correct && !wasCorrect) {
+                        btn.classList.add('correct');
+                        btn.querySelector('.status-icon').textContent = '✓';
+                    }
+                } else {
+                    btn.onclick = () => selectAnswer(i);
+                }
+                optionsGrid.appendChild(btn);
+            });
+
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+
+            // Show Previous button if not on first question
+            prevBtn.style.display = currentQuestion > 0 ? 'inline-flex' : 'none';
+
+            // Show Next/Finish buttons based on question state and position
+            if (currentQuestion === quizData.length - 1) {
+                // Last question: show Finish button if answered, otherwise hide all
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = wasAnswered ? 'inline-flex' : 'none';
+            } else {
+                // Not last question: show Next button if answered
+                nextBtn.style.display = wasAnswered ? 'inline-flex' : 'none';
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        // --- INITIALIZE 3D VIEWER ---
+        function init3DViewer(molBase64) {
+            const container = document.getElementById('viewerContainer');
+
+            // Clear previous viewer
+            if (viewer) {
+                viewer.clear();
+            }
+
+            // Create new viewer
+            viewer = $3Dmol.createViewer(container, {
+                backgroundColor: '#f3f4f6'
+            });
+
+            // Decode base64 mol file
+            const molBlock = atob(molBase64);
+
+            // Add model
+            viewer.addModel(molBlock, 'mol');
+            viewer.setStyle({}, {
+                stick: { radius: 0.15, colorscheme: 'Jmol' },
+                sphere: { radius: 0.3, colorscheme: 'Jmol' }
+            });
+
+            viewer.zoomTo();
+            viewer.rotate(30, 'x');
+            viewer.spin(true);
+            viewer.render();
+        }
+
+        // --- SELECT ANSWER ---
+        function selectAnswer(index) {
+            const q = quizData[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Store the selected answer
+            selectedAnswers[currentQuestion] = index;
+
+            // Mark correct/wrong
+            const isCorrect = index === q.correct;
+            answers[currentQuestion] = isCorrect;
+
+            if (isCorrect) {
+                score++;
+                buttons[index].classList.add('correct');
+                buttons[index].querySelector('.status-icon').textContent = '✓';
+            } else {
+                buttons[index].classList.add('wrong');
+                buttons[index].querySelector('.status-icon').textContent = '✗';
+                // Show correct answer
+                buttons[q.correct].classList.add('correct');
+                buttons[q.correct].querySelector('.status-icon').textContent = '✓';
+            }
+
+            // Update nav dot
+            document.querySelectorAll('.question-dot')[currentQuestion].classList.add(isCorrect ? 'correct' : 'wrong');
+
+            // Update navigation buttons
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+
+            if (currentQuestion === quizData.length - 1) {
+                // Last question: show Finish button
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-flex';
+            } else {
+                // Not last question: show Next button
+                nextBtn.style.display = 'inline-flex';
+                finishBtn.style.display = 'none';
+            }
+
+            // Update progress
+            document.getElementById('answeredCount').textContent = answers.filter(a => a !== null).length;
+        }
+
+        // --- PREVIOUS QUESTION ---
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        // --- NEXT QUESTION ---
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        // --- GO TO QUESTION (allows jumping to any question) ---
+        function goToQuestion(index) {
+            currentQuestion = index;
+            loadQuestion();
+        }
+
+        // --- SHOW RESULTS ---
+        function showResults() {
+            document.getElementById('quizPanel').classList.remove('active');
+            document.getElementById('scorePanel').classList.add('active');
+
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('scoreCircle').textContent = `${percentage}%`;
+
+            let message = '';
+            if (percentage >= 90) message = 'Excellent! You have mastered cross-coupling reactions!';
+            else if (percentage >= 70) message = 'Great job! You have a solid understanding of cross-coupling chemistry.';
+            else if (percentage >= 50) message = 'Good effort! Review the reaction mechanisms for improvement.';
+            else message = 'Keep studying! Focus on the coupling partner reactivity patterns.';
+
+            document.getElementById('scoreMessage').textContent = message;
+        }
+
+        // --- START QUIZ ON PAGE LOAD ---
+        document.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>

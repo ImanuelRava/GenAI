@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMC | GenAI Research</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --pink: #ec4899;
+            --red: #ef4444;
+            --bg-main: #ffffff;
+            --bg-gray: #f3f4f6;
+            --bg-blue-light: #dbeafe;
+            --bg-dark: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-main: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-gray);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+
+
+
+
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-main);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-gray);
+            color: var(--text-main);
+        }
+
+        .sidebar-item.active {
+            background: var(--bg-blue-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            background: var(--bg-gray);
+        }
+
+        .content-panel {
+            display: none;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            min-height: 400px;
+        }
+
+        .content-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .content-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .content-body h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 24px 0 12px;
+        }
+
+        .content-body p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .content-body ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .content-body ul li {
+            padding: 10px 0;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .content-body ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* --- Highlight Box --- */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--bg-blue-light) 0%, var(--bg-gray) 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        /* --- Action Button --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-gray);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* --- Welcome Panel --- */
+        .welcome-panel {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .welcome-panel h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .welcome-panel p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .header-layout {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            nav ul {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 12px 0;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 0 12px;
+            }
+
+            .sidebar-item {
+                padding: 10px 16px;
+                border-left: none;
+                border-radius: var(--radius);
+                border: 1px solid var(--border-color);
+            }
+
+            .sidebar-item.active {
+                border-color: var(--primary);
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .content-panel {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar-item-text {
+                display: none;
+            }
+
+            .sidebar-item {
+                padding: 10px;
+            }
+
+            .sidebar-icon {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-layout">
+            <a href="../index.html" class="logo-section">
+                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
+                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
+                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
+                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Transition Metal Catalysis</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="introduction">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                    <span class="sidebar-item-text">Introduction</span>
+                </li>
+                <li class="sidebar-item" data-panel="data-extraction">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                        <line x1="2" y1="20" x2="22" y2="20"/>
+                    </svg>
+                    <span class="sidebar-item-text">Data Extraction</span>
+                </li>
+                <li class="sidebar-item" data-panel="citation">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                        <circle cx="12" cy="12" r="2"/>
+                        <circle cx="4" cy="6" r="2"/>
+                        <circle cx="20" cy="6" r="2"/>
+                        <circle cx="4" cy="18" r="2"/>
+                        <circle cx="20" cy="18" r="2"/>
+                        <line x1="10" y1="11" x2="6" y2="7.5"/>
+                        <line x1="14" y1="11" x2="18" y2="7.5"/>
+                    </svg>
+                    <span class="sidebar-item-text">Citation Network</span>
+                </li>
+                <li class="sidebar-item" data-panel="nicobot-live">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"/>
+                        <line x1="9" y1="3" x2="15" y2="3"/>
+                    </svg>
+                    <span class="sidebar-item-text">TMC Live</span>
+                </li>
+                <li class="sidebar-item" data-panel="quiz">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="sidebar-item-text">Chemistry Quiz</span>
+                </li>
+                <a href="knowledge-graph.html" class="sidebar-item">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="4" cy="8" r="2"/>
+                        <circle cx="20" cy="8" r="2"/>
+                        <circle cx="4" cy="16" r="2"/>
+                        <circle cx="20" cy="16" r="2"/>
+                        <line x1="6" y1="8" x2="9" y2="10"/>
+                        <line x1="18" y1="8" x2="15" y2="10"/>
+                        <line x1="6" y1="16" x2="9" y2="14"/>
+                        <line x1="18" y1="16" x2="15" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Knowledge Graph</span>
+                </a>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Welcome Panel -->
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">🧪</div>
+                    <h2>Welcome to Transition Metal Catalysis</h2>
+                    <p>An integrated research platform for nickel-catalyzed C-O bond activation, combining theory, data science, AI prediction, and interactive learning tools.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Select a module from the sidebar to begin exploring.</p>
+                </div>
+            </div>
+
+            <!-- Introduction Panel -->
+            <div id="introduction" class="content-panel">
+                <div class="content-header">
+                    <h2>Introduction</h2>
+                    <p>Explore the fundamental mechanistic principles of Ni-catalyzed activation of strong C-O bonds.</p>
+                </div>
+                <div class="content-body">
+                    <p>Nickel-catalyzed C-O bond activation represents a transformative approach in synthetic chemistry, enabling the conversion of abundant and renewable oxygenated feedstocks into valuable chemical products. This research area bridges fundamental organometallic chemistry with practical applications in sustainable synthesis.</p>
+                    
+                    <h3>Key Concepts</h3>
+                    <ul>
+                        <li>Oxidative addition of C-O bonds to nickel centers</li>
+                        <li>Transmetalation and reductive elimination pathways</li>
+                        <li>Ligand effects on reactivity and selectivity</li>
+                        <li>Mechanistic studies using spectroscopic and computational methods</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Learning Objectives</h4>
+                        <p style="margin-bottom: 0;">Understand the fundamental principles governing nickel-catalyzed reactions and develop intuition for predicting reaction outcomes based on substrate structure and reaction conditions.</p>
+                    </div>
+
+                    <a href="introduction.html" class="btn btn-primary">View Full Introduction →</a>
+                </div>
+            </div>
+
+            <!-- Data Extraction Panel -->
+            <div id="data-extraction" class="content-panel">
+                <div class="content-header">
+                    <h2>Data Extraction</h2>
+                    <p>Employ PDF parsing and entity recognition to automatically extract information from scientific literature.</p>
+                </div>
+                <div class="content-body">
+                    <p>Our data extraction pipeline leverages natural language processing and machine learning to systematically harvest reaction data from the scientific literature. This automated approach enables rapid compilation of large datasets for training predictive models.</p>
+                    
+                    <h3>Capabilities</h3>
+                    <ul>
+                        <li>PDF parsing and text extraction from scientific articles</li>
+                        <li>Named entity recognition for chemical compounds</li>
+                        <li>Reaction condition extraction (temperature, time, solvents)</li>
+                        <li>Yield and product identification</li>
+                        <li>Automated database population</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Data Sources</h4>
+                        <p style="margin-bottom: 0;">We process publications from major chemistry journals including JACS, Angewandte Chemie, Organic Letters, and more.</p>
+                    </div>
+
+                    <a href="data-extraction.html" class="btn btn-primary">Access Data Tools →</a>
+                </div>
+            </div>
+
+            <!-- Citation Network Panel -->
+            <div id="citation" class="content-panel">
+                <div class="content-header">
+                    <h2>Citation Network</h2>
+                    <p>Navigate the complex web of scientific publications through our interactive citation graph.</p>
+                </div>
+                <div class="content-body">
+                    <p>The citation network visualization enables researchers to explore the interconnected landscape of nickel catalysis research. Identify seminal works, trace the evolution of ideas, and discover new connections between research areas.</p>
+                    
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Interactive network visualization</li>
+                        <li>Author collaboration networks</li>
+                        <li>Keyword co-occurrence analysis</li>
+                        <li>Time-evolution of research themes</li>
+                        <li>Export citation data in standard formats</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Network Statistics</h4>
+                        <p style="margin-bottom: 0;">Our database contains over 2,500 interconnected publications spanning two decades of nickel catalysis research.</p>
+                    </div>
+
+                    <a href="citation-tool.html" class="btn btn-primary">Explore Network →</a>
+                </div>
+            </div>
+
+            <!-- TMC Live Panel -->
+            <div id="nicobot-live" class="content-panel">
+                <div class="content-header">
+                    <h2>TMC Live</h2>
+                    <p>Access our trained Graph Neural Network in real-time for reaction prediction.</p>
+                </div>
+                <div class="content-body">
+                    <p>TMC Live provides instant access to our machine learning models trained on thousands of nickel-catalyzed reactions. Predict reaction outcomes, optimize conditions, and explore substrate scope with AI assistance.</p>
+                    
+                    <h3>AI Capabilities</h3>
+                    <ul>
+                        <li>Reaction outcome prediction with confidence scores</li>
+                        <li>Condition optimization suggestions</li>
+                        <li>Substrate compatibility analysis</li>
+                        <li>Side product prediction</li>
+                        <li>Ligand recommendation engine</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Model Performance</h4>
+                        <p style="margin-bottom: 0;">Our Graph Neural Network achieves 87% accuracy on held-out test sets for predicting major product formation.</p>
+                    </div>
+
+                    <a href="tmc-embed.html" class="btn btn-primary">Launch TMC →</a>
+                </div>
+            </div>
+
+            <!-- Quiz Panel -->
+            <div id="quiz" class="content-panel">
+                <div class="content-header">
+                    <h2>Chemistry Quiz</h2>
+                    <p>Challenge yourself with interactive questions designed to bridge theory and computational practice.</p>
+                </div>
+                <div class="content-body">
+                    <p>Test your understanding of nickel catalysis concepts through our interactive quiz system. Questions range from fundamental mechanistic principles to advanced applications of AI in chemistry.</p>
+                    
+                    <h3>Quiz Categories</h3>
+                    <ul>
+                        <li>Mechanism and reactivity fundamentals</li>
+                        <li>Ligand design principles</li>
+                        <li>Data science in chemistry</li>
+                        <li>AI and machine learning basics</li>
+                        <li>Integrated problem-solving challenges</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Track Your Progress</h4>
+                        <p style="margin-bottom: 0;">Complete quizzes to earn badges and track your mastery of nickel catalysis concepts.</p>
+                    </div>
+
+                    <a href="quiz.html" class="btn btn-primary">Start Quiz →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
+    </footer>
+
+    <script>
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                contentPanels.forEach(p => p.classList.remove('active'));
+
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Show corresponding panel
+                const panelId = item.getAttribute('data-panel');
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
