@@ -6,6 +6,31 @@ BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 # Get the parent directory (download folder) for static files
 BASE_DIR = os.path.dirname(BACKEND_DIR)
 
+# Load .env file if it exists (for local development)
+env_paths = [
+    os.path.join(BASE_DIR, '.env'),
+    os.path.join(BACKEND_DIR, '.env'),
+    '/home/z/my-project/.env',
+    os.path.expanduser('~/.env')
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        print(f"[STARTUP] Loading environment from: {env_path}")
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    if key and value and key not in os.environ:
+                        os.environ[key] = value
+                        # Hide API keys in logs
+                        if 'KEY' in key or 'SECRET' in key:
+                            print(f"  {key}=***")
+                        else:
+                            print(f"  {key}={value[:20]}...")
+        break
+
 # Add backend directory to path for module imports
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
@@ -13,14 +38,21 @@ if BACKEND_DIR not in sys.path:
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 import networkx as nx
-from rdkit import Chem
-from rdkit.Chem import AllChem, Draw
 import base64
 import io
 
+# RDKit is optional - only needed for molecular visualization
+try:
+    from rdkit import Chem
+    from rdkit.Chem import AllChem, Draw
+    RDKIT_AVAILABLE = True
+except ImportError:
+    RDKIT_AVAILABLE = False
+    print("[WARNING] RDKit not installed. Molecular visualization features disabled.")
+
 # Import your citation modules
 from modules.Forward_Reference import build_forward_network
-from modules.Backward_Reference import build_reference_network
+from modules.Local_Reference import build_reference_network
 from modules.Cross_Reference import build_cross_reference_network
 
 # Import visualization modules
@@ -165,6 +197,8 @@ def analyze_network():
 # ==================== QUIZ API ====================
 
 def generate_base64_mol(smiles):
+    if not RDKIT_AVAILABLE:
+        return None
     try:
         mol = Chem.MolFromSmiles(smiles)
         if not mol: 
@@ -221,6 +255,8 @@ def get_molecules():
 
 def generate_reaction_image(reaction_smarts, width=600, height=150):
     """Generate a reaction diagram image using RDKit"""
+    if not RDKIT_AVAILABLE:
+        return None
     try:
         rxn = AllChem.ReactionFromSmarts(reaction_smarts, useSmiles=True)
         if not rxn:
@@ -446,189 +482,18 @@ def api_pca_chemistry(dataset):
 
 # ==================== LLM KNOWLEDGE GRAPH API ====================
 
-import subprocess
-import tempfile
-import os
-import json as json_module
+# Import pure Python LLM providers (works on PythonAnywhere without Node.js)
+from llm_providers import get_llm_response, generate_knowledge_graph as llm_generate_kg, explain_concept
 
-# LLM Provider Configuration
-LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'glm')  # glm, openai, anthropic
-
-def get_llm_response_sync(system_prompt: str, user_message: str, model: str = None) -> str:
-    """Get response from LLM - supports multiple providers"""
-    
-    if LLM_PROVIDER == 'glm' or LLM_PROVIDER is None:
-        return _call_glm_llm(system_prompt, user_message, model)
-    elif LLM_PROVIDER == 'openai':
-        return _call_openai_llm(system_prompt, user_message, model)
-    elif LLM_PROVIDER == 'anthropic':
-        return _call_anthropic_llm(system_prompt, user_message, model)
-    else:
-        # Default to GLM
-        return _call_glm_llm(system_prompt, user_message, model)
-
-
-def _call_glm_llm(system_prompt: str, user_message: str, model: str = None) -> str:
-    """Call GLM (z-ai-web-dev-sdk) LLM"""
-    try:
-        # Create a temporary script to call the SDK
-        model_param = f", model: '{model}'" if model else ""
-        script_content = f'''
-const ZAI = require('z-ai-web-dev-sdk').default;
-
-async function main() {{
-    try {{
-        const zai = await ZAI.create();
-        const completion = await zai.chat.completions.create({{
-            messages: [
-                {{ role: 'system', content: {json_module.dumps(system_prompt)} }},
-                {{ role: 'user', content: {json_module.dumps(user_message)} }}
-            ],
-            temperature: 0.7,
-            max_tokens: 3000{model_param}
-        }});
-        console.log(completion.choices[0].message.content);
-    }} catch (err) {{
-        console.error('LLM Error:', err.message);
-        process.exit(1);
-    }}
-}}
-
-main();
-'''
-
-        # Write to temp file and execute
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False) as f:
-            f.write(script_content)
-            temp_path = f.name
-
-        try:
-            result = subprocess.run(
-                ['node', temp_path],
-                capture_output=True,
-                text=True,
-                timeout=120,
-                cwd=BACKEND_DIR
-            )
-
-            if result.returncode == 0:
-                return result.stdout.strip()
-            else:
-                print(f"GLM LLM Error: {result.stderr}")
-                return None
-        finally:
-            os.unlink(temp_path)
-
-    except subprocess.TimeoutExpired:
-        print("GLM LLM request timed out")
-        return None
-    except Exception as e:
-        print(f"GLM LLM Error: {e}")
-        return None
-
-
-def _call_openai_llm(system_prompt: str, user_message: str, model: str = None) -> str:
-    """Call OpenAI LLM (requires OPENAI_API_KEY environment variable)"""
-    try:
-        import openai
-        
-        api_key = os.environ.get('OPENAI_API_KEY')
-        if not api_key:
-            print("OpenAI API key not found in environment")
-            return None
-        
-        client = openai.OpenAI(api_key=api_key)
-        
-        response = client.chat.completions.create(
-            model=model or "gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
-            ],
-            temperature=0.7,
-            max_tokens=3000
-        )
-        
-        return response.choices[0].message.content
-        
-    except Exception as e:
-        print(f"OpenAI LLM Error: {e}")
-        return None
-
-
-def _call_anthropic_llm(system_prompt: str, user_message: str, model: str = None) -> str:
-    """Call Anthropic Claude LLM (requires ANTHROPIC_API_KEY environment variable)"""
-    try:
-        import anthropic
-        
-        api_key = os.environ.get('ANTHROPIC_API_KEY')
-        if not api_key:
-            print("Anthropic API key not found in environment")
-            return None
-        
-        client = anthropic.Anthropic(api_key=api_key)
-        
-        response = client.messages.create(
-            model=model or "claude-3-haiku-20240307",
-            max_tokens=3000,
-            system=system_prompt,
-            messages=[
-                {"role": "user", "content": user_message}
-            ]
-        )
-        
-        return response.content[0].text
-        
-    except Exception as e:
-        print(f"Anthropic LLM Error: {e}")
-        return None
+def get_llm_response_sync(system_prompt: str, user_message: str) -> str:
+    """Get response from LLM using pure Python providers"""
+    return get_llm_response(system_prompt, user_message)
 
 
 def generate_knowledge_graph_with_llm(topic: str) -> dict:
     """Use LLM to generate a knowledge graph for a given topic"""
-    system_prompt = """You are an expert in transition metal catalysis and chemistry education.
-Generate a knowledge graph for the given topic in valid JSON format ONLY (no markdown, no explanation).
-Return ONLY a JSON object with this exact structure:
-{
-    "nodes": [
-        {"id": "unique_snake_case_id", "label": "Display Name", "type": "reaction|catalyst|reagent|mechanism|product|ligand|property", "description": "Brief 1-2 sentence description"}
-    ],
-    "edges": [
-        {"source": "node_id", "target": "node_id", "label": "relationship"}
-    ]
-}
-Rules:
-- Include 8-15 nodes
-- Use snake_case for IDs
-- Types must be one of: reaction, catalyst, reagent, mechanism, product, ligand, property
-- Make connections educationally meaningful
-- Focus on chemical accuracy
-- Return ONLY the JSON, no other text"""
-
-    user_message = f"Generate a knowledge graph for: {topic}"
-
-    response = get_llm_response_sync(system_prompt, user_message)
-
-    if response:
-        try:
-            # Try to parse the JSON response
-            # Handle potential markdown code blocks
-            json_str = response.strip()
-            if json_str.startswith('```'):
-                # Remove markdown code blocks
-                lines = json_str.split('\n')
-                json_str = '\n'.join(lines[1:-1] if lines[-1] == '```' else lines[1:])
-
-            graph_data = json_module.loads(json_str)
-
-            # Validate structure
-            if 'nodes' in graph_data and 'edges' in graph_data:
-                return graph_data
-        except json_module.JSONDecodeError as e:
-            print(f"JSON Parse Error: {e}")
-            print(f"Response was: {response[:500]}...")
-
-    return None
+    # Use the pure Python LLM provider
+    return llm_generate_kg(topic)
 
 
 def generate_mock_knowledge_graph(topic: str) -> dict:
@@ -777,476 +642,6 @@ def api_knowledge_graph():
         return jsonify({'error': str(e), 'success': False}), 500
 
 
-# ==========================================
-# PDF TEXT PREPROCESSING (Enhanced for Scientific Papers)
-# ==========================================
-
-import re as regex_module
-
-def preprocess_pdf_text(text):
-    """Clean and preprocess text extracted from PDF - optimized for scientific papers"""
-    lines = text.split('\n')
-    relevant_lines = []
-    
-    # Stop processing when reaching these sections
-    stop_keywords = ["References", "Bibliography", "ACKNOWLEDGMENTS", 
-                     "Acknowledgement", "Works Cited", "Supplementary",
-                     "Appendix", "Supporting Information", "Supporting",
-                     "Conflict of Interest", "Author Contributions"]
-    
-    # Regex to remove inline citations like [1], [2,3], [4-6], (Smith et al., 2020)
-    inline_citation_regex = regex_module.compile(
-        r"\[\d+(,\s*\d+)*\]|\[\d+-\d+\]|\([^)]*\d{4}[^)]*\)|et\s+al\.?"
-    )
-    
-    # Keywords that indicate important scientific content
-    important_keywords = [
-        'catalyst', 'catalysis', 'reaction', 'coupling', 'mechanism', 'oxidation',
-        'reduction', 'synthesis', 'ligand', 'metal', 'palladium', 'nickel', 'copper',
-        'bond', 'product', 'reagent', 'substrate', 'yield', 'temperature', 'pressure',
-        'solvent', 'base', 'acid', 'oxidative', 'reductive', 'transmetalation',
-        'elimination', 'insertion', 'activation', 'complex', 'coordination',
-        'cross-coupling', 'suzuki', 'heck', 'sonogashira', 'stille', 'negishi',
-        'kumada', 'buchwald', 'c-h activation', 'functional', 'aryl', 'alkyl',
-        'vinyl', 'alkene', 'alkyne', 'halide', 'boron', 'tin', 'zinc', 'magnesium'
-    ]
-    
-    for line in lines:
-        stripped_line = line.strip()
-        
-        # Stop at reference section
-        if any(kw.lower() in stripped_line.lower() for kw in stop_keywords):
-            break
-            
-        # Skip very short lines but be less aggressive
-        if len(stripped_line) < 20:
-            continue
-        
-        # Skip lines that are mostly numbers or special characters
-        alpha_count = sum(1 for c in stripped_line if c.isalpha())
-        if alpha_count < len(stripped_line) * 0.3:
-            continue
-            
-        # Skip lines that start with citation numbers like [1] or Figure, Table
-        if regex_module.match(r'^\[\d+\]|^Figure|^Table|^Scheme|^Eq\.|^Equation', stripped_line, regex_module.IGNORECASE):
-            continue
-        
-        # Remove inline citations
-        clean_line = inline_citation_regex.sub("", stripped_line)
-        clean_line = regex_module.sub(r'\s+', ' ', clean_line).strip()
-        
-        # Skip if too short after cleaning
-        if len(clean_line) < 15:
-            continue
-            
-        # Prioritize lines with scientific keywords
-        line_lower = clean_line.lower()
-        has_keyword = any(kw in line_lower for kw in important_keywords)
-        
-        relevant_lines.append((clean_line, has_keyword))
-    
-    # Sort to prioritize lines with keywords, but keep some order
-    prioritized_lines = [line for line, has_kw in relevant_lines if has_kw]
-    other_lines = [line for line, has_kw in relevant_lines if not has_kw][:20]  # Limit non-keyword lines
-    
-    result_lines = prioritized_lines + other_lines
-    return "\n".join(result_lines[:100])  # Limit total lines
-
-
-def chunk_text_for_extraction(text, max_chars=2000):
-    """Split text into chunks for LLM processing"""
-    lines = text.split('\n')
-    chunks = []
-    current_chunk = ""
-    
-    for line in lines:
-        if len(current_chunk) + len(line) < max_chars:
-            current_chunk += line + "\n"
-        else:
-            if current_chunk.strip():
-                chunks.append(current_chunk)
-            current_chunk = line + "\n"
-    
-    if current_chunk.strip():
-        chunks.append(current_chunk)
-    
-    return chunks
-
-
-def extract_triples_from_chunk(text_chunk):
-    """Extract Subject-Relation-Object triples from a text chunk using LLM"""
-    prompt = f"""You are an expert chemist and knowledge graph extractor specializing in transition metal catalysis and organic chemistry.
-
-TASK: Extract meaningful Subject-Relation-Object triples from the scientific text below.
-
-FOCUS ON:
-- Chemical reactions and mechanisms (e.g., Suzuki coupling, oxidative addition)
-- Catalysts and metals (e.g., palladium, nickel, copper)
-- Reagents and substrates (e.g., organoboron, aryl halides)
-- Chemical bonds and products (e.g., C-C bond, biaryl)
-- Reaction conditions (e.g., temperature, solvent, base)
-- Key properties and comparisons
-
-RULES:
-1. Subject and Object must be specific chemical entities or concepts (1-4 words)
-2. Relations should be meaningful verbs or phrases describing the connection
-3. Avoid pronouns, determiners, and generic terms
-4. Each triple should represent ONE clear relationship
-
-EXAMPLES:
-Text: "Suzuki-Miyaura coupling is a palladium-catalyzed cross-coupling reaction between organoboron compounds and organic halides."
-Output: [
-  {{"subject": "Suzuki coupling", "relation": "is catalyzed by", "object": "palladium"}},
-  {{"subject": "Suzuki coupling", "relation": "couples", "object": "organoboron compounds"}},
-  {{"subject": "Suzuki coupling", "relation": "couples", "object": "organic halides"}}
-]
-
-Text: "Oxidative addition involves insertion of a metal center into a covalent bond, increasing its oxidation state by two units."
-Output: [
-  {{"subject": "oxidative addition", "relation": "involves", "object": "metal insertion"}},
-  {{"subject": "oxidative addition", "relation": "increases", "object": "oxidation state"}},
-  {{"subject": "metal center", "relation": "inserts into", "object": "covalent bond"}}
-]
-
-Text: "Nickel catalysts offer a cost-effective alternative to palladium and can activate C-Cl bonds efficiently."
-Output: [
-  {{"subject": "Nickel catalysts", "relation": "are alternative to", "object": "palladium"}},
-  {{"subject": "Nickel catalysts", "relation": "activate", "object": "C-Cl bonds"}},
-  {{"subject": "Nickel", "relation": "is cheaper than", "object": "palladium"}}
-]
-
-NOW EXTRACT TRIPLES FROM THIS TEXT:
-Text: "{text_chunk}"
-
-Output ONLY a valid JSON array of triples. No explanations or markdown:
-["""
-
-    try:
-        response = get_llm_response_sync("", prompt)
-        
-        if not response:
-            return []
-        
-        # Clean response
-        content = response.strip()
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0].strip()
-        elif "```" in content:
-            content = content.split("```")[1].split("```")[0].strip()
-        
-        # Handle case where LLM returns with explanation
-        if "[" in content:
-            start_idx = content.index("[")
-            end_idx = content.rindex("]") + 1
-            content = content[start_idx:end_idx]
-        
-        data = json_module.loads(content)
-        
-        if isinstance(data, list):
-            return data
-        return []
-        
-    except Exception as e:
-        print(f"[Triple Extraction] Error: {e}")
-        print(f"[Triple Extraction] Response was: {response[:200] if response else 'None'}...")
-        return []
-
-
-def triples_to_knowledge_graph(triples_list):
-    """Convert triples to knowledge graph format with intelligent entity resolution"""
-    # Flatten the list
-    flat_triples = []
-    for item in triples_list:
-        if isinstance(item, list):
-            flat_triples.extend(item)
-        else:
-            flat_triples.append(item)
-    
-    # Stopwords to filter out
-    stopwords = {
-        "we", "it", "they", "this", "that", "paper", "study", 
-        "result", "figure", "table", "section", "et", "al", 
-        "use", "method", "data", "analysis", "approach", "here",
-        "our", "their", "its", "which", "who", "what", "when",
-        "where", "how", "why", "some", "many", "most", "all",
-        "these", "those", "other", "another", "such", "same"
-    }
-    
-    # Entity normalization map - helps merge similar entities
-    entity_aliases = {
-        "pd": "palladium",
-        "ni": "nickel", 
-        "cu": "copper",
-        "fe": "iron",
-        "rh": "rhodium",
-        "pt": "platinum",
-        "au": "gold",
-        "ag": "silver",
-        "suzuki-miyaura": "suzuki coupling",
-        "suzuki reaction": "suzuki coupling",
-        "heck reaction": "heck coupling",
-        "cross coupling": "cross-coupling",
-        "c-c coupling": "cross-coupling",
-        "c-c bond formation": "cross-coupling",
-        "organoboron": "organoboron reagent",
-        "boronic acid": "organoboron reagent",
-        "aryl halide": "organic halide",
-        "aryl halides": "organic halide",
-    }
-    
-    nodes_map = {}  # Use map to avoid duplicates
-    edges_list = []
-    
-    def normalize_entity(entity):
-        """Normalize entity name for consistent IDs"""
-        entity_lower = entity.lower().strip()
-        # Check aliases
-        for alias, canonical in entity_aliases.items():
-            if alias in entity_lower:
-                return canonical
-        return entity_lower
-    
-    def get_node_type(text):
-        """Determine node type based on content"""
-        text_lower = text.lower()
-        
-        # Catalysts and metals
-        if any(w in text_lower for w in ["catalyst", "palladium", "nickel", "copper", "iron", "rhodium", 
-                                          "platinum", "gold", "silver", "pd", "ni", "cu", "fe", "rh"]):
-            return "catalyst"
-        
-        # Reactions
-        if any(w in text_lower for w in ["coupling", "reaction", "oxidation", "reduction", 
-                                          "hydrogenation", "addition", "substitution"]):
-            return "reaction"
-        
-        # Reagents
-        if any(w in text_lower for w in ["reagent", "boronic", "halide", "amine", "alkene", 
-                                          "alkyne", "substrate", "acid", "base", "solvent"]):
-            return "reagent"
-        
-        # Mechanisms
-        if any(w in text_lower for w in ["mechanism", "oxidative", "reductive", "transmetalation", 
-                                          "insertion", "elimination", "cycle", "step"]):
-            return "mechanism"
-        
-        # Ligands
-        if any(w in text_lower for w in ["ligand", "phosphine", "carbene", "pyridine", "nhc"]):
-            return "ligand"
-        
-        # Products
-        if any(w in text_lower for w in ["product", "yield", "biaryl", "output", "formation"]):
-            return "product"
-        
-        # Bonds
-        if any(w in text_lower for w in ["bond", "c-c", "c-h", "c-o", "c-n"]):
-            return "property"
-        
-        return "concept"
-    
-    for item in flat_triples:
-        if not isinstance(item, dict):
-            continue
-            
-        raw_subj = item.get("subject", "").strip()
-        raw_rel = item.get("relation", "").strip()
-        raw_obj = item.get("object", "").strip()
-        
-        # Skip if too short or empty
-        if len(raw_subj) < 2 or len(raw_obj) < 2 or len(raw_rel) < 2:
-            continue
-        
-        # Skip stopwords
-        if raw_subj.lower() in stopwords or raw_obj.lower() in stopwords:
-            continue
-        
-        # Normalize entities
-        norm_subj = normalize_entity(raw_subj)
-        norm_obj = normalize_entity(raw_obj)
-        
-        # Create node IDs (use normalized form)
-        subj_id = norm_subj.replace(" ", "_").replace("-", "_")
-        obj_id = norm_obj.replace(" ", "_").replace("-", "_")
-        
-        # Skip self-references
-        if subj_id == obj_id:
-            continue
-        
-        # Determine node types
-        subj_type = get_node_type(norm_subj)
-        obj_type = get_node_type(norm_obj)
-        
-        # Add nodes with better descriptions
-        if subj_id not in nodes_map:
-            nodes_map[subj_id] = {
-                "id": subj_id,
-                "label": norm_subj.title() if len(norm_subj) < 20 else norm_subj[:18] + "...",
-                "type": subj_type,
-                "description": f"{norm_subj} ({subj_type})"
-            }
-        
-        if obj_id not in nodes_map:
-            nodes_map[obj_id] = {
-                "id": obj_id,
-                "label": norm_obj.title() if len(norm_obj) < 20 else norm_obj[:18] + "...",
-                "type": obj_type,
-                "description": f"{norm_obj} ({obj_type})"
-            }
-        
-        # Add edge with truncated label if needed
-        edge_label = raw_rel[:25] + "..." if len(raw_rel) > 25 else raw_rel
-        edges_list.append({
-            "source": subj_id,
-            "target": obj_id,
-            "label": edge_label
-        })
-    
-    # Post-process: Remove duplicate edges
-    seen_edges = set()
-    unique_edges = []
-    for edge in edges_list:
-        edge_key = f"{edge['source']}|{edge['target']}|{edge['label']}"
-        if edge_key not in seen_edges:
-            seen_edges.add(edge_key)
-            unique_edges.append(edge)
-    
-    return {
-        "nodes": list(nodes_map.values()),
-        "edges": unique_edges
-    }
-
-
-@app.route('/api/knowledge-graph/pdf', methods=['POST'])
-def api_knowledge_graph_pdf():
-    """Generate knowledge graph from uploaded PDF using triple extraction"""
-    try:
-        if 'pdf' not in request.files:
-            return jsonify({'error': 'No PDF file uploaded', 'success': False}), 400
-
-        file = request.files['pdf']
-        if file.filename == '':
-            return jsonify({'error': 'No file selected', 'success': False}), 400
-
-        if not file.filename.lower().endswith('.pdf'):
-            return jsonify({'error': 'File must be a PDF', 'success': False}), 400
-
-        # Save uploaded file temporarily
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filepath)
-
-        print(f"[PDF API] Processing: {file.filename}")
-
-        try:
-            # Extract text from PDF using pypdf
-            from pypdf import PdfReader
-            
-            reader = PdfReader(filepath)
-            full_raw_text = ""
-            
-            print(f"[PDF API] Found {len(reader.pages)} pages")
-            
-            # Extract text from first 15 pages max (covers most papers)
-            max_pages = min(len(reader.pages), 15)
-            for i in range(max_pages):
-                text = reader.pages[i].extract_text()
-                if text:
-                    full_raw_text += text + "\n"
-
-            print(f"[PDF API] Raw text: {len(full_raw_text)} characters")
-
-            # Pre-process text
-            print("[PDF API] Pre-processing text...")
-            clean_text = preprocess_pdf_text(full_raw_text)
-            
-            reduction = 100 * (1 - len(clean_text) / max(len(full_raw_text), 1))
-            print(f"[PDF API] Reduced text by {reduction:.1f}%")
-            print(f"[PDF API] Clean text: {len(clean_text)} characters")
-            print(f"[PDF API] Text preview: {clean_text[:500]}...")
-
-            if len(clean_text.strip()) < 200:
-                return jsonify({
-                    'error': 'Could not extract enough text from PDF. The PDF may be scanned or contain images instead of text.',
-                    'success': False
-                }), 400
-
-            # Chunk text for processing - use larger chunks for better context
-            chunks = chunk_text_for_extraction(clean_text, max_chars=2500)
-            print(f"[PDF API] Split into {len(chunks)} chunks")
-
-            # Extract triples from each chunk
-            all_triples = []
-            
-            # Process chunks (limit to first 5 for speed)
-            max_chunks = min(len(chunks), 5)
-            for i in range(max_chunks):
-                chunk = chunks[i]
-                if len(chunk.strip()) < 100:
-                    continue
-                print(f"[PDF API] Processing chunk {i+1}/{max_chunks}...")
-                triples = extract_triples_from_chunk(chunk)
-                all_triples.extend(triples)
-                print(f"[PDF API] Chunk {i+1}: extracted {len(triples)} triples")
-
-            print(f"[PDF API] Total extracted triples: {len(all_triples)}")
-
-            if not all_triples:
-                # Try one more time with combined text
-                print("[PDF API] Retrying with combined text...")
-                combined_text = clean_text[:3000]
-                triples = extract_triples_from_chunk(combined_text)
-                all_triples.extend(triples)
-                print(f"[PDF API] Retry extracted {len(triples)} triples")
-
-            if not all_triples:
-                return jsonify({
-                    'error': 'Could not extract any knowledge triples from the PDF. The document may not contain recognizable chemical concepts.',
-                    'success': False
-                }), 500
-
-            # Convert triples to knowledge graph format
-            graph_data = triples_to_knowledge_graph(all_triples)
-            
-            print(f"[PDF API] Generated graph: {len(graph_data['nodes'])} nodes, {len(graph_data['edges'])} edges")
-
-            if len(graph_data['nodes']) == 0:
-                return jsonify({
-                    'error': 'No valid nodes could be created from the extracted triples.',
-                    'success': False
-                }), 500
-
-            # Ensure we have a reasonable graph
-            if len(graph_data['nodes']) < 3:
-                print("[PDF API] Too few nodes, adding additional context...")
-                # Add some basic chemistry context
-                default_nodes = [
-                    {"id": "cross_coupling", "label": "Cross-Coupling", "type": "reaction", "description": "Metal-catalyzed C-C bond formation"},
-                    {"id": "catalyst", "label": "Catalyst", "type": "catalyst", "description": "Transition metal catalyst"},
-                ]
-                for node in default_nodes:
-                    if node["id"] not in [n["id"] for n in graph_data["nodes"]]:
-                        graph_data["nodes"].append(node)
-
-            return jsonify({
-                'success': True,
-                'graph': graph_data,
-                'llm_used': True,
-                'text_length': len(clean_text),
-                'triples_count': len(all_triples),
-                'nodes_count': len(graph_data['nodes'])
-            })
-
-        finally:
-            # Clean up uploaded file
-            if os.path.exists(filepath):
-                os.remove(filepath)
-
-    except Exception as e:
-        print(f"[PDF API] Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e), 'success': False}), 500
-
-
 @app.route('/api/knowledge-graph/explain', methods=['POST'])
 def api_knowledge_graph_explain():
     """Get LLM explanation for a node or relationship"""
@@ -1296,6 +691,210 @@ Keep the explanation accessible to graduate-level chemistry students."""
         })
 
     except Exception as e:
+        return jsonify({'error': str(e), 'success': False}), 500
+
+
+# ==================== PDF UPLOAD & KNOWLEDGE GRAPH API ====================
+
+import pdfplumber
+
+def extract_text_from_pdf(filepath: str) -> str:
+    """Extract text content from a PDF file"""
+    text = ""
+    try:
+        with pdfplumber.open(filepath) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+    except Exception as e:
+        print(f"PDF extraction error: {e}")
+        return None
+    return text.strip()
+
+
+def generate_kg_from_content(content: str, source_name: str = "PDF") -> dict:
+    """Generate knowledge graph from text content using LLM"""
+    
+    # Truncate content if too long (LLM token limits)
+    max_chars = 6000  # Reduced to ensure complete response
+    if len(content) > max_chars:
+        content = content[:max_chars] + "..."
+    
+    system_prompt = """You are a knowledge extraction expert. Extract key concepts from the text and create a knowledge graph.
+
+IMPORTANT: Return ONLY valid JSON with no markdown, no code blocks, no explanation.
+
+Return a JSON object with this EXACT structure:
+{"nodes":[{"id":"id","label":"Name","type":"concept","description":"desc"}],"edges":[{"source":"id","target":"id","label":"rel"}]}
+
+Node types: concept, reaction, catalyst, reagent, mechanism, product, method, theory, property
+
+Rules:
+- Extract only 8-12 most important concepts
+- Use short IDs in snake_case
+- Keep descriptions under 15 words
+- Make sure ALL JSON brackets and quotes are properly closed
+- Return ONLY the JSON object, nothing else"""
+
+    user_message = f"Extract knowledge graph from this text:\n\n{content}"
+
+    response = get_llm_response_sync(system_prompt, user_message)
+    
+    if response:
+        try:
+            # Clean up response - remove markdown code blocks
+            json_str = response.strip()
+            
+            # Remove markdown code blocks if present
+            if '```' in json_str:
+                # Extract content between code blocks
+                lines = json_str.split('\n')
+                json_lines = []
+                in_code_block = False
+                for line in lines:
+                    if line.strip().startswith('```'):
+                        in_code_block = not in_code_block
+                        continue
+                    if in_code_block or not line.strip().startswith('```'):
+                        json_lines.append(line)
+                json_str = '\n'.join(json_lines)
+            
+            # Find JSON object boundaries
+            start_idx = json_str.find('{')
+            end_idx = json_str.rfind('}')
+            
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                json_str = json_str[start_idx:end_idx + 1]
+            
+            import json
+            result = json.loads(json_str)
+            
+            # Validate structure
+            if 'nodes' in result and 'edges' in result:
+                return result
+            else:
+                print(f"Invalid structure: missing nodes or edges")
+                return None
+                
+        except json.JSONDecodeError as e:
+            print(f"JSON Parse Error: {e}")
+            print(f"Attempting to fix incomplete JSON...")
+            
+            # Try to fix incomplete JSON
+            try:
+                fixed_json = fix_incomplete_json(json_str)
+                if fixed_json:
+                    return fixed_json
+            except Exception as fix_error:
+                print(f"JSON fix failed: {fix_error}")
+            
+            return None
+        except Exception as e:
+            print(f"Parse error: {e}")
+            return None
+    
+    return None
+
+
+def fix_incomplete_json(json_str: str) -> dict:
+    """Attempt to fix incomplete JSON by closing open brackets"""
+    import json
+    
+    # Count brackets
+    open_braces = json_str.count('{') - json_str.count('}')
+    open_brackets = json_str.count('[') - json_str.count(']')
+    
+    # Add missing closing brackets
+    fixed = json_str
+    for _ in range(open_brackets):
+        fixed += ']'
+    for _ in range(open_braces):
+        fixed += '}'
+    
+    try:
+        result = json.loads(fixed)
+        if 'nodes' in result:
+            # Clean up any incomplete nodes
+            if isinstance(result.get('nodes'), list):
+                result['nodes'] = [n for n in result['nodes'] if isinstance(n, dict) and 'id' in n]
+            if isinstance(result.get('edges'), list):
+                result['edges'] = [e for e in result['edges'] if isinstance(e, dict) and 'source' in e and 'target' in e]
+            return result
+    except:
+        pass
+    
+    return None
+
+
+@app.route('/api/knowledge-graph/upload', methods=['POST'])
+def api_knowledge_graph_upload():
+    """Upload PDF and generate knowledge graph from its content"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded', 'success': False}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected', 'success': False}), 400
+        
+        # Check file extension
+        filename = file.filename.lower()
+        if not filename.endswith('.pdf'):
+            return jsonify({'error': 'Only PDF files are supported', 'success': False}), 400
+        
+        # Save uploaded file temporarily
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(filepath)
+        
+        print(f"[KG Upload] Processing PDF: {file.filename}")
+        
+        try:
+            # Extract text from PDF
+            text_content = extract_text_from_pdf(filepath)
+            
+            if not text_content:
+                return jsonify({
+                    'error': 'Could not extract text from PDF. The PDF may be scanned or image-based.',
+                    'success': False
+                }), 400
+            
+            print(f"[KG Upload] Extracted {len(text_content)} characters from PDF")
+            
+            # Generate knowledge graph using LLM
+            graph_data = generate_kg_from_content(text_content, file.filename)
+            
+            if not graph_data:
+                return jsonify({
+                    'error': 'Failed to generate knowledge graph from PDF content',
+                    'success': False
+                }), 500
+            
+            # Extract title/topic from content
+            lines = text_content.split('\n')
+            title = file.filename.replace('.pdf', '').replace('_', ' ')
+            
+            print(f"[KG Upload] Generated graph with {len(graph_data.get('nodes', []))} nodes")
+            
+            return jsonify({
+                'success': True,
+                'topic': title,
+                'graph': graph_data,
+                'llm_used': True,
+                'content_length': len(text_content),
+                'source': 'pdf_upload'
+            })
+            
+        finally:
+            # Clean up uploaded file
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                
+    except Exception as e:
+        print(f"KG Upload Error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e), 'success': False}), 500
 
 

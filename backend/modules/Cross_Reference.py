@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 import networkx as nx
-from modules.DOI import get_paper_details
+from .DOI import get_paper_details
 
 # ---------------------------------------------------------
 # Data Processing

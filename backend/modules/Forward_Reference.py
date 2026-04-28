@@ -3,7 +3,7 @@ import networkx as nx
 import uuid
 from datetime import datetime
 import pandas as pd
-from modules.DOI import extract_doi_from_pdf, get_paper_details, get_forward_citations
+from .DOI import extract_doi_from_pdf, get_paper_details, get_forward_citations
 
 # ---------------------------------------------------------
 # Forward Citation Network
