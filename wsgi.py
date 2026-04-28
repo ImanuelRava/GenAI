@@ -1,58 +1,82 @@
-<<<<<<< HEAD
-import sys
-import os
-
-path = '/home/hbsu/GenAI/upload'
-if path not in sys.path:
-    sys.path.insert(0, path)
-
-from app import app as application
-=======
 """
 WSGI Configuration for PythonAnywhere Deployment
-ChemAI Research - Flask Application
 
-IMPORTANT: Update the paths below with your PythonAnywhere username!
+This file is the entry point for the Flask application on PythonAnywhere.
+It sets up the correct paths and imports the Flask app.
 """
 
 import sys
 import os
 
-# ============================================
-# CONFIGURATION - UPDATE THESE PATHS!
-# ============================================
-# Replace 'yourusername' with your actual PythonAnywhere username
-PROJECT_PATH = '/home/yourusername/chemai-research/upload'
+# ============================================================
+# CONFIGURATION - Edit these paths for your PythonAnywhere account
+# ============================================================
 
-# Add project path to Python path
-if PROJECT_PATH not in sys.path:
-    sys.path.insert(0, PROJECT_PATH)
+USERNAME = 'hbsu'
 
-# ============================================
-# SET UP VIRTUAL ENVIRONMENT (Optional)
-# ============================================
-# Uncomment and adjust if you created a virtual environment
-# activate_this = '/home/yourusername/.virtualenvs/chemai/bin/activate_this.py'
-# with open(activate_this) as file_:
-#     exec(file_.read(), dict(__file__=activate_this))
+# Project home directory
+PROJECT_HOME = f'/home/{USERNAME}/genai-research'
 
-# ============================================
-# IMPORT FLASK APPLICATION
-# ============================================
-from app import app as application
+# Backend directory path
+BACKEND_PATH = os.path.join(PROJECT_HOME, 'backend')
 
-# ============================================
-# LOGGING
-# ============================================
+# ============================================================
+# PATH SETUP - Do not modify unless you know what you're doing
+# ============================================================
+
+# Add project home to Python path
+if PROJECT_HOME not in sys.path:
+    sys.path.insert(0, PROJECT_HOME)
+
+# Add backend directory to Python path
+if BACKEND_PATH not in sys.path:
+    sys.path.insert(0, BACKEND_PATH)
+
+# ============================================================
+# ENVIRONMENT VARIABLES - Set your API keys here or in PythonAnywhere dashboard
+# ============================================================
+
+# Uncomment and set these if you need LLM features
+# os.environ['LLM_API_KEY'] = 'your-api-key-here'
+# os.environ['LLM_PROVIDER'] = 'openai'
+# os.environ['LLM_MODEL'] = 'gpt-4'
+
+# Or load from .env file if it exists
+env_file = os.path.join(BACKEND_PATH, '.env')
+if os.path.exists(env_file):
+    with open(env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                if key and value and key not in os.environ:
+                    os.environ[key] = value
+
+# ============================================================
+# FLASK APP IMPORT - This is what PythonAnywhere looks for
+# ============================================================
+
+# Import the Flask application
+from backend.app import app as application
+
+# ============================================================
+# OPTIONAL: Add middleware or logging
+# ============================================================
+
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s %(levelname)s: %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-# ============================================
-# FOR LOCAL TESTING
-# ============================================
+# Log startup
+logging.info(f"WSGI starting - Project home: {PROJECT_HOME}")
+logging.info(f"Python version: {sys.version}")
+
+# ============================================================
+# ALTERNATIVE: If you want to serve directly from this file
+# ============================================================
+
+# You can also run this file directly for local testing:
 if __name__ == '__main__':
-    application.run(debug=True, port=5000)
->>>>>>> 23a354a1c0fa65f4045e5795ea5aa80df0313e9b
+    application.run(debug=True, host='0.0.0.0', port=5000)
