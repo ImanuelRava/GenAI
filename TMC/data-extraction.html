@@ -5,25 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Extraction | TMC - GenAI Research</title>
     <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/shared.css">
     <style>
         /* Page-specific styles */
-        html { height: 100%; }
-        body { height: 100%; }
+        /* Page-specific styles */
+        html { height: auto; min-height: 100vh; }
+        body { min-height: 100vh; }
         
-        .iframe-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
+        .iframe-container { flex: 1; position: relative; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
         
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        .step-list { list-style: none; }
+        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--ral-primary); }
+        .step-number { width: 32px; height: 32px; background: var(--ral-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
+        
+        .sidebar-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        
     </style>
 </head>
-<body>
+<body class="theme-purple">
 
     <!-- Header -->
     <header>

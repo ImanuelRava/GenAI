@@ -19,231 +19,33 @@
             }
         };
     </script>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --red: #ef4444;
-            --pink: #ec4899;
-            --cyan: #06b6d4;
-            --orange: #f97316;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-purple-light: #ede9fe;
-            --bg-green-light: #d1fae5;
-            --bg-pink-light: #fce7f3;
-            --bg-cyan-light: #cffafe;
-            --bg-orange-light: #ffedd5;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { height: auto; min-height: 100vh; }
-        body { min-height: 100vh; font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-        /* --- Header --- */
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-
-
-
-
-
-        /* Main Layout */
-        .main-wrapper { display: flex; flex: 1 1 auto; }
-
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
-        .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
-        .sidebar-nav { list-style: none; }
-        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; text-decoration: none; color: var(--text-secondary); }
-        .sidebar-item:hover { background: var(--bg-gray); color: var(--text-main); }
-        .sidebar-item.active { background: var(--bg-blue-light); color: var(--primary); border-left-color: var(--primary); }
-        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
-        .sidebar-item-text { font-size: 0.85rem; font-weight: 500; }
-        .sidebar-section { padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color); }
-        .sidebar-section-title { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Content Area */
-        .content-area { flex: 1 1 auto; padding: 20px; background: var(--bg-gray); }
-        .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
-        .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .content-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
-        .content-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .content-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
-
-        h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-block; }
-        h3 { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin: 16px 0 8px; }
-        p { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
-        strong { color: var(--text-main); font-weight: 600; }
-
-        ul { list-style: none; padding: 0; margin-bottom: 16px; }
-        ul li { padding: 6px 0 6px 20px; position: relative; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
-        .content-panel ul li::before { content: ''; position: absolute; left: 0; top: 12px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
-
-        /* Info Box */
-        .info-box { background: var(--bg-blue-light); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px; margin: 16px 0; }
-        .info-box h4 { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
-        .info-box p { margin-bottom: 0; font-size: 0.9rem; }
-        .info-box.warning { background: var(--bg-orange-light); border-left-color: var(--warning); }
-        .info-box.warning h4 { color: var(--warning); }
-        .info-box.success { background: var(--bg-green-light); border-left-color: var(--accent); }
-        .info-box.success h4 { color: var(--accent); }
-        .info-box.purple { background: var(--bg-purple-light); border-left-color: var(--secondary); }
-        .info-box.purple h4 { color: var(--secondary); }
-
-        /* Cards Grid */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
-        .info-card { background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
-        .info-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
-        .info-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
-        .info-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
-        .info-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
-
+        /* Page-specific styles for Supervised Learning */
+        
         /* Formula Box */
         .formula-box { background: var(--bg-dark); color: #ffffff; padding: 16px 20px; border-radius: var(--radius); font-family: 'Fira Code', 'Courier New', monospace; margin: 16px 0; overflow-x: auto; }
         .formula-box p { color: #ffffff; margin-bottom: 8px; }
         .formula-box strong { color: #ffffff; }
-        .formula-box .comment { color: #a0a0a0; }
-        .formula-box .keyword { color: #ff79c6; }
-        .formula-box .function { color: #50fa7b; }
-        .formula-box .string { color: #f1fa8c; }
-        .formula-box .number { color: #bd93f9; }
-
-        /* Table */
-        .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--bg-main); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); }
-        .data-table th { background: var(--primary); color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 0.85rem; }
-        .data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary); }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover { background: var(--bg-gray); }
-
-        /* Steps */
-        .steps-container { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
-        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--accent); }
-        .step-number { width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
-        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
 
         /* Diagram */
         .diagram-container { background: var(--bg-gray); border-radius: var(--radius); padding: 24px; margin: 16px 0; }
         .diagram-flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px; }
         .diagram-box { padding: 12px 20px; border-radius: var(--radius); font-weight: 600; text-align: center; min-width: 100px; }
-        .diagram-box.input { background: var(--bg-blue-light); border: 2px solid var(--primary); color: var(--primary); }
-        .diagram-box.process { background: var(--bg-purple-light); border: 2px solid var(--secondary); color: var(--secondary); }
-        .diagram-box.output { background: var(--bg-green-light); border: 2px solid var(--accent); color: var(--accent); }
+        .diagram-box.input { background: var(--bg-blue-light); border: 2px solid var(--ai-primary); color: var(--ai-primary); }
+        .diagram-box.process { background: var(--bg-purple-light); border: 2px solid var(--tmc-primary); color: var(--tmc-primary); }
+        .diagram-box.output { background: var(--bg-green-light); border: 2px solid var(--ral-primary); color: var(--ral-primary); }
         .diagram-arrow { font-size: 1.5rem; color: var(--text-muted); }
 
-        /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 0.9rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; gap: 6px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
-        .btn-outline:hover { background: var(--bg-gray); border-color: var(--primary); color: var(--primary); }
-        .btn-group { display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); }
-
-        /* Footer */
-        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
-        footer p { font-size: 0.7rem; color: var(--text-light); }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .header-layout { flex-direction: column; gap: 8px; }
-            nav ul { justify-content: center; gap: 12px; }
-            .main-wrapper { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 150px; }
-            .sidebar-header { display: none; }
-            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px; }
-            .sidebar-item { padding: 6px 10px; border-left: none; border-radius: var(--radius); border: 1px solid var(--border-color); }
-            .sidebar-section { display: none; }
-            .sidebar-item-text { display: none; }
-        }
+        /* Steps */
+        .steps-container { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--ral-primary); }
+        .step-number { width: 32px; height: 32px; background: var(--ral-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
     </style>
 </head>
-<body>
+<body class="theme-blue">
 
     <!-- Header -->
     <header>
@@ -385,12 +187,16 @@
                 <h2>Binary vs Multi-Class Classification</h2>
                 <div class="cards-grid">
                     <div class="info-card">
-                        <div class="icon">🔘</div>
+                        <div class="icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--section-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+                        </div>
                         <h4>Binary Classification</h4>
                         <p>Two possible outcomes (e.g., spam/not spam, toxic/non-toxic molecule). Output is typically a probability that's thresholded at 0.5.</p>
                     </div>
                     <div class="info-card">
-                        <div class="icon">🎯</div>
+                        <div class="icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--section-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                        </div>
                         <h4>Multi-Class Classification</h4>
                         <p>Three or more possible categories (e.g., reaction type classification, compound activity level). Uses softmax for probability distribution.</p>
                     </div>

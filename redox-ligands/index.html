@@ -447,22 +447,43 @@
             apiKeyHint.innerHTML = `Get your API key from <a href="${config?.url || '#'}" target="_blank">${config?.url || 'provider'}</a>`;
         }
 
-        function updateApiStatus() {
+        async function updateApiStatus() {
             const settings = loadSettings();
             const apiStatus = document.getElementById('apiStatus');
             const apiStatusText = document.getElementById('apiStatusText');
             
+            // First check if user has configured their own API key
             if (settings.apiKey) {
                 apiStatus.classList.remove('disconnected');
                 apiStatus.classList.add('connected');
                 apiStatusText.innerHTML = `Connected to <strong>${PROVIDER_CONFIG[settings.provider]?.name || settings.provider}</strong>`;
                 settingsBtn.classList.add('configured');
-            } else {
-                apiStatus.classList.remove('connected');
-                apiStatus.classList.add('disconnected');
-                apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
-                settingsBtn.classList.remove('configured');
+                return;
             }
+            
+            // Check if backend has API keys configured
+            try {
+                const response = await fetch('/api/llm/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.has_backend_key) {
+                        apiStatus.classList.remove('disconnected');
+                        apiStatus.classList.add('connected');
+                        const providerName = PROVIDER_CONFIG[data.default_provider]?.name || data.default_provider;
+                        apiStatusText.innerHTML = `Connected to <strong>${providerName}</strong> (Server)`;
+                        settingsBtn.classList.add('configured');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not check backend LLM status:', e);
+            }
+            
+            // No API key available
+            apiStatus.classList.remove('connected');
+            apiStatus.classList.add('disconnected');
+            apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
+            settingsBtn.classList.remove('configured');
         }
 
         providerSelect.addEventListener('change', updateModelOptions);
@@ -512,9 +533,84 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'chat-message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">RAL</div>
+                <div class="message-body">
+                    <div class="message-sender">Redox-Active Ligand Assistant</div>
+                    <div class="message-text typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage(message) {
+            const settings = loadSettings();
+            
+            // Allow message if user has API key OR if backend has one configured
+            // The backend will handle the case where no API key is available
+
+            addMessage(message, true);
+            addTypingIndicator();
+
+            try {
+                const response = await fetch('/api/redox/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        provider: settings.provider || undefined,
+                        api_key: settings.apiKey || undefined,
+                        model: settings.model || undefined
+                    })
+                });
+
+                removeTypingIndicator();
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`Error: ${data.error || 'Failed to get response'}`, false);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Connection failed. Is the server running?', false);
+            }
+        }
+
         function askQuestion(q) {
             chatInput.value = q;
+            sendMessage(q);
         }
+
+        sendBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                chatInput.value = '';
+            }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
 
         // Initialize
         updateApiStatus();

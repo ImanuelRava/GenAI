@@ -4,212 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PCA Visualization | AI Education - GenAI Research</title>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --red: #ef4444;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-dark: #1f2937;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --radius: 8px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { height: auto; min-height: 100vh; }
-        body { min-height: 100vh; font-family: var(--font-main); background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; }
-
-        /* Header */
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-/* Playground Layout */
+        /* Page-specific styles */
+        /* Playground Layout */
         .playground-wrapper { flex: 1 1 auto; display: flex; overflow: hidden; }
         
         /* Control Panel */
-        .control-panel { 
-            width: 260px; 
-            background: var(--bg-main); 
-            border-right: 1px solid var(--border-color); 
-            padding: 16px; 
-            overflow-y: auto; 
-            flex-shrink: 0;
-        }
-        
+        .control-panel { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px; overflow-y: auto; flex-shrink: 0; }
         .control-section { margin-bottom: 20px; }
-        .control-section h3 { 
-            font-size: 0.7rem; 
-            font-weight: 600; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
+        .control-section h3 { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
         .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .control-row label { font-size: 0.8rem; color: var(--text-secondary); }
         
-        /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; font-size: 0.8rem; font-weight: 500; border-radius: var(--radius); cursor: pointer; border: none; gap: 4px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-secondary { background: var(--secondary); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-        .btn-block { width: 100%; margin-bottom: 8px; }
-        
         /* Toggle Buttons */
         .toggle-group { display: flex; gap: 4px; flex-wrap: wrap; }
-        .toggle-btn { 
-            padding: 5px 10px; 
-            font-size: 0.75rem; 
-            border: 1px solid var(--border-color); 
-            background: var(--bg-main); 
-            border-radius: var(--radius); 
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .toggle-btn { padding: 5px 10px; font-size: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-main); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
         .toggle-btn:hover { background: var(--bg-gray); }
-        .toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .toggle-btn.active { background: var(--ai-primary); color: white; border-color: var(--ai-primary); }
         
         /* Stats */
         .stats-box { background: var(--bg-gray); border-radius: var(--radius); padding: 10px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.8rem; }
         .stat-label { color: var(--text-muted); }
-        .stat-value { font-weight: 600; color: var(--primary); }
+        .stat-value { font-weight: 600; color: var(--ai-primary); }
         
         /* Select & Input */
         select, input[type="number"] { padding: 5px 8px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.8rem; background: var(--bg-main); width: 90px; }
         
         /* Canvas Area */
         .canvas-area { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
         .canvas-container { flex: 1; position: relative; overflow: hidden; }
-        
         #main-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: grab; }
         #main-canvas:active { cursor: grabbing; }
         
         /* Info Panel */
-        .info-panel { 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: rgba(31, 41, 55, 0.9); 
-            padding: 12px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-        
+        .info-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(31, 41, 55, 0.9); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
         .legend-inline { display: flex; gap: 20px; }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: white; }
         .legend-color { width: 12px; height: 12px; border-radius: 50%; }
         .legend-line { width: 20px; height: 3px; border-radius: 2px; }
-        
         .info-text { font-size: 0.8rem; color: var(--text-muted); }
         
         /* Tooltip */
-        .tooltip {
-            position: fixed;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 6px 10px;
-            border-radius: var(--radius);
-            font-size: 0.75rem;
-            pointer-events: none;
-            display: none;
-            z-index: 1000;
-        }
+        .tooltip { position: fixed; background: rgba(0, 0, 0, 0.8); color: white; padding: 6px 10px; border-radius: var(--radius); font-size: 0.75rem; pointer-events: none; display: none; z-index: 1000; }
         
-        /* Footer */
-        footer { background: var(--bg-dark); color: #9ca3af; padding: 6px 20px; text-align: center; font-size: 0.7rem; border-top: 1px solid #374151; }
-
-        @media (max-width: 800px) {
-            .playground-wrapper { flex-direction: column; }
-            .control-panel { width: 100%; max-height: 200px; display: flex; flex-wrap: wrap; gap: 10px; }
-            .control-section { flex: 1; min-width: 150px; margin-bottom: 10px; }
-        }
     </style>
 </head>
-<body>
+<body class="theme-blue">
 
     <!-- Header -->
     <header>

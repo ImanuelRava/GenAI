@@ -6,99 +6,301 @@
     <title>Citation Network | TMC - GenAI Research</title>
     <!-- Cytoscape.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <!-- Cytoscape FCose layout (for Force-directed layout) -->
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.min.js"></script>
     <!-- SheetJS (For Excel Download) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/shared.css">
     <style>
         /* Page-specific styles */
-        html {  }
-        body {  }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .main-wrapper {
+            height: calc(100vh - 72px);
+        }
+        
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            min-height: 0;
+        }
         
         .sidebar {
-            width: 300px;
+            width: 320px;
+            overflow-y: auto;
         }
         
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            cursor: pointer;
-        }
-
-        .form-label input[type="radio"] {
-            accent-color: var(--primary);
-            transform: scale(1.1);
-        }
-
         /* Graph Container */
         .graph-container {
             flex: 1;
             position: relative;
-            background: var(--bg-main);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 400px;
+            display: flex;
         }
-
+        
+        .dark-mode .graph-container {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+        
         #cy {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-
+        
+        /* Statistics Dashboard */
+        .stats-dashboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .dark-mode .stats-dashboard {
+            background: rgba(30, 41, 59, 0.95);
+            color: #e2e8f0;
+        }
+        
+        .stats-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+        }
+        
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-item .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            font-size: 0.75rem;
+        }
+        
+        .dark-mode .legend {
+            background: rgba(30, 41, 59, 0.95);
+            color: #e2e8f0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .legend-size {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+        
+        /* Toolbar */
+        .graph-toolbar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .toolbar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow);
+        }
+        
+        .toolbar-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .toolbar-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Search Box */
+        .search-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            padding: 8px 16px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            width: 200px;
+            background: transparent;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        
         /* Zoom Controls */
         .zoom-controls {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-main);
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid var(--border-color);
             padding: 8px 20px;
-            border-radius: 20px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
             gap: 12px;
             box-shadow: var(--shadow);
+            z-index: 10;
         }
-
+        
         .zoom-controls label {
             font-size: 0.8rem;
             color: var(--text-muted);
         }
-
+        
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
-            width: 120px;
-            height: 4px;
-            background: var(--border-color);
-            border-radius: 2px;
+            width: 100%;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 4px;
             outline: none;
+            cursor: pointer;
+            margin: 8px 0;
         }
-
+        
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: var(--primary);
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            border: 3px solid #ffffff;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
         }
-
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            border: 3px solid #ffffff;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        input[type="range"]::-moz-range-track {
+            background: #cbd5e1;
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .dark-mode input[type="range"] {
+            background: #374151;
+        }
+        
+        .dark-mode input[type="range"]::-moz-range-track {
+            background: #374151;
+        }
+        
         /* Info Panel (Right Sidebar) */
         .info-panel {
             position: absolute;
             top: 0;
             right: 0;
-            width: 350px;
+            width: 380px;
             height: 100%;
-            background: var(--bg-main);
+            background: var(--bg-white);
             border-left: 1px solid var(--border-color);
             box-shadow: var(--shadow-lg);
             transform: translateX(100%);
@@ -107,94 +309,280 @@
             display: flex;
             flex-direction: column;
         }
-
+        
         .info-panel.open {
             transform: translateX(0);
         }
-
+        
         .info-panel-header {
-            padding: 16px;
+            padding: 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
         }
-
+        
         .info-panel-header h3 {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--primary);
         }
-
+        
         .close-btn {
-            background: none;
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             font-size: 1.5rem;
-            color: var(--text-muted);
+            color: white;
             cursor: pointer;
             line-height: 1;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
+        
         .close-btn:hover {
-            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.3);
         }
-
+        
         .info-panel-content {
-            padding: 16px;
+            padding: 20px;
             overflow-y: auto;
             flex: 1;
         }
-
+        
         .detail-card {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
-
+        
         .detail-label {
             font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-weight: 600;
         }
-
+        
         .detail-value {
             font-size: 0.95rem;
             color: var(--text-main);
-            line-height: 1.5;
+            line-height: 1.6;
         }
-
+        
         .stat-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin: 16px 0;
+            margin: 20px 0;
         }
-
+        
         .stat-box {
-            background: var(--bg-gray);
-            padding: 12px;
+            background: linear-gradient(135deg, var(--bg-gray) 0%, var(--bg-main) 100%);
+            padding: 16px 12px;
             border-radius: var(--radius);
             text-align: center;
             border: 1px solid var(--border-color);
         }
-
+        
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--accent);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
+        
         .stat-label-small {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        /* Connected Papers */
+        .connected-papers {
+            margin-top: 20px;
+        }
+        
+        .connected-paper-item {
+            padding: 10px 12px;
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-left: 3px solid var(--primary);
+            transition: all var(--transition-normal);
+        }
+        
+        .connected-paper-item:hover {
+            background: var(--bg-blue-light);
+            transform: translateX(4px);
+        }
+        
+        .connected-paper-item.citing {
+            border-left-color: #10b981;
+        }
+        
+        .connected-paper-item.cited {
+            border-left-color: #f59e0b;
+        }
+        
+        .connected-paper-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .connected-paper-meta {
             font-size: 0.75rem;
             color: var(--text-muted);
         }
-
+        
+        /* Sidebar Sections */
+        .sidebar-section {
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px;
+        }
+        
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+        
+        .sidebar-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-section-title .icon {
+            font-size: 1rem;
+        }
+        
+        /* Layout Selector */
+        .layout-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .layout-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-gray);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all var(--transition-normal);
+            text-align: center;
+        }
+        
+        .layout-btn:hover, .layout-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Filter Controls */
+        .filter-control {
+            margin-bottom: 12px;
+        }
+        
+        .filter-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .filter-label span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: var(--radius);
+            transition: background var(--transition-normal);
+        }
+        
+        .form-label:hover {
+            background: var(--bg-gray);
+        }
+        
+        .form-label input[type="radio"] {
+            accent-color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        /* File Drop */
+        .file-drop {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            background: var(--bg-gray);
+            margin-bottom: 12px;
+        }
+        
+        .file-drop:hover {
+            border-color: var(--primary);
+            background: var(--bg-blue-light);
+        }
+        
+        .file-drop-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .file-drop-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .file-name {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
         /* Suggestion List */
         .suggestion-list {
-            flex: 1;
+            max-height: 300px;
             overflow-y: auto;
         }
-
+        
         .suggestion-item {
             background: var(--bg-gray);
             border-left: 3px solid var(--accent);
@@ -204,24 +592,31 @@
             cursor: pointer;
             transition: all var(--transition-normal);
         }
-
+        
         .suggestion-item:hover {
             background: var(--bg-blue-light);
             border-left-color: var(--primary);
+            transform: translateX(4px);
         }
-
+        
         .suggestion-title {
             font-weight: 600;
             font-size: 0.85rem;
             color: var(--text-main);
             margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-
+        
         .suggestion-meta {
             font-size: 0.75rem;
             color: var(--text-muted);
+            display: flex;
+            gap: 12px;
         }
-
+        
         /* Loader Overlay */
         .loader-overlay {
             position: absolute;
@@ -229,22 +624,96 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             z-index: 50;
         }
-
+        
         .loader-overlay.active {
             display: flex;
         }
-
+        
+        .loader-progress {
+            margin-top: 20px;
+            width: 200px;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .loader-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loader-text {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 5;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h4 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Tooltip */
+        .node-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            max-width: 250px;
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .node-tooltip.visible {
+            opacity: 1;
+        }
+        
         /* Responsive */
         @media (max-width: 900px) {
             .info-panel {
                 width: 100%;
+            }
+            .sidebar {
+                width: 280px;
+            }
+            .stats-dashboard {
+                display: none;
             }
         }
     </style>
@@ -286,7 +755,13 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-section">
-                <div class="sidebar-section-title">Settings</div>
+                <div class="sidebar-section-title">
+                    <span class="icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                    </span> Analysis Settings
+                </div>
                 <div class="form-group">
                     <label class="form-label"><input type="radio" name="type" value="forward" checked> Forward (PDF)</label>
                     <label class="form-label"><input type="radio" name="type" value="backward"> Backward (PDF)</label>
@@ -294,20 +769,56 @@
                 </div>
 
                 <div class="file-drop" onclick="document.getElementById('fileInput').click()">
-                    <div class="file-drop-icon">📄</div>
+                    <div class="file-drop-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                    </div>
                     <div class="file-drop-text">Click to upload file</div>
                     <div class="file-name" id="fileName">No file selected</div>
                     <input type="file" id="fileInput" style="display: none" onchange="updateFileName(this)">
                 </div>
 
-                <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()">Build Network</button>
-                <button class="btn btn-accent" id="downloadBtn" onclick="downloadExcel()" style="display: none; margin-top: 8px;">Download Excel</button>
+                <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()" style="width: 100%;">Build Network</button>
+                <button class="btn btn-accent" id="downloadBtn" onclick="downloadExcel()" style="display: none; margin-top: 8px; width: 100%;">Download Excel</button>
             </div>
 
-            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
-                <div class="sidebar-section-title">Top Papers</div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <span class="icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="17" r="2"/><circle cx="6" cy="12" r="3"/><circle cx="12" cy="19" r="2"/>
+                        </svg>
+                    </span> Layout & Display
+                </div>
+                <div class="layout-selector">
+                    <button class="layout-btn active" onclick="setLayout('preset')" id="layout-preset">Scatter</button>
+                    <button class="layout-btn" onclick="setLayout('fcose')" id="layout-fcose">Force</button>
+                    <button class="layout-btn" onclick="setLayout('circle')" id="layout-circle">Circle</button>
+                    <button class="layout-btn" onclick="setLayout('concentric')" id="layout-concentric">Rings</button>
+                </div>
+                
+                <div class="filter-control">
+                    <div class="filter-label">Node Size by Citations</div>
+                    <input type="range" id="nodeSizeSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateNodeSizes()">
+                </div>
+                
+                <div class="filter-control">
+                    <div class="filter-label">Min Year: <span id="yearMinValue">1900</span></div>
+                    <input type="range" id="yearMinSlider" min="1900" max="2025" step="1" value="1900" oninput="filterByYear()">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <span class="icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </span> Top Papers
+                </div>
                 <div class="suggestion-list" id="suggestionsList">
-                    <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Run analysis to see suggestions...</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Run analysis to see top papers...</p>
                 </div>
             </div>
         </aside>
@@ -317,23 +828,115 @@
             <!-- Graph Container -->
             <div class="graph-container">
                 <div id="cy"></div>
+                
+                <!-- Statistics Dashboard -->
+                <div class="stats-dashboard" id="statsDashboard" style="display: none;">
+                    <div class="stats-title">Network Statistics</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="value" id="statNodes">0</div>
+                            <div class="label">Papers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" id="statEdges">0</div>
+                            <div class="label">Citations</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" id="statAvgCites">0</div>
+                            <div class="label">Avg Cites</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" id="statMaxCites">0</div>
+                            <div class="label">Max Cites</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="search-box" id="searchBox" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" placeholder="Search papers..." id="searchInput" oninput="searchNodes(this.value)">
+                </div>
+                
+                <!-- Legend -->
+                <div class="legend" id="legend" style="display: none;">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <span>Main Paper</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <span>Cited Paper</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <span>Highly Cited</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-size" style="border-color: #6366f1;"></div>
+                        <span>Size = Citations</span>
+                    </div>
+                </div>
+                
+                <!-- Toolbar -->
+                <div class="graph-toolbar" id="graphToolbar" style="display: none;">
+                    <button class="toolbar-btn" onclick="exportPNG()" title="Export PNG">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </button>
+                    <button class="toolbar-btn" onclick="fitNetwork()" title="Fit Network">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
+                    <button class="toolbar-btn" onclick="resetView()" title="Reset View">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                    </button>
+                </div>
+                
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">🔗</div>
-                    <h4>Network Visualization</h4>
-                    <p>Upload a file and click "Build Network" to visualize citation data.</p>
+                    <div class="empty-state-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                    </div>
+                    <h4>Citation Network Visualization</h4>
+                    <p>Upload a PDF or Excel file and click "Build Network" to visualize citation relationships.</p>
                 </div>
                 
                 <div class="zoom-controls" id="zoomControls" style="display: none;">
+                    <button class="toolbar-btn" onclick="zoomIn()" style="width: 32px; height: 32px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
                     <label>Zoom:</label>
                     <input type="range" id="zoomSlider" min="0.1" max="3.0" step="0.1" value="1.0">
                     <span id="zoomLabel">100%</span>
+                    <button class="toolbar-btn" onclick="zoomOut()" style="width: 32px; height: 32px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
             <!-- Loader -->
             <div class="loader-overlay" id="loader">
                 <div class="loading-spinner"></div>
-                <p>Processing data...</p>
+                <div class="loader-progress">
+                    <div class="loader-progress-bar" id="loaderProgress"></div>
+                </div>
+                <p class="loader-text" id="loaderText">Processing data...</p>
             </div>
 
             <!-- Info Panel -->
@@ -356,20 +959,33 @@
                             <div class="stat-value" id="detail-year">-</div>
                             <div class="stat-label-small">Year</div>
                         </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="detail-local">0</div>
+                            <div class="stat-label-small">Local</div>
+                        </div>
                     </div>
                     <div class="detail-card">
                         <div class="detail-label">Author</div>
                         <div class="detail-value" id="detail-author">-</div>
                     </div>
                     <div class="detail-card">
-                        <div class="detail-label">DOI / ID</div>
+                        <div class="detail-label">DOI</div>
                         <div class="detail-value" id="detail-doi" style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">-</div>
                     </div>
-                    <a id="detail-link" href="#" target="_blank" class="btn btn-primary" style="display: none; margin-top: 12px;">View Paper (DOI)</a>
+                    <a id="detail-link" href="#" target="_blank" class="btn btn-primary" style="display: none; margin-top: 12px; width: 100%;">View Paper (DOI)</a>
+                    
+                    <!-- Connected Papers -->
+                    <div class="connected-papers" id="connectedPapers" style="display: none;">
+                        <div class="detail-label">Connected Papers</div>
+                        <div id="connectedPapersList"></div>
+                    </div>
                 </div>
             </aside>
         </main>
     </div>
+
+    <!-- Tooltip -->
+    <div class="node-tooltip" id="nodeTooltip"></div>
 
     <!-- Footer -->
     <footer>
@@ -377,8 +993,19 @@
     </footer>
 
     <script>
-        // Global variable to store full paper data for download
+        // Register fcose layout with cytoscape
+        if (typeof cytoscape !== 'undefined' && typeof cytoscapeFcose !== 'undefined') {
+            cytoscape.use(cytoscapeFcose);
+            console.log('fcose layout registered successfully');
+        } else {
+            console.warn('fcose library not loaded properly');
+        }
+
+        // Global variables
         let fullPaperData = [];
+        let currentLayout = 'preset';
+        let networkData = null;
+        let minYear = 1900, maxYear = 2025, maxCites = 0;
 
         function updateFileName(input) {
             if(input.files && input.files[0]) {
@@ -397,6 +1024,14 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Papers");
             XLSX.writeFile(wb, "Citation_Network_Data.xlsx");
+        }
+
+        // --- PROGRESS UPDATE ---
+        function updateProgress(percent, text) {
+            document.getElementById('loaderProgress').style.width = percent + '%';
+            if (text) {
+                document.getElementById('loaderText').innerText = text;
+            }
         }
 
         async function runAnalysis() {
@@ -419,12 +1054,22 @@
             emptyState.style.display = 'none';
             dlBtn.style.display = 'none';
             zoomControls.style.display = 'none';
+            
+            // Hide UI elements during loading
+            document.getElementById('statsDashboard').style.display = 'none';
+            document.getElementById('searchBox').style.display = 'none';
+            document.getElementById('legend').style.display = 'none';
+            document.getElementById('graphToolbar').style.display = 'none';
+
+            updateProgress(10, 'Uploading file...');
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
             formData.append('type', typeInput.value);
 
             try {
+                updateProgress(20, 'Processing file...');
+                
                 const response = await fetch('/api/network', { method: 'POST', body: formData });
                 
                 if (!response.ok) {
@@ -438,35 +1083,54 @@
                     throw new Error(errorMessage);
                 }
                 
+                updateProgress(60, 'Building network...');
                 const data = await response.json();
 
                 fullPaperData = data.all_papers || [];
-                initCytoscape(data.elements);
+                networkData = data.elements;
+                
+                updateProgress(80, 'Rendering visualization...');
+                
+                initCytoscape(networkData);
+                updateStatistics(networkData);
 
+                // Update suggestions list
                 list.innerHTML = '';
-                if (data.suggestions.length > 0) {
-                    data.suggestions.forEach((s, i) => {
+                if (data.suggestions && data.suggestions.length > 0) {
+                    data.suggestions.slice(0, 10).forEach((s, i) => {
                         list.innerHTML += `
                             <div class="suggestion-item" onclick="focusOnNode('${s.doi}')">
-                                <div class="suggestion-title">${i+1}. ${s.title.substring(0, 40)}...</div>
-                                <div class="suggestion-meta">Source: ${s.source} | Cites: ${s.citations}</div>
+                                <div class="suggestion-title">${i+1}. ${s.title || 'Unknown Title'}</div>
+                                <div class="suggestion-meta">
+                                    <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 2px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>${s.citations || 0} cites</span>
+                                    <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 2px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${s.year || 'N/A'}</span>
+                                </div>
                             </div>`;
                     });
                 } else {
                     list.innerHTML = '<p style="font-size:0.8rem; color: var(--text-muted);">No suggestions found.</p>';
                 }
 
+                // Show UI elements
                 dlBtn.style.display = 'block';
                 zoomControls.style.display = 'flex';
+                document.getElementById('statsDashboard').style.display = 'block';
+                document.getElementById('searchBox').style.display = 'flex';
+                document.getElementById('legend').style.display = 'block';
+                document.getElementById('graphToolbar').style.display = 'flex';
+                
+                updateProgress(100, 'Complete!');
 
             } catch (e) {
                 console.error("Analysis error:", e);
                 emptyState.style.display = 'flex';
                 emptyState.querySelector('h4').innerText = "Error";
-                emptyState.querySelector('p').innerText = e.message || "Failed to connect to server. Please check if the backend is running.";
+                emptyState.querySelector('p').innerText = e.message || "Failed to connect to server.";
                 alert("Error: " + e.message);
             } finally {
-                loader.classList.remove('active');
+                setTimeout(() => {
+                    loader.classList.remove('active');
+                }, 500);
                 btn.disabled = false;
             }
         }
@@ -480,8 +1144,487 @@
             return baseVal + (normalized * scale);
         }
 
+        // --- COLOR HELPER ---
+        function getNodeColor(node) {
+            const isMain = node.data('is_main') === "True";
+            const cites = parseInt(node.data('citations')) || 0;
+            
+            if (isMain) return '#f59e0b'; // Gold for main paper
+            
+            // Gradient from blue to green based on citations
+            const normalizedCites = Math.min(cites / Math.max(maxCites, 1), 1);
+            if (normalizedCites > 0.7) return '#10b981'; // Green for highly cited
+            if (normalizedCites > 0.4) return '#6366f1'; // Indigo for moderately cited
+            return '#3b82f6'; // Blue for normal
+        }
+
+        // --- NODE SIZE HELPER ---
+        function getNodeSize(node) {
+            const isMain = node.data('is_main') === "True";
+            const cites = parseInt(node.data('citations')) || 0;
+            const sizeMultiplier = parseFloat(document.getElementById('nodeSizeSlider').value);
+            
+            if (isMain) return 35 * sizeMultiplier;
+            
+            // Logarithmic scale for size
+            const baseSize = 12;
+            const citeBonus = Math.log10(Math.max(cites, 1) + 1) * 8;
+            return Math.min(baseSize + citeBonus, 40) * sizeMultiplier;
+        }
+
+        function initCytoscape(elements) {
+            console.log("initCytoscape called with:", elements);
+            
+            if (window.cy && typeof window.cy.destroy === 'function') {
+                try { window.cy.destroy(); window.cy = null; } catch (e) { console.warn(e); }
+            }
+            
+            if (!elements || !elements.nodes || !elements.edges) {
+                console.error("Invalid graph data:", elements);
+                return;
+            }
+            
+            const nodes = elements.nodes;
+            const edges = elements.edges;
+            console.log(`Processing ${nodes.length} nodes and ${edges.length} edges`);
+            
+            // Debug: log first node structure
+            if (nodes.length > 0) {
+                console.log("Sample node structure:", nodes[0]);
+            }
+
+            // Helper function to get node property (handles different data structures)
+            function getNodeProp(node, prop) {
+                // Try direct property first
+                if (node[prop] !== undefined) return node[prop];
+                // Try nested under 'data'
+                if (node.data && node.data[prop] !== undefined) return node.data[prop];
+                // Try as lowercase
+                const lowerProp = prop.toLowerCase();
+                if (node[lowerProp] !== undefined) return node[lowerProp];
+                return null;
+            }
+
+            // Calculate ranges
+            minYear = Infinity;
+            maxYear = -Infinity;
+            maxCites = 0;
+            
+            nodes.forEach(n => {
+                const y = parseInt(getNodeProp(n, 'year')) || 0;
+                const c = parseInt(getNodeProp(n, 'citations')) || 0;
+                if (y > 0 && y < minYear) minYear = y;
+                if (y > maxYear) maxYear = y;
+                if (c > maxCites) maxCites = c;
+            });
+            
+            console.log(`Year range: ${minYear} - ${maxYear}, Max citations: ${maxCites}`);
+            
+            // Handle edge case where no valid year data
+            if (minYear === Infinity) minYear = 1900;
+            if (maxYear === -Infinity) maxYear = 2025;
+            
+            // Update year slider
+            document.getElementById('yearMinSlider').min = minYear;
+            document.getElementById('yearMinSlider').max = maxYear;
+            document.getElementById('yearMinSlider').value = minYear;
+            document.getElementById('yearMinValue').innerText = minYear;
+            
+            const yearRange = (maxYear - minYear) === 0 ? 1 : (maxYear - minYear);
+            const PLOT_WIDTH = 1200;
+            const PLOT_HEIGHT = 800;
+            const jitterX = PLOT_WIDTH * 0.05;
+            const jitterY = PLOT_HEIGHT * 0.05;
+
+            const cyElements = {
+                nodes: nodes.map(node => {
+                    const nodeId = getNodeProp(node, 'id') || getNodeProp(node, 'doi') || `node-${Math.random()}`;
+                    const year = parseInt(getNodeProp(node, 'year')) || minYear;
+                    const cites = parseInt(getNodeProp(node, 'citations')) || 0;
+                    
+                    // Calculate scatter plot position (year on X, citations on Y)
+                    let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
+                    let rawY = PLOT_HEIGHT - ((cites / Math.max(maxCites, 1)) * PLOT_HEIGHT * 0.9) - 40;
+                    
+                    // Add stable jitter to prevent overlap
+                    const xPos = getStableJitter(String(nodeId), rawX, jitterX);
+                    const yPos = getStableJitter(String(nodeId), rawY, jitterY);
+                    
+                    // Build node data object
+                    const nodeData = {
+                        id: String(nodeId),
+                        title: getNodeProp(node, 'title') || 'Unknown',
+                        year: year,
+                        citations: cites,
+                        author: getNodeProp(node, 'author') || getNodeProp(node, 'authors') || 'Unknown',
+                        doi: getNodeProp(node, 'doi') || '',
+                        is_main: String(getNodeProp(node, 'is_main') || false)
+                    };
+                    
+                    return { 
+                        data: nodeData, 
+                        position: { x: xPos, y: yPos },
+                        classes: nodeData.is_main === "True" ? 'main' : ''
+                    };
+                }),
+                edges: edges.map(edge => ({ 
+                    data: {
+                        id: `edge-${edge.source}-${edge.target}`,
+                        source: String(edge.source),
+                        target: String(edge.target)
+                    }
+                }))
+            };
+            
+            console.log("Created cyElements with positions. Sample node:", cyElements.nodes[0]);
+
+            try {
+                window.cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: cyElements,
+                    layout: { name: 'preset', fit: true, padding: 50, animate: true, animationDuration: 500 },
+                    style: [
+                        { 
+                            selector: 'node', 
+                            style: { 
+                                'background-color': function(ele) { return getNodeColor(ele); },
+                                'width': function(ele) { return getNodeSize(ele); },
+                                'height': function(ele) { return getNodeSize(ele); },
+                                'border-width': 2,
+                                'border-color': '#fff',
+                                'border-opacity': 0.8,
+                                'label': function(ele) {
+                                    const isMain = ele.data('is_main') === "True";
+                                    const cites = parseInt(ele.data('citations')) || 0;
+                                    return isMain || cites > maxCites * 0.5 ? (ele.data('title') || '').substring(0, 30) + '...' : '';
+                                },
+                                'font-size': '10px',
+                                'color': '#1e293b',
+                                'text-valign': 'bottom',
+                                'text-margin-y': 8,
+                                'text-wrap': 'wrap',
+                                'text-max-width': '150px',
+                                'transition-property': 'width, height, background-color, border-color',
+                                'transition-duration': '0.2s'
+                            } 
+                        },
+                        { 
+                            selector: 'node.main', 
+                            style: { 
+                                'border-width': 4,
+                                'border-color': '#fbbf24',
+                                'z-index': 10
+                            } 
+                        },
+                        { 
+                            selector: 'node:hover', 
+                            style: { 
+                                'border-width': 3,
+                                'border-color': '#ef4444',
+                                'cursor': 'pointer'
+                            } 
+                        },
+                        { 
+                            selector: 'node.highlighted', 
+                            style: { 
+                                'border-width': 4,
+                                'border-color': '#ef4444',
+                                'z-index': 20
+                            } 
+                        },
+                        { 
+                            selector: 'edge', 
+                            style: { 
+                                'width': 1.5,
+                                'line-color': 'rgba(99, 102, 241, 0.3)',
+                                'curve-style': 'bezier',
+                                'target-arrow-shape': 'triangle',
+                                'target-arrow-color': 'rgba(99, 102, 241, 0.4)',
+                                'arrow-scale': 0.6,
+                                'transition-property': 'line-color, target-arrow-color, width',
+                                'transition-duration': '0.2s'
+                            } 
+                        },
+                        {
+                            selector: 'edge.highlighted',
+                            style: {
+                                'width': 3,
+                                'line-color': '#ef4444',
+                                'target-arrow-color': '#ef4444',
+                                'z-index': 5
+                            }
+                        },
+                        {
+                            selector: 'edge.dimmed',
+                            style: {
+                                'line-color': 'rgba(99, 102, 241, 0.1)',
+                                'target-arrow-color': 'rgba(99, 102, 241, 0.1)'
+                            }
+                        },
+                        {
+                            selector: 'node.dimmed',
+                            style: {
+                                'opacity': 0.3
+                            }
+                        }
+                    ],
+                    zoomingEnabled: true,
+                    userZoomingEnabled: true,
+                    panningEnabled: true,
+                    userPanningEnabled: true,
+                    wheelSensitivity: 0.3
+                });
+
+                // Event handlers
+                window.cy.on('tap', 'node', function(evt) { 
+                    const node = evt.target; 
+                    focusOnNode(node.id()); 
+                });
+                
+                window.cy.on('tap', function(event) { 
+                    if (event.target === window.cy) { 
+                        closeInfoPanel(); 
+                        resetHighlight();
+                    } 
+                });
+                
+                // Hover tooltip
+                window.cy.on('mouseover', 'node', function(evt) {
+                    const node = evt.target;
+                    const data = node.data();
+                    showTooltip(evt.renderedPosition, data);
+                });
+                
+                window.cy.on('mouseout', 'node', function(evt) {
+                    hideTooltip();
+                });
+
+            } catch (error) { 
+                console.error("Cytoscape Error:", error); 
+            }
+        }
+
+        // --- TOOLTIP FUNCTIONS ---
+        function showTooltip(position, data) {
+            const tooltip = document.getElementById('nodeTooltip');
+            tooltip.innerHTML = `
+                <strong>${(data.title || 'No Title').substring(0, 50)}${(data.title || '').length > 50 ? '...' : ''}</strong><br>
+                <span style="opacity: 0.7">📅 ${data.year || 'N/A'} | 📖 ${data.citations || 0} citations</span>
+            `;
+            tooltip.style.left = (position.x + 20) + 'px';
+            tooltip.style.top = (position.y - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            document.getElementById('nodeTooltip').classList.remove('visible');
+        }
+
+        // --- STATISTICS ---
+        function updateStatistics(elements) {
+            if (!elements || !elements.nodes) return;
+            
+            const nodes = elements.nodes;
+            const edges = elements.edges;
+            
+            const totalCites = nodes.reduce((sum, n) => sum + (parseInt(n.citations) || 0), 0);
+            const avgCites = nodes.length > 0 ? Math.round(totalCites / nodes.length) : 0;
+            const maxCite = Math.max(...nodes.map(n => parseInt(n.citations) || 0));
+            
+            document.getElementById('statNodes').innerText = nodes.length;
+            document.getElementById('statEdges').innerText = edges.length;
+            document.getElementById('statAvgCites').innerText = avgCites;
+            document.getElementById('statMaxCites').innerText = maxCite;
+        }
+
+        // Store original positions for scatter layout
+        let originalPositions = {};
+        
+        // --- LAYOUT FUNCTIONS ---
+        function setLayout(layoutName) {
+            console.log('setLayout called with:', layoutName);
+            if (!window.cy) {
+                console.error('Cytoscape instance not initialized');
+                return;
+            }
+            
+            // Update button states
+            document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('layout-' + layoutName);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            currentLayout = layoutName;
+            
+            let layoutOptions;
+            switch(layoutName) {
+                case 'fcose':
+                    layoutOptions = {
+                        name: 'fcose',
+                        quality: 'proof',
+                        animate: true,
+                        animationDuration: 800,
+                        fit: true,
+                        padding: 50,
+                        nodeDimensionsIncludeLabels: false,
+                        idealEdgeLength: 80,
+                        nodeRepulsion: 4500,
+                        randomize: true
+                    };
+                    console.log('Running fcose layout');
+                    break;
+                case 'circle':
+                    layoutOptions = {
+                        name: 'circle',
+                        fit: true,
+                        padding: 50,
+                        animate: true,
+                        animationDuration: 800,
+                        sort: function(a, b) {
+                            return (parseInt(b.data('citations')) || 0) - (parseInt(a.data('citations')) || 0);
+                        }
+                    };
+                    break;
+                case 'concentric':
+                    layoutOptions = {
+                        name: 'concentric',
+                        fit: true,
+                        padding: 50,
+                        animate: true,
+                        animationDuration: 800,
+                        concentric: function(node) {
+                            if (node.data('is_main') === "True") return 100;
+                            return parseInt(node.data('citations')) || 0;
+                        },
+                        levelWidth: function(nodes) { return nodes.length / 5; }
+                    };
+                    break;
+                default:
+                    // Preset layout (Scatter) - restore original positions based on year/citations
+                    console.log('Running preset (scatter) layout');
+                    
+                    // Recalculate positions for scatter plot
+                    const yearRange = (maxYear - minYear) === 0 ? 1 : (maxYear - minYear);
+                    const container = document.getElementById('cy');
+                    const PLOT_WIDTH = container.offsetWidth || 1200;
+                    const PLOT_HEIGHT = container.offsetHeight || 800;
+                    const jitterX = PLOT_WIDTH * 0.05;
+                    const jitterY = PLOT_HEIGHT * 0.05;
+                    
+                    window.cy.nodes().forEach(node => {
+                        const year = parseInt(node.data('year')) || minYear;
+                        const cites = parseInt(node.data('citations')) || 0;
+                        const nodeId = node.id();
+                        
+                        // Calculate scatter plot position (year on X, citations on Y)
+                        let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
+                        let rawY = PLOT_HEIGHT - ((cites / Math.max(maxCites, 1)) * PLOT_HEIGHT * 0.9) - 40;
+                        
+                        // Add stable jitter
+                        const xPos = getStableJitter(String(nodeId), rawX, jitterX);
+                        const yPos = getStableJitter(String(nodeId), rawY, jitterY);
+                        
+                        node.position({ x: xPos, y: yPos });
+                    });
+                    
+                    // Fit to view
+                    window.cy.fit(50);
+                    return; // Skip the layout.run() below
+            }
+            
+            try {
+                const layout = window.cy.layout(layoutOptions);
+                layout.on('layoutstop', function() {
+                    console.log('Layout completed:', layoutName);
+                });
+                layout.run();
+            } catch (e) {
+                console.error('Layout error:', e);
+                // Fallback to preset if fcose fails
+                if (layoutName === 'fcose') {
+                    console.log('Falling back to grid layout');
+                    window.cy.layout({ name: 'grid', fit: true, animate: true }).run();
+                }
+            }
+        }
+
+        // --- FILTER FUNCTIONS ---
+        function filterByYear() {
+            const minYearFilter = parseInt(document.getElementById('yearMinSlider').value);
+            document.getElementById('yearMinValue').innerText = minYearFilter;
+            
+            if (!window.cy) return;
+            
+            window.cy.nodes().forEach(node => {
+                const nodeYear = parseInt(node.data('year')) || 0;
+                if (nodeYear >= minYearFilter) {
+                    node.removeClass('dimmed');
+                } else {
+                    node.addClass('dimmed');
+                }
+            });
+        }
+
+        function updateNodeSizes() {
+            if (!window.cy) return;
+            window.cy.nodes().forEach(node => {
+                node.style('width', getNodeSize(node));
+                node.style('height', getNodeSize(node));
+            });
+        }
+
+        // --- SEARCH FUNCTION ---
+        function searchNodes(query) {
+            if (!window.cy) return;
+            
+            query = query.toLowerCase().trim();
+            
+            if (!query) {
+                resetHighlight();
+                return;
+            }
+            
+            window.cy.nodes().forEach(node => {
+                const title = (node.data('title') || '').toLowerCase();
+                const author = (node.data('author') || '').toLowerCase();
+                const id = (node.data('id') || '').toLowerCase();
+                
+                if (title.includes(query) || author.includes(query) || id.includes(query)) {
+                    node.removeClass('dimmed');
+                    node.addClass('highlighted');
+                } else {
+                    node.addClass('dimmed');
+                    node.removeClass('highlighted');
+                }
+            });
+        }
+
+        // --- HIGHLIGHT FUNCTIONS ---
+        function resetHighlight() {
+            if (!window.cy) return;
+            window.cy.nodes().removeClass('dimmed highlighted');
+            window.cy.edges().removeClass('highlighted dimmed');
+        }
+
+        function highlightConnected(node) {
+            if (!window.cy) return;
+            
+            // Dim all
+            window.cy.nodes().addClass('dimmed');
+            window.cy.edges().addClass('dimmed');
+            
+            // Highlight connected
+            const neighborhood = node.neighborhood();
+            neighborhood.nodes().removeClass('dimmed').addClass('highlighted');
+            neighborhood.edges().removeClass('dimmed').addClass('highlighted');
+            node.removeClass('dimmed').addClass('highlighted');
+        }
+
+        // --- ZOOM FUNCTIONS ---
         const zoomSlider = document.getElementById('zoomSlider');
         const zoomLabel = document.getElementById('zoomLabel');
+        
         zoomSlider.addEventListener('input', (e) => {
             const level = parseFloat(e.target.value);
             if (window.cy) {
@@ -490,118 +1633,98 @@
             zoomLabel.innerText = Math.round(level * 100) + '%';
         });
 
-        function initCytoscape(elements) {
-            if (window.cy && typeof window.cy.destroy === 'function') {
-                try { window.cy.destroy(); window.cy = null; } catch (e) { console.warn(e); }
+        function zoomIn() {
+            const slider = document.getElementById('zoomSlider');
+            const newZoom = Math.min(parseFloat(slider.value) + 0.2, 3.0);
+            slider.value = newZoom;
+            slider.dispatchEvent(new Event('input'));
+        }
+
+        function zoomOut() {
+            const slider = document.getElementById('zoomSlider');
+            const newZoom = Math.max(parseFloat(slider.value) - 0.2, 0.1);
+            slider.value = newZoom;
+            slider.dispatchEvent(new Event('input'));
+        }
+
+        function fitNetwork() {
+            if (window.cy) {
+                window.cy.fit(undefined, 50);
+                const zoom = window.cy.zoom();
+                document.getElementById('zoomSlider').value = zoom;
+                document.getElementById('zoomLabel').innerText = Math.round(zoom * 100) + '%';
             }
-            if (!elements || !elements.nodes || !elements.edges) {
-                console.error("Invalid graph data:", elements);
-                return;
+        }
+
+        function resetView() {
+            if (window.cy) {
+                window.cy.fit(undefined, 50);
+                window.cy.zoom(1);
+                document.getElementById('zoomSlider').value = 1;
+                document.getElementById('zoomLabel').innerText = '100%';
+                resetHighlight();
+                closeInfoPanel();
             }
-            const nodes = elements.nodes;
-            const edges = elements.edges;
-            let minYear = Infinity, maxYear = -Infinity, maxCites = 0;
-            nodes.forEach(n => {
-                const y = parseInt(n.year) || 0;
-                const c = parseInt(n.citations) || 0;
-                if (y < minYear) minYear = y;
-                if (y > maxYear) maxYear = y;
-                if (c > maxCites) maxCites = c;
+        }
+
+        // --- EXPORT FUNCTIONS ---
+        function exportPNG() {
+            if (!window.cy) return;
+            
+            const png = window.cy.png({ 
+                full: true, 
+                scale: 2,
+                bg: '#ffffff'
             });
-            const yearRange = (maxYear - minYear) === 0 ? 1 : (maxYear - minYear);
-            const PLOT_WIDTH = 1500;
-            const PLOT_HEIGHT = 1000;
-            const jitterX = PLOT_WIDTH * 0.03;
-            const jitterY = PLOT_HEIGHT * 0.03;
-            const cyElements = {
-                nodes: nodes.map(node => {
-                    const year = parseInt(node.year) || 0;
-                    const cites = parseInt(node.citations) || 0;
-                    let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
-                    let rawY = PLOT_HEIGHT - ((cites / maxCites) * PLOT_HEIGHT);
-                    const xPos = getStableJitter(node.id, rawX, jitterX);
-                    const yPos = getStableJitter(node.id, rawY, jitterY);
-                    return { data: node, position: { x: xPos, y: yPos } };
-                }),
-                edges: edges.map(edge => ({ data: edge }))
-            };
-            try {
-                window.cy = cytoscape({
-                    container: document.getElementById('cy'),
-                    elements: cyElements,
-                    layout: { name: 'preset', fit: true, padding: 100, animate: false },
-                    style: [
-                        { selector: 'node', style: { 'background-color': '#3b82f6', 'width': 15, 'height': 15, 'border-width': 1, 'border-color': '#fff', 'transition-property': 'width, height, background-color', 'transition-duration': '0.2s' } },
-                        { selector: 'node[is_main = "True"]', style: { 'background-color': '#f59e0b', 'width': 30, 'height': 30, 'border-width': 3, 'z-index': 10 } },
-                        { selector: 'node:hover', style: { 'width': 25, 'height': 25, 'border-width': 3, 'border-color': '#fff' } },
-                        { selector: 'edge', style: { 'width': 0.5, 'line-color': 'rgba(59, 130, 246, 0.2)', 'curve-style': 'straight', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'rgba(59, 130, 246, 0.3)', 'arrow-scale': 0.3 } }
-                    ],
-                    zoomingEnabled: true, userZoomingEnabled: false, panningEnabled: true, userPanningEnabled: true
-                });
-                window.cy.on('tap', 'node', function(evt) { const node = evt.target; focusOnNode(node.id()); });
-                window.cy.on('tap', function(event) { if( event.target === window.cy ){ closeInfoPanel(); } });
-            } catch (error) { console.error("Cytoscape Error:", error); }
+            
+            const link = document.createElement('a');
+            link.href = png;
+            link.download = 'citation_network.png';
+            link.click();
+        }
+
+        // --- NODE FOCUS ---
+        function focusOnNode(nodeId) {
+            if (!window.cy) return;
+            const node = window.cy.getElementById(nodeId);
+            if (!node || node.length === 0) return;
+            
+            resetNodeStyles();
+            highlightConnected(node);
+            showNodeDetails(node.data());
+            
+            // Animate to node
+            window.cy.animate({
+                center: { eles: node },
+                zoom: 1.5,
+                duration: 500,
+                easing: 'ease-out-cubic'
+            });
+            
+            document.getElementById('zoomSlider').value = 1.5;
+            document.getElementById('zoomLabel').innerText = "150%";
         }
 
         function resetNodeStyles() {
             if (!window.cy) return;
             window.cy.nodes().forEach(node => {
-                const isMain = node.data('is_main') === "True";
-                if (isMain) {
-                    node.style('background-color', '#f59e0b');
-                    node.style('width', 30);
-                    node.style('height', 30);
-                    node.style('border-width', 3);
-                } else {
-                    node.style('background-color', '#3b82f6');
-                    node.style('width', 15);
-                    node.style('height', 15);
-                    node.style('border-width', 1);
-                }
-                node.style('border-color', '#fff');
-            });
-            window.cy.edges().forEach(edge => {
-                edge.style('line-color', 'rgba(59, 130, 246, 0.2)');
-                edge.style('target-arrow-color', 'rgba(59, 130, 246, 0.3)');
+                node.style('background-color', getNodeColor(node));
+                node.style('width', getNodeSize(node));
+                node.style('height', getNodeSize(node));
             });
         }
 
-        function focusOnNode(nodeId) {
-            if (!window.cy) return;
-            const node = window.cy.getElementById(nodeId);
-            if (!node) return;
-            resetNodeStyles();
-            node.style('background-color', '#ef4444');
-            node.style('border-color', '#ef4444');
-            node.style('width', 25);
-            node.style('height', 25);
-            const connectedEdges = node.connectedEdges();
-            connectedEdges.style('line-color', '#ef4444');
-            connectedEdges.style('target-arrow-color', '#ef4444');
-            showNodeDetails(node.data());
-            const nodePos = node.position();
-            const targetPan = {
-                x: (window.cy.width() / 2) - nodePos.x,
-                y: (window.cy.height() / 2) - nodePos.y
-            };
-            window.cy.animate({
-                pan: targetPan,
-                zoom: 1,
-                duration: 500,
-                easing: 'ease-out-cubic'
-            });
-            document.getElementById('zoomSlider').value = 1;
-            document.getElementById('zoomLabel').innerText = "100%";
-        }
-
+        // --- INFO PANEL ---
         function showNodeDetails(data) {
             document.getElementById('detail-title').innerText = data.title || "No Title";
             document.getElementById('detail-cites').innerText = data.citations || 0;
             document.getElementById('detail-year').innerText = data.year || "N/A";
             document.getElementById('detail-author').innerText = data.author || "Unknown";
+            document.getElementById('detail-local').innerText = data.local_citations || window.cy.getElementById(data.id).indegree() || 0;
             
             const doiText = document.getElementById('detail-doi');
             const doiLink = document.getElementById('detail-link');
+            
             if (data.id && !data.id.startsWith('ref_')) {
                 doiText.innerText = data.id;
                 doiLink.href = `https://doi.org/${data.id}`;
@@ -610,12 +1733,53 @@
                 doiText.innerText = data.id || "N/A";
                 doiLink.style.display = 'none';
             }
+            
+            // Show connected papers
+            updateConnectedPapers(data.id);
+            
             document.getElementById('infoPanel').classList.add('open');
+        }
+
+        function updateConnectedPapers(nodeId) {
+            if (!window.cy) return;
+            
+            const node = window.cy.getElementById(nodeId);
+            if (!node || node.length === 0) return;
+            
+            const connected = node.neighborhood().nodes();
+            const container = document.getElementById('connectedPapersList');
+            container.innerHTML = '';
+            
+            if (connected.length > 0) {
+                document.getElementById('connectedPapers').style.display = 'block';
+                
+                connected.slice(0, 5).forEach(n => {
+                    const data = n.data();
+                    const isCiting = n.edgesTo(node).length > 0;
+                    const isCited = node.edgesTo(n).length > 0;
+                    const type = isCiting ? 'citing' : (isCited ? 'cited' : '');
+                    
+                    container.innerHTML += `
+                        <div class="connected-paper-item ${type}" onclick="focusOnNode('${data.id}')">
+                            <div class="connected-paper-title">${data.title || 'Unknown'}</div>
+                            <div class="connected-paper-meta">
+                                ${type === 'citing' ? '↑ Cites this' : '↓ Cited by this'} | ${data.year || 'N/A'}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                if (connected.length > 5) {
+                    container.innerHTML += `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">+${connected.length - 5} more connected papers</p>`;
+                }
+            } else {
+                document.getElementById('connectedPapers').style.display = 'none';
+            }
         }
 
         function closeInfoPanel() { 
             document.getElementById('infoPanel').classList.remove('open');
-            resetNodeStyles();
+            resetHighlight();
         }
     </script>
 </body>

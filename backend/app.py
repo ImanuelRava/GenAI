@@ -239,7 +239,28 @@ def analyze_network():
             if G is None or G.number_of_nodes() < 2:
                 return jsonify({'error': 'Could not build network'}), 400
 
-            graph_json = nx.node_link_data(G, attrs={'link': 'edges'})
+            # Manually format graph data for maximum compatibility across NetworkX versions
+            # This ensures nodes have 'id' field and edges have proper 'source'/'target' IDs
+            nodes = []
+            for node_id in G.nodes():
+                node_data = dict(G.nodes[node_id])
+                node_data['id'] = node_id  # Ensure ID is included
+                # Convert is_main boolean to string for Cytoscape selector compatibility
+                if 'is_main' in node_data:
+                    node_data['is_main'] = "True" if node_data['is_main'] else "False"
+                nodes.append(node_data)
+            
+            edges = []
+            for source, target in G.edges():
+                edges.append({
+                    'source': source,
+                    'target': target
+                })
+            
+            graph_json = {
+                'nodes': nodes,
+                'edges': edges
+            }
 
             return jsonify({
                 'elements': graph_json, 
@@ -548,7 +569,37 @@ def api_pca_chemistry(dataset):
 # ==================== LLM KNOWLEDGE GRAPH API ====================
 
 # Import pure Python LLM providers (works on PythonAnywhere without Node.js)
-from llm_providers import get_llm_response, generate_knowledge_graph as llm_generate_kg, explain_concept
+from llm_providers import get_llm_response, generate_knowledge_graph as llm_generate_kg, explain_concept, LLMProviderFactory
+
+@app.route('/api/llm/status')
+def api_llm_status():
+    """Check if any LLM API key is configured on the backend"""
+    providers_with_keys = []
+    
+    # Check for each provider's API key in environment
+    if os.environ.get('GROQ_API_KEY'):
+        providers_with_keys.append({'provider': 'groq', 'name': 'Groq', 'configured': True})
+    if os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY'):
+        providers_with_keys.append({'provider': 'gemini', 'name': 'Google Gemini', 'configured': True})
+    if os.environ.get('HF_API_KEY') or os.environ.get('HUGGINGFACE_API_KEY'):
+        providers_with_keys.append({'provider': 'huggingface', 'name': 'Hugging Face', 'configured': True})
+    if os.environ.get('DEEPSEEK_API_KEY'):
+        providers_with_keys.append({'provider': 'deepseek', 'name': 'DeepSeek', 'configured': True})
+    if os.environ.get('OPENROUTER_API_KEY'):
+        providers_with_keys.append({'provider': 'openrouter', 'name': 'OpenRouter', 'configured': True})
+    if os.environ.get('OPENAI_API_KEY'):
+        providers_with_keys.append({'provider': 'openai', 'name': 'OpenAI', 'configured': True})
+    if os.environ.get('ANTHROPIC_API_KEY'):
+        providers_with_keys.append({'provider': 'anthropic', 'name': 'Anthropic', 'configured': True})
+    
+    # Get the default provider
+    default_provider = LLMProviderFactory.get_default_provider()
+    
+    return jsonify({
+        'has_backend_key': len(providers_with_keys) > 0,
+        'providers': providers_with_keys,
+        'default_provider': default_provider
+    })
 
 def get_llm_response_sync(system_prompt: str, user_message: str, 
                           provider: str = None, api_key: str = None) -> str:
@@ -1536,6 +1587,13 @@ When answering:
     except Exception as e:
         logger.error(f"NiCOBot chat error: {e}", exc_info=True)
         return jsonify({'success': False, 'error': 'An internal error occurred'}), 500
+
+# Alias for TMC chat
+@app.route('/api/chat', methods=['POST'])
+@limiter.limit("20 per minute")
+def tmc_chat():
+    """Alias for NiCOBot chat - used by TMC page"""
+    return nicobot_chat()
 
 @app.route('/api/nicobot/smiles/<compound_name>')
 def nicobot_get_smiles(compound_name):

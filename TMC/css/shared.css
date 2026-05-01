@@ -396,7 +396,9 @@ nav a.active {
 .content-area {
     flex: 1 1 auto;
     background: var(--bg-main);
-    padding: 32px;
+    padding: 40px;
+    overflow-y: auto;
+    max-height: calc(100vh - 72px);
 }
 
 .content-panel {
@@ -406,11 +408,211 @@ nav a.active {
     box-shadow: var(--shadow);
     padding: 0;
     border: 1px solid var(--border-color);
+    overflow: hidden;
 }
 
 .content-panel.active {
     display: block;
     animation: fadeSlideIn 0.4s ease;
+}
+
+/* Elements directly inside content-panel (not in content-header/body) */
+.content-panel > h2,
+.content-panel > h3 {
+    padding: 0 40px;
+    margin-top: 44px;
+    margin-bottom: 24px;
+}
+
+.content-panel > h2:first-child,
+.content-panel > h3:first-child {
+    margin-top: 0;
+}
+
+/* Ensure proper spacing after content-header */
+.content-header + h2,
+.content-header + h3,
+.content-header + p,
+.content-header + ul,
+.content-header + ol,
+.content-header + .highlight-box,
+.content-header + .info-box,
+.content-header + .module-cards,
+.content-header + .steps-container,
+.content-header + .cards-grid,
+.content-header + .diagram-container,
+.content-header + .stats-grid,
+.content-header + .data-table,
+.content-header + .formula-box,
+.content-header + .reaction-scheme,
+.content-header + .network-diagram {
+    margin-top: 32px !important;
+}
+
+.content-panel > p {
+    padding: 0 40px;
+    margin-bottom: 28px;
+    margin-top: 24px;
+    line-height: 1.75;
+}
+
+.content-panel > p:first-of-type {
+    margin-top: 32px;
+}
+
+.content-panel > ul,
+.content-panel > ol {
+    padding: 0 40px;
+    padding-left: 60px;
+    margin-bottom: 36px;
+    margin-top: 28px;
+}
+
+.content-panel > ul li,
+.content-panel > ol li {
+    margin-bottom: 14px;
+    line-height: 1.7;
+    padding-left: 4px;
+}
+
+/* Add proper spacing between consecutive elements in content-panel */
+.content-panel > h2 + p,
+.content-panel > h3 + p {
+    margin-top: 16px;
+}
+
+.content-panel > p + h2,
+.content-panel > p + h3 {
+    margin-top: 36px;
+}
+
+.content-panel > ul + h2,
+.content-panel > ul + h3,
+.content-panel > ol + h2,
+.content-panel > ol + h3 {
+    margin-top: 36px;
+}
+
+.content-panel > p + .highlight-box,
+.content-panel > p + .info-box,
+.content-panel > p + .warning-box,
+.content-panel > p + .module-cards,
+.content-panel > p + .cards-grid,
+.content-panel > p + .steps-container,
+.content-panel > p + .diagram-container,
+.content-panel > p + .stats-grid,
+.content-panel > p + .data-table,
+.content-panel > p + .formula-box,
+.content-panel > p + .reaction-scheme,
+.content-panel > p + .network-diagram {
+    margin-top: 28px;
+}
+
+.content-panel > .highlight-box,
+.content-panel > .info-box,
+.content-panel > .warning-box,
+.content-panel > .module-cards,
+.content-panel > .steps-container,
+.content-panel > .reaction-scheme,
+.content-panel > .diagram-container,
+.content-panel > .cards-grid,
+.content-panel > .data-table,
+.content-panel > .formula-box,
+.content-panel > .network-diagram,
+.content-panel > .stats-grid,
+.content-panel > .btn-group {
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+/* Add spacing after boxes and containers */
+.content-panel > .highlight-box + h2,
+.content-panel > .highlight-box + h3,
+.content-panel > .info-box + h2,
+.content-panel > .info-box + h3,
+.content-panel > .warning-box + h2,
+.content-panel > .warning-box + h3,
+.content-panel > .module-cards + h2,
+.content-panel > .module-cards + h3,
+.content-panel > .cards-grid + h2,
+.content-panel > .cards-grid + h3,
+.content-panel > .steps-container + h2,
+.content-panel > .steps-container + h3,
+.content-panel > .data-table + h2,
+.content-panel > .data-table + h3,
+.content-panel > .diagram-container + h2,
+.content-panel > .diagram-container + h3,
+.content-panel > .stats-grid + h2,
+.content-panel > .stats-grid + h3 {
+    margin-top: 40px;
+}
+
+/* Add spacing between consecutive boxes */
+.content-panel > .highlight-box + .highlight-box,
+.content-panel > .highlight-box + .info-box,
+.content-panel > .highlight-box + .warning-box,
+.content-panel > .info-box + .highlight-box,
+.content-panel > .info-box + .info-box,
+.content-panel > .info-box + .warning-box,
+.content-panel > .warning-box + .highlight-box,
+.content-panel > .warning-box + .info-box,
+.content-panel > .warning-box + .warning-box {
+    margin-top: 28px;
+}
+
+/* Add spacing after boxes to following elements */
+.content-panel > .highlight-box + p,
+.content-panel > .info-box + p,
+.content-panel > .warning-box + p,
+.content-panel > .module-cards + p,
+.content-panel > .cards-grid + p,
+.content-panel > .steps-container + p,
+.content-panel > .data-table + p,
+.content-panel > .diagram-container + p,
+.content-panel > .stats-grid + p {
+    margin-top: 28px;
+}
+
+.content-panel > .highlight-box + ul,
+.content-panel > .highlight-box + ol,
+.content-panel > .info-box + ul,
+.content-panel > .info-box + ol,
+.content-panel > .warning-box + ul,
+.content-panel > .warning-box + ol,
+.content-panel > .module-cards + ul,
+.content-panel > .module-cards + ol,
+.content-panel > .cards-grid + ul,
+.content-panel > .cards-grid + ol,
+.content-panel > .steps-container + ul,
+.content-panel > .steps-container + ol,
+.content-panel > .data-table + ul,
+.content-panel > .data-table + ol,
+.content-panel > .diagram-container + ul,
+.content-panel > .diagram-container + ol,
+.content-panel > .stats-grid + ul,
+.content-panel > .stats-grid + ol {
+    margin-top: 28px;
+}
+
+/* Reaction scheme specific spacing */
+.reaction-scheme {
+    margin: 32px 0;
+    padding: 24px 20px;
+}
+
+/* Add bottom padding to content panels */
+.content-panel > .btn-group {
+    margin-bottom: 32px;
+}
+
+.content-panel > *:last-child:not(.btn-group) {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+}
+
+/* Ensure content-panel has proper bottom padding */
+.content-panel.active {
+    padding-bottom: 8px;
 }
 
 @keyframes fadeSlideIn {
@@ -425,12 +627,21 @@ nav a.active {
 }
 
 .content-header {
-    padding: 32px 32px 24px;
+    padding: 36px 40px 32px;
     border-bottom: 1px solid var(--border-color);
     background: linear-gradient(135deg, var(--section-bg-light) 0%, var(--bg-white) 100%);
+    margin-bottom: 12px;
 }
 
 .content-header h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.content-header h1 {
     font-size: 1.75rem;
     font-weight: 800;
     color: var(--text-main);
@@ -442,18 +653,23 @@ nav a.active {
     color: var(--text-muted);
     font-size: 1rem;
     margin: 0;
+    line-height: 1.6;
 }
 
 /* Content Body */
 .content-body {
-    padding: 32px;
+    padding: 36px 40px;
 }
 
 .content-body h3 {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-main);
-    margin: 28px 0 12px;
+    margin: 36px 0 16px;
+}
+
+.content-body h3:first-child {
+    margin-top: 0;
 }
 
 .content-body p {
@@ -465,14 +681,15 @@ nav a.active {
 .content-body ul {
     list-style: none;
     padding: 0;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    margin-top: 16px;
 }
 
 .content-body ul li {
-    padding: 12px 0 12px 28px;
+    padding: 14px 0 14px 28px;
     position: relative;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -490,6 +707,32 @@ nav a.active {
     height: 8px;
     background: var(--section-primary);
     border-radius: 50%;
+}
+
+/* Content-body children spacing */
+.content-body > .highlight-box,
+.content-body > .info-box,
+.content-body > .warning-box,
+.content-body > .stats-grid,
+.content-body > .module-cards {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 28px;
+    margin-bottom: 28px;
+}
+
+.content-body > .highlight-box + .highlight-box,
+.content-body > .highlight-box + .info-box,
+.content-body > .info-box + .highlight-box,
+.content-body > .info-box + .info-box {
+    margin-top: 24px;
+}
+
+.content-body > h3 + .highlight-box,
+.content-body > h3 + .info-box,
+.content-body > h3 + .stats-grid,
+.content-body > h3 + .module-cards {
+    margin-top: 20px;
 }
 
 /* ========================================
@@ -542,9 +785,35 @@ nav a.active {
     border: 1px solid var(--section-primary-light);
     border-left: 4px solid var(--section-primary);
     border-radius: var(--radius-lg);
-    padding: 24px;
-    margin: 24px 0;
+    padding: 28px 32px;
+    margin: 36px 0;
 }
+
+/* Extra spacing when these boxes follow other elements */
+.content-panel > .highlight-box:first-of-type,
+.content-panel > .info-box:first-of-type {
+    margin-top: 32px;
+}
+
+/* Success variant */
+.highlight-box.success,
+.info-box.success {
+    background: linear-gradient(135deg, var(--ral-light) 0%, var(--bg-white) 100%);
+    border-left-color: var(--ral-primary);
+}
+
+.highlight-box.success h4,
+.info-box.success h4 { color: var(--ral-primary); }
+
+/* Pink variant */
+.highlight-box.pink,
+.info-box.pink {
+    background: linear-gradient(135deg, #fce7f3 0%, var(--bg-white) 100%);
+    border-left-color: var(--pink);
+}
+
+.highlight-box.pink h4,
+.info-box.pink h4 { color: var(--pink); }
 
 .highlight-box h4,
 .info-box h4 {
@@ -604,8 +873,8 @@ nav a.active {
     background: linear-gradient(135deg, var(--virus-light) 0%, var(--bg-white) 100%);
     border-left: 4px solid var(--virus-primary);
     border-radius: var(--radius);
-    padding: 20px;
-    margin: 20px 0;
+    padding: 24px 28px;
+    margin: 36px 0;
 }
 
 .warning-box h4 {
@@ -627,8 +896,13 @@ nav a.active {
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin: 24px 0;
+    gap: 20px;
+    margin: 28px 0;
+}
+
+/* Ensure stats-grid inside content-panel has proper margins */
+.content-panel > .stats-grid {
+    margin: 32px 0;
 }
 
 .stat-card {
@@ -747,10 +1021,21 @@ nav a.active {
 .btn-group {
     display: flex;
     gap: 16px;
-    margin-top: 28px;
-    padding-top: 20px;
+    margin-top: 40px;
+    padding: 28px 0 0 0;
     border-top: 1px solid var(--border-color);
     flex-wrap: wrap;
+}
+
+/* Add clear separation before button groups */
+.btn-group::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 1px;
 }
 
 /* Quick Action Buttons */
@@ -785,15 +1070,20 @@ nav a.active {
 .module-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 24px 0;
+    gap: 28px;
+    margin: 32px 0;
+}
+
+/* Ensure module-cards inside content-panel has proper margins */
+.content-panel > .module-cards {
+    margin: 32px 0;
 }
 
 .module-card {
     background: var(--bg-gray);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 28px;
+    padding: 32px 36px;
     transition: all var(--transition-normal);
     text-decoration: none;
     color: inherit;
@@ -836,6 +1126,52 @@ nav a.active {
     color: var(--text-muted);
     margin-bottom: 16px;
     line-height: 1.6;
+}
+
+/* Cards Grid (for AI pages) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: 28px 0;
+}
+
+/* Ensure cards-grid inside content-panel has proper margins */
+.content-panel > .cards-grid {
+    margin: 32px 0;
+}
+
+/* Info Card (for AI pages) */
+.info-card {
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    transition: all var(--transition-normal);
+}
+
+.info-card:hover {
+    border-color: var(--section-primary-light);
+    box-shadow: var(--shadow);
+}
+
+.info-card .icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.info-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.info-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0;
 }
 
 /* Module Badge */
@@ -1445,17 +1781,22 @@ nav a.active {
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 32px 0;
     background: var(--bg-white);
     border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--border-color);
 }
 
+/* Ensure data-table inside content-panel has proper margins */
+.content-panel > .data-table {
+    margin: 32px 0;
+}
+
 .data-table th {
     background: linear-gradient(135deg, var(--section-primary), var(--section-primary-dark));
     color: white;
-    padding: 14px 16px;
+    padding: 16px 20px;
     text-align: left;
     font-weight: 600;
     font-size: 0.85rem;
@@ -1464,7 +1805,7 @@ nav a.active {
 }
 
 .data-table td {
-    padding: 14px 16px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
     font-size: 0.9rem;
     color: var(--text-secondary);
@@ -1472,6 +1813,186 @@ nav a.active {
 
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: var(--bg-gray); }
+
+/* Table wrapper for horizontal scroll on mobile */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 28px 0;
+    border-radius: var(--radius-lg);
+}
+
+.table-wrapper .data-table {
+    margin: 0;
+    min-width: 500px;
+}
+
+/* ========================================
+   STEPS CONTAINER
+   ======================================== */
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 32px 0;
+}
+
+/* Ensure steps-container inside content-panel has proper margins */
+.content-panel > .steps-container {
+    margin: 32px 0;
+}
+
+/* ========================================
+   FORMULA BOX
+   ======================================== */
+.formula-box {
+    background: var(--bg-dark);
+    color: #ffffff;
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    font-family: 'Fira Code', 'Courier New', monospace;
+    margin: 32px 0;
+    overflow-x: auto;
+}
+
+.formula-box p {
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.formula-box strong {
+    color: #ffffff;
+}
+
+/* Ensure formula-box inside content-panel has proper margins */
+.content-panel > .formula-box {
+    margin: 32px 0;
+}
+
+/* ========================================
+   DIAGRAM CONTAINER
+   ======================================== */
+.diagram-container {
+    background: var(--bg-gray);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin: 32px 0;
+}
+
+.diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.diagram-box {
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.diagram-arrow {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+/* Ensure diagram-container inside content-panel has proper margins */
+.content-panel > .diagram-container {
+    margin: 32px 0;
+}
+
+/* ========================================
+   NETWORK DIAGRAM
+   ======================================== */
+.network-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 30px;
+    background: var(--bg-gray);
+    border-radius: var(--radius);
+    margin: 32px 0;
+    flex-wrap: wrap;
+}
+
+.layer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.neuron {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.layer-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* Ensure network-diagram inside content-panel has proper margins */
+.content-panel > .network-diagram {
+    margin: 32px 0;
+}
+
+/* ========================================
+   VIEWER CONTAINER
+   ======================================== */
+.viewer-container {
+    width: 100%;
+    min-height: 300px;
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+    margin: 24px 0;
+}
+
+/* ========================================
+   QUIZ PANEL
+   ======================================== */
+.quiz-panel {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    border: 1px solid var(--border-color);
+}
+
+.quiz-panel.active {
+    display: block;
+}
+
+.quiz-header {
+    margin-bottom: 24px;
+}
+
+.quiz-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.quiz-header p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
 
 /* ========================================
    FOOTER
@@ -1495,6 +2016,11 @@ footer p {
 @media (max-width: 1200px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .module-cards,
+    .cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
 }
 
@@ -1569,6 +2095,7 @@ footer p {
 
     .content-area {
         padding: 20px;
+        max-height: none;
     }
 
     .content-panel {
@@ -1578,6 +2105,41 @@ footer p {
     .content-header,
     .content-body {
         padding: 24px;
+    }
+    
+    .content-panel > h2,
+    .content-panel > h3,
+    .content-panel > p,
+    .content-panel > ul,
+    .content-panel > ol {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+    
+    .content-panel > .highlight-box,
+    .content-panel > .info-box,
+    .content-panel > .warning-box,
+    .content-panel > .module-cards,
+    .content-panel > .steps-container,
+    .content-panel > .reaction-scheme,
+    .content-panel > .diagram-container,
+    .content-panel > .cards-grid,
+    .content-panel > .data-table,
+    .content-panel > .formula-box,
+    .content-panel > .btn-group {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+    
+    .data-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .data-table th,
+    .data-table td {
+        min-width: 100px;
     }
 }
 
@@ -1625,4 +2187,275 @@ footer p {
         width: 40px;
         height: 40px;
     }
+    
+    .content-area {
+        padding: 16px;
+    }
+    
+    .content-header,
+    .content-body {
+        padding: 20px;
+    }
+    
+    .content-header h2,
+    .content-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .content-panel > h2,
+    .content-panel > h3,
+    .content-panel > p,
+    .content-panel > ul,
+    .content-panel > ol {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .content-panel > .highlight-box,
+    .content-panel > .info-box,
+    .content-panel > .warning-box,
+    .content-panel > .module-cards,
+    .content-panel > .steps-container,
+    .content-panel > .reaction-scheme,
+    .content-panel > .diagram-container,
+    .content-panel > .cards-grid,
+    .content-panel > .data-table,
+    .content-panel > .formula-box,
+    .content-panel > .btn-group {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    
+    .module-cards,
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   COMPREHENSIVE SPACING FIXES
+   Prevent content overlapping/touching
+   ======================================== */
+
+/* Ensure all content-body elements have proper vertical spacing */
+.content-body > * {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.content-body > * + * {
+    margin-top: 24px;
+}
+
+.content-body > h3 + * {
+    margin-top: 16px;
+}
+
+.content-body > p + p {
+    margin-top: 16px;
+}
+
+.content-body > ul + p,
+.content-body > ol + p {
+    margin-top: 24px;
+}
+
+.content-body > .highlight-box + .highlight-box,
+.content-body > .info-box + .info-box,
+.content-body > .highlight-box + .info-box,
+.content-body > .info-box + .highlight-box {
+    margin-top: 32px;
+}
+
+/* Ensure content-panel direct children have clear separation */
+.content-panel > * + h2,
+.content-panel > * + h3 {
+    margin-top: 48px;
+}
+
+.content-panel > h2 + *,
+.content-panel > h3 + * {
+    margin-top: 20px;
+}
+
+.content-panel > ul + .highlight-box,
+.content-panel > ul + .info-box,
+.content-panel > ol + .highlight-box,
+.content-panel > ol + .info-box {
+    margin-top: 36px;
+}
+
+/* Fix for consecutive highlight/info boxes in content-panel */
+.content-panel > .highlight-box + .highlight-box,
+.content-panel > .info-box + .info-box,
+.content-panel > .highlight-box + .info-box,
+.content-panel > .info-box + .highlight-box {
+    margin-top: 32px;
+}
+
+/* Ensure stats-grid and cards-grid have proper margins */
+.content-panel > .stats-grid {
+    margin-top: 36px;
+    margin-bottom: 36px;
+}
+
+.content-panel > .cards-grid {
+    margin-top: 36px;
+    margin-bottom: 36px;
+}
+
+.content-panel > .module-cards {
+    margin-top: 36px;
+    margin-bottom: 36px;
+}
+
+/* Add clear spacing after stats-grid to following elements */
+.stats-grid + h2,
+.stats-grid + h3,
+.stats-grid + p,
+.stats-grid + ul,
+.cards-grid + h2,
+.cards-grid + h3,
+.cards-grid + p,
+.cards-grid + ul,
+.module-cards + h2,
+.module-cards + h3,
+.module-cards + p,
+.module-cards + ul {
+    margin-top: 40px !important;
+}
+
+/* Fix for data-table spacing */
+.content-panel > .data-table {
+    margin-top: 36px;
+    margin-bottom: 36px;
+}
+
+.data-table + h2,
+.data-table + h3,
+.data-table + p {
+    margin-top: 40px !important;
+}
+
+/* Ensure formula-box has proper margins */
+.content-panel > .formula-box {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.formula-box + h2,
+.formula-box + h3,
+.formula-box + p {
+    margin-top: 36px !important;
+}
+
+/* Fix for steps-container spacing */
+.content-panel > .steps-container {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.steps-container + h2,
+.steps-container + h3,
+.steps-container + p,
+.steps-container + ul {
+    margin-top: 36px !important;
+}
+
+/* Ensure diagram-container has proper margins */
+.content-panel > .diagram-container {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.diagram-container + h2,
+.diagram-container + h3,
+.diagram-container + p {
+    margin-top: 36px !important;
+}
+
+/* Ensure network-diagram has proper margins */
+.content-panel > .network-diagram {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+/* Add clear gap between lists and following boxes */
+.content-panel > ul + .stats-grid,
+.content-panel > ol + .stats-grid,
+.content-panel > ul + .cards-grid,
+.content-panel > ol + .cards-grid,
+.content-panel > ul + .module-cards,
+.content-panel > ol + .module-cards {
+    margin-top: 36px;
+}
+
+/* Ensure content-header spacing is consistent */
+.content-header + .stats-grid,
+.content-header + .cards-grid,
+.content-header + .module-cards,
+.content-header + .data-table {
+    margin-top: 36px !important;
+}
+
+/* Fix welcome-panel stats-grid spacing */
+.welcome-panel .stats-grid {
+    margin-top: 48px;
+    margin-bottom: 0;
+}
+
+/* Ensure nested elements in content-body don't collapse margins */
+.content-body > ul li {
+    margin-bottom: 12px;
+}
+
+.content-body > ul li:last-child {
+    margin-bottom: 0;
+}
+
+/* Add padding-bottom to content panels to prevent content cutoff */
+.content-panel {
+    padding-bottom: 16px;
+}
+
+/* Ensure btn-group has proper separation from content above */
+.btn-group {
+    margin-top: 40px;
+    padding-top: 28px;
+}
+
+/* Fix for visualization pages */
+.viz-layout {
+    gap: 24px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+/* Ensure info-panel doesn't overlap content */
+.info-panel {
+    padding: 16px 20px;
+    margin-top: 0;
+}
+
+/* Fix for comparison-grid and steps-grid */
+.comparison-grid,
+.steps-grid {
+    gap: 24px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+/* Ensure oxi-flow has proper spacing */
+.oxi-flow {
+    margin-top: 32px;
+    margin-bottom: 32px;
 }
