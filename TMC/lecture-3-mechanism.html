@@ -33,8 +33,8 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
+        html { height: 100%; }
+        body { height: 100%; font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; overflow: hidden; }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         /* --- Header --- */
@@ -107,8 +107,8 @@
 
 
 
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; }
+        .main-wrapper { display: flex; flex: 1; min-height: 0; }
+        .sidebar { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px 0; flex-shrink: 0; overflow-y: auto; max-height: calc(100vh - 120px); }
         .sidebar-header { padding: 0 16px 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
         .sidebar-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .sidebar-subtitle { font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
@@ -121,7 +121,7 @@
         .sidebar-section { padding: 8px 16px; margin-top: 12px; border-top: 1px solid var(--border-color); }
         .sidebar-section-title { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .content-area { flex: 1; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
+        .content-area { flex: 1; min-height: 0; padding: 20px; background: var(--bg-gray); overflow-y: auto; }
         .content-panel { display: none; background: var(--bg-main); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
         .content-panel.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

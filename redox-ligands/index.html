@@ -4,141 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redox-Active Ligands | GenAI Research</title>
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --red: #ef4444;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-purple-light: #ede9fe;
-            --bg-green-light: #d1fae5;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-
-        
-
-
-
-
-
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .content-area { flex: 1; padding: 40px; background: var(--bg-main); display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .coming-soon {
-            text-align: center;
-            padding: 60px 40px;
-        }
-        .coming-soon h1 { font-size: 2rem; color: var(--text-muted); margin-bottom: 16px; }
-        .coming-soon p { font-size: 1rem; color: var(--text-light); }
-        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
-        footer p { font-size: 0.7rem; color: var(--text-light); }
-        @media (max-width: 900px) {
-            .header-layout { flex-direction: column; gap: 8px; }
-            nav ul { justify-content: center; gap: 12px; }
-        }
-    </style>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
 </head>
-<body>
+<body class="theme-green">
+
+    <!-- Header -->
     <header>
         <div class="container header-layout">
             <a href="../index.html" class="logo-section">
                 <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="logoGradRAL" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#10b981"/>
+                            <stop offset="50%" style="stop-color:#8b5cf6"/>
+                            <stop offset="100%" style="stop-color:#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="32" cy="32" r="28" stroke="url(#logoGradRAL)" stroke-width="3" fill="none"/>
+                    <circle cx="32" cy="22" r="7" fill="#10b981"/>
+                    <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
+                    <circle cx="42" cy="40" r="5" fill="#3b82f6"/>
+                    <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
                 </div>
             </a>
+
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
@@ -150,16 +43,482 @@
             </nav>
         </div>
     </header>
+
+    <!-- Main Layout -->
     <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Redox-Active Ligands</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="introduction">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                    <span class="sidebar-item-text">Introduction</span>
+                </li>
+                <li class="sidebar-item" data-panel="ligand-classes">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="4" cy="8" r="2"/>
+                        <circle cx="20" cy="8" r="2"/>
+                        <circle cx="4" cy="16" r="2"/>
+                        <circle cx="20" cy="16" r="2"/>
+                        <line x1="6" y1="8" x2="9" y2="10"/>
+                        <line x1="18" y1="8" x2="15" y2="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Ligand Classes</span>
+                </li>
+                <li class="sidebar-item" data-panel="applications">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"/>
+                    </svg>
+                    <span class="sidebar-item-text">Applications</span>
+                </li>
+                <li class="sidebar-item" data-panel="ai-assistant">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="sidebar-item-text">AI Assistant</span>
+                </li>
+                <li class="sidebar-item" data-panel="characterization">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <span class="sidebar-item-text">Characterization</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
         <main class="content-area">
-            <div class="coming-soon">
-                <h1>🚧 Coming Soon</h1>
-                <p>Redox-Active Ligands research content is under development.</p>
+            <!-- Welcome Panel -->
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2v7.31"/>
+                            <path d="M14 9.3V1.99"/>
+                            <path d="M8.5 2h7"/>
+                            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"/>
+                            <path d="M5.58 16.5h12.85"/>
+                        </svg>
+                    </div>
+                    <h2>Redox-Active Ligands</h2>
+                    <p>Explore the fascinating world of redox-active ligands - molecules that participate directly in electron transfer reactions, enabling novel catalytic transformations and sustainable chemistry.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Select a module from the sidebar to begin exploring.</p>
+                </div>
+            </div>
+
+            <!-- Introduction Panel -->
+            <div id="introduction" class="content-panel">
+                <div class="content-header">
+                    <h2>Introduction to Redox-Active Ligands</h2>
+                    <p>Understanding the fundamentals of non-innocent ligand behavior in transition metal chemistry.</p>
+                </div>
+                <div class="content-body">
+                    <p>Redox-active ligands (also called non-innocent ligands) represent a paradigm shift in our understanding of transition metal chemistry. Unlike traditional "innocent" ligands that simply support the metal center, these ligands actively participate in redox chemistry, acting as electron reservoirs that can dramatically expand the reactivity of metal complexes.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">5+</div>
+                            <div class="stat-label">Ligand Classes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">1000+</div>
+                            <div class="stat-label">Publications</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Research Groups</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Growing</div>
+                            <div class="stat-label">Field</div>
+                        </div>
+                    </div>
+
+                    <h3>Key Concepts</h3>
+                    <ul>
+                        <li><strong>Innocent vs Non-Innocent:</strong> The distinction between ligands that maintain constant oxidation states versus those that participate in electron transfer</li>
+                        <li><strong>Electron Reservoir:</strong> How redox-active ligands store and deliver electrons during catalytic cycles</li>
+                        <li><strong>Metal-Ligand Cooperativity:</strong> Synergistic bond-making and bond-breaking involving both metal and ligand</li>
+                        <li><strong>Two-Electron Processes:</strong> Enabling first-row metals to mimic noble metal reactivity</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Historical Context</h4>
+                        <p style="margin-bottom: 0;">The concept of non-innocent ligands was first articulated by Jørgensen and Cotton in the 1960s. Today, this field has grown into a major area of research with applications spanning catalysis, materials science, and bioinorganic chemistry.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ligand Classes Panel -->
+            <div id="ligand-classes" class="content-panel">
+                <div class="content-header">
+                    <h2>Ligand Classes</h2>
+                    <p>Explore the major families of redox-active ligands and their unique properties.</p>
+                </div>
+                <div class="content-body">
+                    <div class="highlight-box">
+                        <h4>Bis(imino)pyridine (PDI)</h4>
+                        <p>One of the most studied redox-active ligand families. The diimine backbone can accept up to 2 electrons, forming radical anion and dianion states. PDI ligands are key for nickel-catalyzed C-O activation reactions and small molecule activation.</p>
+                    </div>
+
+                    <div class="highlight-box blue">
+                        <h4>Catecholate / o-Quinone</h4>
+                        <p>Reversible two-electron redox couple between catecholate (dianion) and o-quinone (neutral). These ligands can stabilize high-valent metal centers and are found in biological systems like copper amine oxidase.</p>
+                    </div>
+
+                    <div class="highlight-box purple">
+                        <h4>Dithiolene Ligands</h4>
+                        <p>Sulfur-based ligands with extensive redox activity. Can form stable complexes with metals in unusual oxidation states. Important in molybdenum enzymes and conductive materials.</p>
+                    </div>
+
+                    <h3>Other Important Classes</h3>
+                    <ul>
+                        <li><strong>α-Diimines:</strong> Bipyridine, phenanthroline derivatives used in photoredox catalysis</li>
+                        <li><strong>Redox-Active NHCs:</strong> N-heterocyclic carbenes with tunable redox properties</li>
+                        <li><strong>Porphyrins & Corroles:</strong> Macrocyclic ligands with rich redox chemistry</li>
+                        <li><strong>Verdazyl & Semiquinone radicals:</strong> Stable organic radicals as ligand components</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Applications Panel -->
+            <div id="applications" class="content-panel">
+                <div class="content-header">
+                    <h2>Applications</h2>
+                    <p>Discover how redox-active ligands enable new catalytic transformations.</p>
+                </div>
+                <div class="content-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">Ni</div>
+                            <div class="stat-label">Nickel Catalysis</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">C-O</div>
+                            <div class="stat-label">Bond Activation</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">N2</div>
+                            <div class="stat-label">Small Molecules</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Bio</div>
+                            <div class="stat-label">Biomimetic</div>
+                        </div>
+                    </div>
+
+                    <h3>Nickel Catalysis</h3>
+                    <p>Redox-active ligands are particularly important for nickel catalysis. Ni is approximately 1000x cheaper than Pd but traditionally limited by one-electron redox chemistry. Ligands like PDI enable Ni to catalyze cross-couplings and C-O activation reactions previously requiring palladium.</p>
+
+                    <h3>C-O Bond Activation</h3>
+                    <p>C-O bond activation in aryl ethers and esters is challenging due to strong bonds (~85-90 kcal/mol). Ni-PDI complexes can cleave these bonds, enabling conversion of biomass-derived compounds into valuable chemicals.</p>
+
+                    <div class="highlight-box">
+                        <h4>Cross-Coupling Revolution</h4>
+                        <p style="margin-bottom: 0;">Redox-active ligands expand cross-coupling capabilities by: (1) Enabling use of cheaper metals, (2) Allowing activation of stronger bonds, (3) Providing access to novel reactivity patterns through ligand-centered radicals.</p>
+                    </div>
+
+                    <h3>Small Molecule Activation</h3>
+                    <ul>
+                        <li><strong>N2 Fixation:</strong> Converting atmospheric nitrogen to ammonia under mild conditions</li>
+                        <li><strong>CO2 Reduction:</strong> Transforming carbon dioxide into fuels and chemicals</li>
+                        <li><strong>H2 Activation:</strong> Hydrogenation reactions without precious metals</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- AI Assistant Panel -->
+            <div id="ai-assistant" class="content-panel" style="position: relative;">
+                <button class="settings-btn" id="settingsBtn" title="AI Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+                <div class="content-header">
+                    <h2>Redox-Active Ligand AI Assistant</h2>
+                    <p>Ask questions about redox-active ligands, mechanisms, and applications.</p>
+                </div>
+                <div class="content-body">
+                    <div class="api-status disconnected" id="apiStatus" style="cursor: pointer;" onclick="document.getElementById('settingsBtn').click();">
+                        <div class="api-status-dot"></div>
+                        <span id="apiStatusText">Offline mode - <strong>Click here to configure AI</strong></span>
+                    </div>
+
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="askQuestion('What are redox-active ligands?')">What are RAL?</button>
+                        <button class="quick-btn" onclick="askQuestion('Explain the electron reservoir concept')">Electron Reservoir</button>
+                        <button class="quick-btn" onclick="askQuestion('How do redox-active ligands help nickel catalysis?')">Ni Catalysis</button>
+                        <button class="quick-btn" onclick="askQuestion('What is metal-ligand cooperativity?')">MLC</button>
+                        <button class="quick-btn" onclick="askQuestion('Compare innocent vs non-innocent ligands')">Innocent vs Non-Innocent</button>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                <div class="message-avatar">RAL</div>
+                                <div class="message-body">
+                                    <div class="message-sender">Redox-Active Ligand Assistant</div>
+                                    <div class="message-text">
+                                        Hello! I'm your specialized assistant for redox-active ligand chemistry. I can help you understand ligand types, mechanisms, and applications. Click a quick question above or type your own question below!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <textarea class="chat-input" id="chatInput" placeholder="Ask about redox-active ligands..." rows="1"></textarea>
+                            <button class="send-btn" id="sendBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Characterization Panel -->
+            <div id="characterization" class="content-panel">
+                <div class="content-header">
+                    <h2>Characterization Methods</h2>
+                    <p>Techniques for studying and identifying redox-active ligand behavior.</p>
+                </div>
+                <div class="content-body">
+                    <h3>Spectroscopic Methods</h3>
+                    <ul>
+                        <li><strong>UV-Vis Spectroscopy:</strong> Detecting ligand-based electronic transitions</li>
+                        <li><strong>EPR Spectroscopy:</strong> Characterizing radical species on ligands</li>
+                        <li><strong>X-ray Crystallography:</strong> Determining bond length changes upon redox</li>
+                        <li><strong>X-ray Absorption Spectroscopy:</strong> Probing metal oxidation states</li>
+                    </ul>
+
+                    <div class="highlight-box blue">
+                        <h4>Key Indicators of Redox Activity</h4>
+                        <p style="margin-bottom: 0;">Unusual bond lengths in crystal structures, multiple reversible redox waves in cyclic voltammetry, and EPR signals suggesting ligand-centered radicals are all indicators of non-innocent behavior.</p>
+                    </div>
+
+                    <h3>Electrochemical Methods</h3>
+                    <ul>
+                        <li><strong>Cyclic Voltammetry:</strong> Measuring redox potentials and reversibility</li>
+                        <li><strong>Differential Pulse Voltammetry:</strong> Resolving closely spaced redox events</li>
+                        <li><strong>Spectroelectrochemistry:</strong> Combining spectroscopy with electrochemistry</li>
+                    </ul>
+                </div>
             </div>
         </main>
     </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h3>RAL AI Assistant Settings</h3>
+                <button class="settings-close" id="settingsClose">&times;</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-group">
+                    <label class="settings-label">LLM Provider</label>
+                    <select class="settings-select" id="providerSelect">
+                        <option value="groq">Groq (FREE)</option>
+                        <option value="gemini">Google Gemini (FREE)</option>
+                        <option value="huggingface">Hugging Face (FREE)</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="openai">OpenAI</option>
+                    </select>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">API Key</label>
+                    <input type="password" class="settings-input" id="apiKeyInput" placeholder="Enter your API key...">
+                    <div class="settings-hint" id="apiKeyHint">
+                        Get a free API key from <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">Model (Optional)</label>
+                    <select class="settings-select" id="modelSelect">
+                        <option value="">Default for provider</option>
+                    </select>
+                    <div class="settings-hint">Leave as default for best results</div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn btn-outline" id="settingsCancel">Cancel</button>
+                <button class="btn btn-primary" id="settingsSave">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer>
-        <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
+        <p>Powered by GenAI Research | Redox-Active Ligand Initiative</p>
     </footer>
+
+    <script>
+        // Provider configuration
+        const PROVIDER_CONFIG = {
+            groq: { name: 'Groq', url: 'https://console.groq.com', models: [
+                { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
+                { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B (Fast)' }
+            ]},
+            gemini: { name: 'Google Gemini', url: 'https://ai.google.dev', models: [
+                { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
+                { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+            ]},
+            huggingface: { name: 'Hugging Face', url: 'https://huggingface.co/settings/tokens', models: [
+                { value: 'meta-llama/Llama-3.2-3B-Instruct', label: 'Llama 3.2 3B' }
+            ]},
+            openrouter: { name: 'OpenRouter', url: 'https://openrouter.ai/keys', models: [
+                { value: 'meta-llama/llama-3-8b-instruct:free', label: 'Llama 3 8B (FREE)' }
+            ]},
+            deepseek: { name: 'DeepSeek', url: 'https://platform.deepseek.com', models: [
+                { value: 'deepseek-chat', label: 'DeepSeek Chat (Recommended)' }
+            ]},
+            openai: { name: 'OpenAI', url: 'https://platform.openai.com/api-keys', models: [
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' }
+            ]}
+        };
+
+        // Load/Save settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('ralAiSettings') || '{}');
+            return { provider: settings.provider || 'groq', apiKey: settings.apiKey || '', model: settings.model || '' };
+        }
+
+        function saveSettings(settings) {
+            localStorage.setItem('ralAiSettings', JSON.stringify(settings));
+        }
+
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                contentPanels.forEach(p => p.classList.remove('active'));
+                item.classList.add('active');
+                const panelId = item.getAttribute('data-panel');
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+        // Settings Modal
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsClose = document.getElementById('settingsClose');
+        const settingsCancel = document.getElementById('settingsCancel');
+        const settingsSave = document.getElementById('settingsSave');
+        const providerSelect = document.getElementById('providerSelect');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const modelSelect = document.getElementById('modelSelect');
+        const apiKeyHint = document.getElementById('apiKeyHint');
+
+        function updateModelOptions() {
+            const provider = providerSelect.value;
+            const config = PROVIDER_CONFIG[provider];
+            modelSelect.innerHTML = '<option value="">Default for provider</option>';
+            if (config && config.models) {
+                config.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.value;
+                    option.textContent = model.label;
+                    modelSelect.appendChild(option);
+                });
+            }
+            apiKeyHint.innerHTML = `Get your API key from <a href="${config?.url || '#'}" target="_blank">${config?.url || 'provider'}</a>`;
+        }
+
+        function updateApiStatus() {
+            const settings = loadSettings();
+            const apiStatus = document.getElementById('apiStatus');
+            const apiStatusText = document.getElementById('apiStatusText');
+            
+            if (settings.apiKey) {
+                apiStatus.classList.remove('disconnected');
+                apiStatus.classList.add('connected');
+                apiStatusText.innerHTML = `Connected to <strong>${PROVIDER_CONFIG[settings.provider]?.name || settings.provider}</strong>`;
+                settingsBtn.classList.add('configured');
+            } else {
+                apiStatus.classList.remove('connected');
+                apiStatus.classList.add('disconnected');
+                apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
+                settingsBtn.classList.remove('configured');
+            }
+        }
+
+        providerSelect.addEventListener('change', updateModelOptions);
+
+        settingsBtn.addEventListener('click', () => {
+            const settings = loadSettings();
+            providerSelect.value = settings.provider;
+            apiKeyInput.value = settings.apiKey;
+            updateModelOptions();
+            modelSelect.value = settings.model;
+            settingsOverlay.classList.add('active');
+        });
+
+        settingsClose.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+        settingsCancel.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+
+        settingsSave.addEventListener('click', () => {
+            saveSettings({
+                provider: providerSelect.value,
+                apiKey: apiKeyInput.value,
+                model: modelSelect.value
+            });
+            settingsOverlay.classList.remove('active');
+            updateApiStatus();
+        });
+
+        settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+        });
+
+        // Chat functionality
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isUser ? 'You' : 'RAL'}</div>
+                <div class="message-body">
+                    <div class="message-sender">${isUser ? 'You' : 'Redox-Active Ligand Assistant'}</div>
+                    <div class="message-text">${content}</div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function askQuestion(q) {
+            chatInput.value = q;
+        }
+
+        // Initialize
+        updateApiStatus();
+        updateModelOptions();
+    </script>
 </body>
 </html>

@@ -4,136 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virology | GenAI Research</title>
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --red: #ef4444;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-purple-light: #ede9fe;
-            --bg-green-light: #d1fae5;
-            --bg-red-light: #fee2e2;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: var(--font-main); background-color: var(--bg-gray); color: var(--text-main); line-height: 1.6; display: flex; flex-direction: column; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-
-        
-
-
-
-
-
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .content-area { flex: 1; padding: 40px; background: var(--bg-main); display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .coming-soon {
-            text-align: center;
-            padding: 60px 40px;
-        }
-        .coming-soon h1 { font-size: 2rem; color: var(--text-muted); margin-bottom: 16px; }
-        .coming-soon p { font-size: 1rem; color: var(--text-light); }
-        footer { background-color: var(--bg-dark); color: white; padding: 8px 20px; text-align: center; flex-shrink: 0; }
-        footer p { font-size: 0.7rem; color: var(--text-light); }
-        @media (max-width: 900px) {
-            .header-layout { flex-direction: column; gap: 8px; }
-            nav ul { justify-content: center; gap: 12px; }
-        }
-    </style>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
 </head>
-<body>
+<body class="theme-red">
+
+    <!-- Header -->
     <header>
         <div class="container header-layout">
             <a href="../index.html" class="logo-section">
                 <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="logoGradVirus" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ef4444"/>
+                            <stop offset="50%" style="stop-color:#8b5cf6"/>
+                            <stop offset="100%" style="stop-color:#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="32" cy="32" r="28" stroke="url(#logoGradVirus)" stroke-width="3" fill="none"/>
+                    <circle cx="32" cy="22" r="7" fill="#ef4444"/>
+                    <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
+                    <circle cx="42" cy="40" r="5" fill="#3b82f6"/>
+                    <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
@@ -151,16 +42,75 @@
             </nav>
         </div>
     </header>
+
     <div class="main-wrapper">
         <main class="content-area">
-            <div class="coming-soon">
-                <h1>🦠 Coming Soon</h1>
-                <p>Virology research content is under development.</p>
+            <div class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2"/>
+                            <path d="M12 20v2"/>
+                            <path d="m4.93 4.93 1.41 1.41"/>
+                            <path d="m17.66 17.66 1.41 1.41"/>
+                            <path d="M2 12h2"/>
+                            <path d="M20 12h2"/>
+                            <path d="m6.34 17.66-1.41 1.41"/>
+                            <path d="m19.07 4.93-1.41 1.41"/>
+                        </svg>
+                    </div>
+                    <h2>Computational Virology</h2>
+                    <p>Our virology research section is currently under development. We are building computational tools for viral protein analysis, drug target identification, epidemic modeling, and vaccine development research.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Check back soon for updates on our computational virology initiatives.</p>
+                    
+                    <div class="stats-grid" style="margin-top: 48px;">
+                        <div class="stat-card">
+                            <div class="welcome-icon" style="width: 60px; height: 60px; margin: 0 auto 8px; background: var(--ai-light);">
+                                <svg style="width: 28px; height: 28px; color: var(--ai-primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-label">Protein Analysis</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="welcome-icon" style="width: 60px; height: 60px; margin: 0 auto 8px; background: var(--tmc-light);">
+                                <svg style="width: 28px; height: 28px; color: var(--tmc-primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.5 20H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H20a2 2 0 0 1 2 2v3"/>
+                                    <circle cx="18" cy="18" r="3"/>
+                                    <path d="M18 14v8"/>
+                                    <path d="M14 18h8"/>
+                                </svg>
+                            </div>
+                            <div class="stat-label">Drug Discovery</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="welcome-icon" style="width: 60px; height: 60px; margin: 0 auto 8px; background: var(--ral-light);">
+                                <svg style="width: 28px; height: 28px; color: var(--ral-primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="m19 9-5 5-4-4-3 3"/>
+                                </svg>
+                            </div>
+                            <div class="stat-label">Epidemic Models</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="welcome-icon" style="width: 60px; height: 60px; margin: 0 auto 8px; background: var(--virus-light);">
+                                <svg style="width: 28px; height: 28px; color: var(--virus-primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m14.5 2 7.5 7.5L19.5 12"/>
+                                    <path d="m9.5 22-7.5-7.5L4.5 12"/>
+                                    <path d="M19.5 12 12 4.5 4.5 12 12 19.5Z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-label">Vaccine Research</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
+
     <footer>
-        <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
+        <p>Powered by GenAI Research | Virology Initiative</p>
     </footer>
 </body>
 </html>

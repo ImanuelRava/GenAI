@@ -4,453 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TMC | GenAI Research</title>
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --pink: #ec4899;
-            --red: #ef4444;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-gray);
-            color: var(--text-main);
-            line-height: 1.6;
-        }
-
-        /* --- Container --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* --- Header --- */
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-
-
-
-
-
-        /* --- Main Layout --- */
-        .main-wrapper {
-            display: flex;
-            min-height: calc(100vh - 80px);
-        }
-
-        /* --- Sidebar --- */
-        .sidebar {
-            width: 280px;
-            background: var(--bg-main);
-            border-right: 1px solid var(--border-color);
-            padding: 24px 0;
-            flex-shrink: 0;
-            position: sticky;
-            top: 80px;
-            height: calc(100vh - 80px);
-            overflow-y: auto;
-        }
-
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-
-        .sidebar-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-            text-decoration: none;
-            color: var(--text-secondary);
-        }
-
-        .sidebar-item:hover {
-            background: var(--bg-gray);
-            color: var(--text-main);
-        }
-
-        .sidebar-item.active {
-            background: var(--bg-blue-light);
-            color: var(--primary);
-            border-left-color: var(--primary);
-        }
-
-        .sidebar-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-item-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        /* --- Content Area --- */
-        .content-area {
-            flex: 1;
-            padding: 32px;
-            background: var(--bg-gray);
-        }
-
-        .content-panel {
-            display: none;
-            background: var(--bg-main);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            padding: 32px;
-            min-height: 400px;
-        }
-
-        .content-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .content-header {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .content-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-
-        .content-header p {
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        .content-body h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 24px 0 12px;
-        }
-
-        .content-body p {
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.7;
-        }
-
-        .content-body ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .content-body ul li {
-            padding: 10px 0;
-            padding-left: 20px;
-            position: relative;
-            color: var(--text-secondary);
-        }
-
-        .content-body ul li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-
-        /* --- Highlight Box --- */
-        .highlight-box {
-            background: linear-gradient(135deg, var(--bg-blue-light) 0%, var(--bg-gray) 100%);
-            border: 1px solid var(--primary-light);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .highlight-box h4 {
-            color: var(--primary);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        /* --- Action Button --- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            border: none;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-outline:hover {
-            background: var(--bg-gray);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* --- Welcome Panel --- */
-        .welcome-panel {
-            text-align: center;
-            padding: 60px 40px;
-        }
-
-        .welcome-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .welcome-panel h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .welcome-panel p {
-            color: var(--text-muted);
-            max-width: 500px;
-            margin: 0 auto 24px;
-        }
-
-        /* --- Footer --- */
-        footer {
-            background-color: var(--bg-dark);
-            color: white;
-            padding: 24px 20px;
-            text-align: center;
-        }
-
-        footer p {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 900px) {
-            .header-layout {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            nav ul {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            .main-wrapper {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                top: 0;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 12px 0;
-            }
-
-            .sidebar-header {
-                display: none;
-            }
-
-            .sidebar-nav {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                padding: 0 12px;
-            }
-
-            .sidebar-item {
-                padding: 10px 16px;
-                border-left: none;
-                border-radius: var(--radius);
-                border: 1px solid var(--border-color);
-            }
-
-            .sidebar-item.active {
-                border-color: var(--primary);
-            }
-
-            .content-area {
-                padding: 20px;
-            }
-
-            .content-panel {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .sidebar-item-text {
-                display: none;
-            }
-
-            .sidebar-item {
-                padding: 10px;
-            }
-
-            .sidebar-icon {
-                width: 24px;
-                height: 24px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/shared.css">
 </head>
-<body>
+<body class="theme-purple">
 
     <!-- Header -->
     <header>
         <div class="container header-layout">
             <a href="../index.html" class="logo-section">
                 <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="logoGradTMC" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6"/>
+                            <stop offset="50%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#10b981"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="32" cy="32" r="28" stroke="url(#logoGradTMC)" stroke-width="3" fill="none"/>
+                    <circle cx="32" cy="22" r="7" fill="#8b5cf6"/>
+                    <circle cx="22" cy="40" r="5" fill="#3b82f6"/>
+                    <circle cx="42" cy="40" r="5" fill="#10b981"/>
+                    <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
@@ -486,14 +60,14 @@
                     <span class="sidebar-item-text">Overview</span>
                 </li>
                 <li class="sidebar-item" data-panel="introduction">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                     </svg>
                     <span class="sidebar-item-text">Introduction</span>
                 </li>
                 <li class="sidebar-item" data-panel="data-extraction">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="20" x2="18" y2="10"/>
                         <line x1="12" y1="20" x2="12" y2="4"/>
                         <line x1="6" y1="20" x2="6" y2="14"/>
@@ -502,7 +76,7 @@
                     <span class="sidebar-item-text">Data Extraction</span>
                 </li>
                 <li class="sidebar-item" data-panel="citation">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="2"/>
                         <circle cx="4" cy="6" r="2"/>
                         <circle cx="20" cy="6" r="2"/>
@@ -514,22 +88,22 @@
                     <span class="sidebar-item-text">Citation Network</span>
                 </li>
                 <li class="sidebar-item" data-panel="nicobot-live">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"/>
                         <line x1="9" y1="3" x2="15" y2="3"/>
                     </svg>
                     <span class="sidebar-item-text">TMC Live</span>
                 </li>
                 <li class="sidebar-item" data-panel="quiz">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
                         <line x1="12" y1="17" x2="12.01" y2="17"/>
                     </svg>
                     <span class="sidebar-item-text">Chemistry Quiz</span>
                 </li>
-                <a href="knowledge-graph.html" class="sidebar-item">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+                <li class="sidebar-item" data-panel="knowledge-graph">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"/>
                         <circle cx="4" cy="8" r="2"/>
                         <circle cx="20" cy="8" r="2"/>
@@ -541,7 +115,7 @@
                         <line x1="18" y1="16" x2="15" y2="14"/>
                     </svg>
                     <span class="sidebar-item-text">Knowledge Graph</span>
-                </a>
+                </li>
             </ul>
         </aside>
 
@@ -550,10 +124,22 @@
             <!-- Welcome Panel -->
             <div id="welcome" class="content-panel active">
                 <div class="welcome-panel">
-                    <div class="welcome-icon">🧪</div>
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 2v4"/>
+                            <path d="M12 18v4"/>
+                            <path d="m4.93 4.93 2.83 2.83"/>
+                            <path d="m16.24 16.24 2.83 2.83"/>
+                            <path d="M2 12h4"/>
+                            <path d="M18 12h4"/>
+                            <path d="m4.93 19.07 2.83-2.83"/>
+                            <path d="m16.24 7.76 2.83-2.83"/>
+                        </svg>
+                    </div>
                     <h2>Welcome to Transition Metal Catalysis</h2>
                     <p>An integrated research platform for nickel-catalyzed C-O bond activation, combining theory, data science, AI prediction, and interactive learning tools.</p>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Select a module from the sidebar to begin exploring.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Select a module from the sidebar to begin exploring.</p>
                 </div>
             </div>
 
@@ -566,6 +152,25 @@
                 <div class="content-body">
                     <p>Nickel-catalyzed C-O bond activation represents a transformative approach in synthetic chemistry, enabling the conversion of abundant and renewable oxygenated feedstocks into valuable chemical products. This research area bridges fundamental organometallic chemistry with practical applications in sustainable synthesis.</p>
                     
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Lectures</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Topics</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Beginner</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+
                     <h3>Key Concepts</h3>
                     <ul>
                         <li>Oxidative addition of C-O bonds to nickel centers</li>
@@ -579,7 +184,7 @@
                         <p style="margin-bottom: 0;">Understand the fundamental principles governing nickel-catalyzed reactions and develop intuition for predicting reaction outcomes based on substrate structure and reaction conditions.</p>
                     </div>
 
-                    <a href="introduction.html" class="btn btn-primary">View Full Introduction →</a>
+                    <a href="introduction.html" class="btn btn-primary">View Full Introduction</a>
                 </div>
             </div>
 
@@ -590,8 +195,27 @@
                     <p>Employ PDF parsing and entity recognition to automatically extract information from scientific literature.</p>
                 </div>
                 <div class="content-body">
-                    <p>Our data extraction pipeline leverages natural language processing and machine learning to systematically harvest reaction data from the scientific literature. This automated approach enables rapid compilation of large datasets for training predictive models.</p>
+                    <p>We utilize OpenChemIE tool to automate the extraction of chemical information from scientific literature. The collected data is then structured and can be stored in a searchable database.</p>
                     
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Papers Processed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Journals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">1000+</div>
+                            <div class="stat-label">Reactions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Auto</div>
+                            <div class="stat-label">Extraction</div>
+                        </div>
+                    </div>
+
                     <h3>Capabilities</h3>
                     <ul>
                         <li>PDF parsing and text extraction from scientific articles</li>
@@ -601,12 +225,12 @@
                         <li>Automated database population</li>
                     </ul>
 
-                    <div class="highlight-box">
+                    <div class="highlight-box purple">
                         <h4>Data Sources</h4>
                         <p style="margin-bottom: 0;">We process publications from major chemistry journals including JACS, Angewandte Chemie, Organic Letters, and more.</p>
                     </div>
 
-                    <a href="data-extraction.html" class="btn btn-primary">Access Data Tools →</a>
+                    <a href="data-extraction.html" class="btn btn-primary">Access Data Tools</a>
                 </div>
             </div>
 
@@ -619,48 +243,90 @@
                 <div class="content-body">
                     <p>The citation network visualization enables researchers to explore the interconnected landscape of nickel catalysis research. Identify seminal works, trace the evolution of ideas, and discover new connections between research areas.</p>
                     
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">200+</div>
+                            <div class="stat-label">Papers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Citations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Authors</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Interactive</div>
+                            <div class="stat-label">Graph</div>
+                        </div>
+                    </div>
+
                     <h3>Features</h3>
                     <ul>
                         <li>Interactive network visualization</li>
                         <li>Author collaboration networks</li>
-                        <li>Keyword co-occurrence analysis</li>
                         <li>Time-evolution of research themes</li>
                         <li>Export citation data in standard formats</li>
                     </ul>
 
-                    <div class="highlight-box">
+                    <div class="highlight-box green">
                         <h4>Network Statistics</h4>
-                        <p style="margin-bottom: 0;">Our database contains over 2,500 interconnected publications spanning two decades of nickel catalysis research.</p>
+                        <p style="margin-bottom: 0;">We provide detailed citation metrics and network analysis to support your research.</p>
                     </div>
 
-                    <a href="citation-tool.html" class="btn btn-primary">Explore Network →</a>
+                    <a href="citation-tool.html" class="btn btn-primary">Explore Network</a>
                 </div>
             </div>
 
             <!-- TMC Live Panel -->
-            <div id="nicobot-live" class="content-panel">
+            <div id="nicobot-live" class="content-panel" style="position: relative;">
+                <button class="settings-btn" id="settingsBtn" title="AI Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
                 <div class="content-header">
-                    <h2>TMC Live</h2>
-                    <p>Access our trained Graph Neural Network in real-time for reaction prediction.</p>
+                    <h2>NiCOBot - TMC Live</h2>
+                    <p>Your AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation.</p>
                 </div>
                 <div class="content-body">
-                    <p>TMC Live provides instant access to our machine learning models trained on thousands of nickel-catalyzed reactions. Predict reaction outcomes, optimize conditions, and explore substrate scope with AI assistance.</p>
-                    
-                    <h3>AI Capabilities</h3>
-                    <ul>
-                        <li>Reaction outcome prediction with confidence scores</li>
-                        <li>Condition optimization suggestions</li>
-                        <li>Substrate compatibility analysis</li>
-                        <li>Side product prediction</li>
-                        <li>Ligand recommendation engine</li>
-                    </ul>
-
-                    <div class="highlight-box">
-                        <h4>Model Performance</h4>
-                        <p style="margin-bottom: 0;">Our Graph Neural Network achieves 87% accuracy on held-out test sets for predicting major product formation.</p>
+                    <div class="api-status disconnected" id="apiStatus" style="cursor: pointer;" onclick="document.getElementById('settingsBtn').click();">
+                        <div class="api-status-dot"></div>
+                        <span id="apiStatusText">Offline mode - <strong>Click here to configure AI</strong></span>
                     </div>
 
-                    <a href="tmc-embed.html" class="btn btn-primary">Launch TMC →</a>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="askQuestion('What is nickel catalysis?')">Ni Catalysis</button>
+                        <button class="quick-btn" onclick="askQuestion('Explain C-O bond activation')">C-O Activation</button>
+                        <button class="quick-btn" onclick="askQuestion('What are the advantages of Ni over Pd?')">Ni vs Pd</button>
+                        <button class="quick-btn" onclick="askQuestion('Explain Suzuki coupling with nickel')">Suzuki Coupling</button>
+                        <button class="quick-btn" onclick="askQuestion('What electrophiles work with nickel?')">Electrophiles</button>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                <div class="message-avatar">Ni</div>
+                                <div class="message-body">
+                                    <div class="message-sender">NiCOBot</div>
+                                    <div class="message-text">
+                                        Hello! I'm NiCOBot, your specialized assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry. I can help you with reaction design, mechanism explanations, and practical optimization tips. Click a quick question above or type your own question below!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <textarea class="chat-input" id="chatInput" placeholder="Ask about nickel catalysis, C-O activation, cross-coupling..." rows="1"></textarea>
+                            <button class="send-btn" id="sendBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -673,6 +339,25 @@
                 <div class="content-body">
                     <p>Test your understanding of nickel catalysis concepts through our interactive quiz system. Questions range from fundamental mechanistic principles to advanced applications of AI in chemistry.</p>
                     
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Questions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Categories</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Levels</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Adaptive</div>
+                            <div class="stat-label">Learning</div>
+                        </div>
+                    </div>
+
                     <h3>Quiz Categories</h3>
                     <ul>
                         <li>Mechanism and reactivity fundamentals</li>
@@ -682,15 +367,105 @@
                         <li>Integrated problem-solving challenges</li>
                     </ul>
 
-                    <div class="highlight-box">
+                    <div class="highlight-box green">
                         <h4>Track Your Progress</h4>
                         <p style="margin-bottom: 0;">Complete quizzes to earn badges and track your mastery of nickel catalysis concepts.</p>
                     </div>
 
-                    <a href="quiz.html" class="btn btn-primary">Start Quiz →</a>
+                    <a href="quiz.html" class="btn btn-primary">Start Quiz</a>
+                </div>
+            </div>
+
+            <!-- Knowledge Graph Panel -->
+            <div id="knowledge-graph" class="content-panel">
+                <div class="content-header">
+                    <h2>Knowledge Graph</h2>
+                    <p>Explore AI-generated knowledge graphs for transition metal catalysis concepts.</p>
+                </div>
+                <div class="content-body">
+                    <p>Our interactive knowledge graph tool uses AI to automatically generate visual representations of chemical concepts, reactions, and their relationships. Simply enter a topic or upload a PDF to explore connections in nickel catalysis and related chemistry.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">AI</div>
+                            <div class="stat-label">Powered</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Input Modes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">10+</div>
+                            <div class="stat-label">Node Types</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Interactive</div>
+                            <div class="stat-label">Visualization</div>
+                        </div>
+                    </div>
+
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Keyword-based graph generation - Enter any chemistry topic</li>
+                        <li>PDF upload support - Extract knowledge from papers</li>
+                        <li>Interactive D3.js visualization with drag and zoom</li>
+                        <li>Click nodes for AI-powered explanations</li>
+                        <li>Multiple LLM provider support (DeepSeek, OpenAI, etc.)</li>
+                        <li>Customizable API key configuration</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>AI Integration</h4>
+                        <p style="margin-bottom: 0;">The knowledge graph leverages Large Language Models to generate accurate, context-aware relationships between chemical concepts. Configure your preferred API key for personalized results.</p>
+                    </div>
+
+                    <a href="knowledge-graph.html" class="btn btn-primary">Open Knowledge Graph</a>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h3>NiCOBot AI Settings</h3>
+                <button class="settings-close" id="settingsClose">&times;</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-group">
+                    <label class="settings-label">LLM Provider</label>
+                    <select class="settings-select" id="providerSelect">
+                        <option value="groq">Groq (FREE)</option>
+                        <option value="gemini">Google Gemini (FREE)</option>
+                        <option value="huggingface">Hugging Face (FREE)</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="openai">OpenAI</option>
+                    </select>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">API Key</label>
+                    <input type="password" class="settings-input" id="apiKeyInput" placeholder="Enter your API key...">
+                    <div class="settings-hint" id="apiKeyHint">
+                        Get a free API key from <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">Model (Optional)</label>
+                    <select class="settings-select" id="modelSelect">
+                        <option value="">Default for provider</option>
+                    </select>
+                    <div class="settings-hint">Leave as default for best results</div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn btn-outline" id="settingsCancel">Cancel</button>
+                <button class="btn btn-primary" id="settingsSave">Save Settings</button>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -699,24 +474,235 @@
     </footer>
 
     <script>
-        // Sidebar Navigation
+        // Provider configuration
+        const PROVIDER_CONFIG = {
+            groq: { name: 'Groq', url: 'https://console.groq.com', models: [
+                { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
+                { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B (Fast)' }
+            ]},
+            gemini: { name: 'Google Gemini', url: 'https://ai.google.dev', models: [
+                { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
+                { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+            ]},
+            huggingface: { name: 'Hugging Face', url: 'https://huggingface.co/settings/tokens', models: [
+                { value: 'meta-llama/Llama-3.2-3B-Instruct', label: 'Llama 3.2 3B' }
+            ]},
+            openrouter: { name: 'OpenRouter', url: 'https://openrouter.ai/keys', models: [
+                { value: 'meta-llama/llama-3-8b-instruct:free', label: 'Llama 3 8B (FREE)' }
+            ]},
+            deepseek: { name: 'DeepSeek', url: 'https://platform.deepseek.com', models: [
+                { value: 'deepseek-chat', label: 'DeepSeek Chat (Recommended)' }
+            ]},
+            openai: { name: 'OpenAI', url: 'https://platform.openai.com/api-keys', models: [
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' }
+            ]}
+        };
+
+        // Load/Save settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('nicobotSettings') || '{}');
+            return { provider: settings.provider || 'groq', apiKey: settings.apiKey || '', model: settings.model || '' };
+        }
+
+        function saveSettings(settings) {
+            localStorage.setItem('nicobotSettings', JSON.stringify(settings));
+        }
+
+        // Panel Navigation
         const sidebarItems = document.querySelectorAll('.sidebar-item');
-        const contentPanels = document.querySelectorAll('.content-panel');
+        const panels = document.querySelectorAll('.content-panel');
 
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
-                // Remove active class from all items
+                const panelId = item.dataset.panel;
+                
                 sidebarItems.forEach(i => i.classList.remove('active'));
-                contentPanels.forEach(p => p.classList.remove('active'));
-
-                // Add active class to clicked item
                 item.classList.add('active');
-
-                // Show corresponding panel
-                const panelId = item.getAttribute('data-panel');
-                document.getElementById(panelId).classList.add('active');
+                
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    if (panel.id === panelId) {
+                        panel.classList.add('active');
+                    }
+                });
             });
         });
+
+        // Settings Modal
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsClose = document.getElementById('settingsClose');
+        const settingsCancel = document.getElementById('settingsCancel');
+        const settingsSave = document.getElementById('settingsSave');
+        const providerSelect = document.getElementById('providerSelect');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const modelSelect = document.getElementById('modelSelect');
+        const apiKeyHint = document.getElementById('apiKeyHint');
+
+        function updateModelOptions() {
+            const provider = providerSelect.value;
+            const config = PROVIDER_CONFIG[provider];
+            modelSelect.innerHTML = '<option value="">Default for provider</option>';
+            if (config && config.models) {
+                config.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.value;
+                    option.textContent = model.label;
+                    modelSelect.appendChild(option);
+                });
+            }
+            apiKeyHint.innerHTML = `Get your API key from <a href="${config?.url || '#'}" target="_blank">${config?.url || 'provider'}</a>`;
+        }
+
+        function updateApiStatus() {
+            const settings = loadSettings();
+            const apiStatus = document.getElementById('apiStatus');
+            const apiStatusText = document.getElementById('apiStatusText');
+            
+            if (settings.apiKey) {
+                apiStatus.classList.remove('disconnected');
+                apiStatus.classList.add('connected');
+                apiStatusText.innerHTML = `Connected to <strong>${PROVIDER_CONFIG[settings.provider]?.name || settings.provider}</strong>`;
+                settingsBtn.classList.add('configured');
+            } else {
+                apiStatus.classList.remove('connected');
+                apiStatus.classList.add('disconnected');
+                apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
+                settingsBtn.classList.remove('configured');
+            }
+        }
+
+        providerSelect.addEventListener('change', updateModelOptions);
+
+        settingsBtn.addEventListener('click', () => {
+            const settings = loadSettings();
+            providerSelect.value = settings.provider;
+            apiKeyInput.value = settings.apiKey;
+            updateModelOptions();
+            modelSelect.value = settings.model;
+            settingsOverlay.classList.add('active');
+        });
+
+        settingsClose.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+        settingsCancel.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+
+        settingsSave.addEventListener('click', () => {
+            saveSettings({
+                provider: providerSelect.value,
+                apiKey: apiKeyInput.value,
+                model: modelSelect.value
+            });
+            settingsOverlay.classList.remove('active');
+            updateApiStatus();
+        });
+
+        settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+        });
+
+        // Chat functionality
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isUser ? 'You' : 'Ni'}</div>
+                <div class="message-body">
+                    <div class="message-sender">${isUser ? 'You' : 'NiCOBot'}</div>
+                    <div class="message-text">${content}</div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'chat-message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">Ni</div>
+                <div class="message-body">
+                    <div class="message-sender">NiCOBot</div>
+                    <div class="message-text typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage(message) {
+            const settings = loadSettings();
+            
+            if (!settings.apiKey) {
+                addMessage('Please configure your API key by clicking the settings button in the top right corner.', false);
+                return;
+            }
+
+            addMessage(message, true);
+            addTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        provider: settings.provider,
+                        api_key: settings.apiKey,
+                        model: settings.model
+                    })
+                });
+
+                removeTypingIndicator();
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`Error: ${data.error || 'Failed to get response'}`, false);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Connection failed. Is the server running?', false);
+            }
+        }
+
+        function askQuestion(question) {
+            chatInput.value = question;
+            sendMessage(question);
+        }
+
+        sendBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                chatInput.value = '';
+            }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // Initialize
+        updateApiStatus();
+        updateModelOptions();
     </script>
 </body>
 </html>

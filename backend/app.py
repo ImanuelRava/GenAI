@@ -35,11 +35,18 @@ for env_path in env_paths:
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
-from flask import Flask, request, jsonify, send_from_directory, send_file
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import networkx as nx
 import base64
 import io
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # RDKit is optional - only needed for molecular visualization
 try:
@@ -52,7 +59,7 @@ except ImportError:
 
 # Import your citation modules
 from modules.Forward_Reference import build_forward_network
-from modules.Local_Reference import build_reference_network
+from modules.Backward_Reference import build_reference_network
 from modules.Cross_Reference import build_cross_reference_network
 
 # Import visualization modules
@@ -72,12 +79,58 @@ from modules.pca_viz import (
 STATIC_FOLDER = BASE_DIR
 UPLOAD_FOLDER = os.path.join(BACKEND_DIR, 'uploads')
 
-app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='')
-CORS(app)
+# Security Configuration
+ALLOWED_EXTENSIONS = {'pdf'}
+MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB max file size
 
-# Configure upload folder
+# CORS Configuration - can be set via environment variable
+# For multiple origins, separate with commas: "http://localhost:3000,https://example.com"
+_default_origins = 'http://localhost:5000,http://127.0.0.1:5000,http://localhost:3000'
+_cors_origins = os.environ.get('CORS_ORIGINS', _default_origins)
+ALLOWED_ORIGINS = [origin.strip() for origin in _cors_origins.split(',') if origin.strip()]
+
+app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='')
+
+# Configure CORS with restricted origins
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ALLOWED_ORIGINS,
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
+
+# Configure rate limiting
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+# Configure upload folder with size limit
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+
+
+def allowed_file(filename: str) -> bool:
+    """Check if file has allowed extension"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def validate_file_upload(file) -> tuple:
+    """Validate uploaded file and return (is_valid, error_message)"""
+    if not file:
+        return False, "No file provided"
+    
+    if file.filename == '':
+        return False, "No file selected"
+    
+    if not allowed_file(file.filename):
+        return False, f"File type not allowed. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
+    
+    return True, None
 
 # Print startup info
 print(f"[STARTUP] Backend Dir: {BACKEND_DIR}")
@@ -128,6 +181,7 @@ def log_progress(msg):
     print(f"[PROGRESS]: {msg}")
 
 @app.route('/api/network', methods=['POST'])
+@limiter.limit("10 per minute")
 def analyze_network():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -135,11 +189,24 @@ def analyze_network():
     file = request.files['file']
     analysis_type = request.form.get('type')
     
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    # Validate file upload
+    is_valid, error_msg = validate_file_upload(file)
+    if not is_valid:
+        return jsonify({'error': error_msg}), 400
+    
+    # Validate analysis type
+    valid_types = ['forward', 'backward', 'cross']
+    if analysis_type not in valid_types:
+        return jsonify({'error': f'Invalid analysis type. Must be one of: {valid_types}'}), 400
 
     if file:
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        # Use secure filename to prevent path traversal
+        from werkzeug.utils import secure_filename
+        filename = secure_filename(file.filename)
+        if not filename:
+            return jsonify({'error': 'Invalid filename'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
         G = None
@@ -172,7 +239,7 @@ def analyze_network():
             if G is None or G.number_of_nodes() < 2:
                 return jsonify({'error': 'Could not build network'}), 400
 
-            graph_json = nx.node_link_data(G, edges="edges")
+            graph_json = nx.node_link_data(G, attrs={'link': 'edges'})
 
             return jsonify({
                 'elements': graph_json, 
@@ -185,10 +252,8 @@ def analyze_network():
             })
 
         except Exception as e:
-            print(f"Error: {e}")
-            import traceback
-            traceback.print_exc()
-            return jsonify({'error': str(e)}), 500
+            logger.error(f"Network analysis error: {e}", exc_info=True)
+            return jsonify({'error': 'An internal error occurred during analysis'}), 500
         
         finally:
             if os.path.exists(filepath):
@@ -485,15 +550,16 @@ def api_pca_chemistry(dataset):
 # Import pure Python LLM providers (works on PythonAnywhere without Node.js)
 from llm_providers import get_llm_response, generate_knowledge_graph as llm_generate_kg, explain_concept
 
-def get_llm_response_sync(system_prompt: str, user_message: str) -> str:
+def get_llm_response_sync(system_prompt: str, user_message: str, 
+                          provider: str = None, api_key: str = None) -> str:
     """Get response from LLM using pure Python providers"""
-    return get_llm_response(system_prompt, user_message)
+    return get_llm_response(system_prompt, user_message, provider=provider, api_key=api_key)
 
 
-def generate_knowledge_graph_with_llm(topic: str) -> dict:
+def generate_knowledge_graph_with_llm(topic: str, provider: str = None, api_key: str = None) -> dict:
     """Use LLM to generate a knowledge graph for a given topic"""
     # Use the pure Python LLM provider
-    return llm_generate_kg(topic)
+    return llm_generate_kg(topic, provider=provider, api_key=api_key)
 
 
 def generate_mock_knowledge_graph(topic: str) -> dict:
@@ -604,13 +670,22 @@ def generate_mock_knowledge_graph(topic: str) -> dict:
 
 @app.route('/api/knowledge-graph', methods=['POST'])
 def api_knowledge_graph():
-    """Generate knowledge graph for a given topic using LLM"""
+    """Generate knowledge graph for a given topic using LLM
+    
+    Request body:
+        topic: The topic to generate knowledge graph for
+        use_llm: Whether to use LLM (default: True)
+        provider: LLM provider (deepseek, openai, groq, gemini, huggingface, openrouter, ollama)
+        api_key: User's API key for the LLM provider
+    """
     try:
         data = request.get_json()
         topic = data.get('topic', 'cross-coupling')
         use_llm = data.get('use_llm', True)  # Default to using LLM
+        provider = data.get('provider')  # LLM provider (optional)
+        api_key = data.get('api_key')  # User's API key (optional for ollama)
 
-        print(f"[KG API] Topic: {topic}, Use LLM: {use_llm}")
+        print(f"[KG API] Topic: {topic}, Use LLM: {use_llm}, Provider: {provider}")
 
         graph_data = None
         llm_used = False
@@ -618,7 +693,7 @@ def api_knowledge_graph():
         if use_llm:
             # Try to use LLM to generate knowledge graph
             print(f"[KG API] Attempting LLM generation for: {topic}")
-            graph_data = generate_knowledge_graph_with_llm(topic)
+            graph_data = generate_knowledge_graph_with_llm(topic, provider=provider, api_key=api_key)
             if graph_data:
                 llm_used = True
                 print(f"[KG API] LLM generation successful, {len(graph_data.get('nodes', []))} nodes")
@@ -644,11 +719,20 @@ def api_knowledge_graph():
 
 @app.route('/api/knowledge-graph/explain', methods=['POST'])
 def api_knowledge_graph_explain():
-    """Get LLM explanation for a node or relationship"""
+    """Get LLM explanation for a node or relationship
+    
+    Request body:
+        node: The node/concept to explain
+        context: Additional context
+        provider: LLM provider (optional)
+        api_key: User's API key (optional)
+    """
     try:
         data = request.get_json()
         node_label = data.get('node', '')
         context = data.get('context', '')
+        provider = data.get('provider')  # LLM provider (optional)
+        api_key = data.get('api_key')  # User's API key (optional)
 
         # Try LLM explanation first
         system_prompt = """You are an expert chemistry educator specializing in transition metal catalysis.
@@ -658,7 +742,7 @@ Keep the explanation accessible to graduate-level chemistry students."""
 
         user_message = f"Explain {node_label} in the context of transition metal catalysis. Context: {context}"
 
-        llm_response = get_llm_response_sync(system_prompt, user_message)
+        llm_response = get_llm_response_sync(system_prompt, user_message, provider=provider, api_key=api_key)
 
         if llm_response:
             return jsonify({
@@ -713,7 +797,8 @@ def extract_text_from_pdf(filepath: str) -> str:
     return text.strip()
 
 
-def generate_kg_from_content(content: str, source_name: str = "PDF") -> dict:
+def generate_kg_from_content(content: str, source_name: str = "PDF", 
+                             provider: str = None, api_key: str = None) -> dict:
     """Generate knowledge graph from text content using LLM"""
     
     # Truncate content if too long (LLM token limits)
@@ -739,7 +824,7 @@ Rules:
 
     user_message = f"Extract knowledge graph from this text:\n\n{content}"
 
-    response = get_llm_response_sync(system_prompt, user_message)
+    response = get_llm_response_sync(system_prompt, user_message, provider=provider, api_key=api_key)
     
     if response:
         try:
@@ -828,27 +913,39 @@ def fix_incomplete_json(json_str: str) -> dict:
 
 
 @app.route('/api/knowledge-graph/upload', methods=['POST'])
+@limiter.limit("5 per minute")
 def api_knowledge_graph_upload():
-    """Upload PDF and generate knowledge graph from its content"""
+    """Upload PDF and generate knowledge graph from its content
+    
+    Form data:
+        file: PDF file
+        provider: LLM provider (optional)
+        api_key: User's API key (optional)
+    """
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file uploaded', 'success': False}), 400
         
         file = request.files['file']
+        provider = request.form.get('provider')  # LLM provider (optional)
+        api_key = request.form.get('api_key')  # User's API key (optional)
         
-        if file.filename == '':
-            return jsonify({'error': 'No file selected', 'success': False}), 400
+        # Validate file upload
+        is_valid, error_msg = validate_file_upload(file)
+        if not is_valid:
+            return jsonify({'error': error_msg, 'success': False}), 400
         
-        # Check file extension
-        filename = file.filename.lower()
-        if not filename.endswith('.pdf'):
-            return jsonify({'error': 'Only PDF files are supported', 'success': False}), 400
+        # Use secure filename to prevent path traversal
+        from werkzeug.utils import secure_filename
+        filename = secure_filename(file.filename)
+        if not filename:
+            return jsonify({'error': 'Invalid filename', 'success': False}), 400
         
         # Save uploaded file temporarily
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        print(f"[KG Upload] Processing PDF: {file.filename}")
+        logger.info(f"Processing PDF: {filename}")
         
         try:
             # Extract text from PDF
@@ -860,10 +957,10 @@ def api_knowledge_graph_upload():
                     'success': False
                 }), 400
             
-            print(f"[KG Upload] Extracted {len(text_content)} characters from PDF")
+            logger.info(f"Extracted {len(text_content)} characters from PDF")
             
             # Generate knowledge graph using LLM
-            graph_data = generate_kg_from_content(text_content, file.filename)
+            graph_data = generate_kg_from_content(text_content, filename, provider=provider, api_key=api_key)
             
             if not graph_data:
                 return jsonify({
@@ -872,10 +969,9 @@ def api_knowledge_graph_upload():
                 }), 500
             
             # Extract title/topic from content
-            lines = text_content.split('\n')
-            title = file.filename.replace('.pdf', '').replace('_', ' ')
+            title = filename.replace('.pdf', '').replace('_', ' ')
             
-            print(f"[KG Upload] Generated graph with {len(graph_data.get('nodes', []))} nodes")
+            logger.info(f"Generated graph with {len(graph_data.get('nodes', []))} nodes")
             
             return jsonify({
                 'success': True,
@@ -892,19 +988,648 @@ def api_knowledge_graph_upload():
                 os.remove(filepath)
                 
     except Exception as e:
-        print(f"KG Upload Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e), 'success': False}), 500
+        logger.error(f"KG Upload Error: {e}", exc_info=True)
+        return jsonify({'error': 'An internal error occurred', 'success': False}), 500
+
+
+# ==================== REDOX-ACTIVE LIGAND CHATBOT API ====================
+
+# Specialized knowledge base for redox-active ligands
+REDOX_KNOWLEDGE = {
+    "fundamentals": {
+        "definition": "Redox-active ligands (also called non-innocent ligands) are ligands that can undergo reversible electron transfer reactions, participating directly in the redox chemistry of metal complexes. Unlike innocent ligands that maintain constant oxidation states, redox-active ligands can exist in multiple oxidation states and act as electron reservoirs.",
+        "innocent_vs_noninnocent": "Innocent ligands (like phosphines, amines) do not change oxidation state during reactions - all redox changes occur at the metal center. Non-innocent (redox-active) ligands can accept or donate electrons, participating in the redox process. This distinction was first articulated by Jørgensen and Cotton.",
+        "metal_ligand_cooperativity": "Metal-ligand cooperativity (MLC) describes systems where both the metal and ligand participate in bond-making and bond-breaking events. Redox-active ligands enable two-electron processes at metals that typically undergo one-electron changes, expanding accessible reactivity patterns."
+    },
+    "ligand_classes": {
+        "pdi": {
+            "name": "Bis(imino)pyridine (PDI)",
+            "description": "One of the most studied redox-active ligand families. The diimine backbone can accept up to 2 electrons, forming radical anion and dianion states. Key for nickel-catalyzed C-O activation reactions.",
+            "redox_states": ["Neutral (PDI)", "Radical anion (PDI•−)", "Dianion (PDI2−)"],
+            "applications": ["C-O bond activation", "Cross-coupling catalysis", "Small molecule activation (N2, CO2, H2)"]
+        },
+        "catecholate": {
+            "name": "Catecholate/o-Quinone",
+            "description": "Reversible two-electron redox couple between catecholate (dianion) and o-quinone (neutral). Can stabilize high-valent metal centers. Found in nature (e.g., copper amine oxidase).",
+            "redox_states": ["Catecholate (Cat2−)", "Semiquinone (SQ•−)", "o-Quinone (Q)"],
+            "applications": ["Oxygen activation", "Electron transfer in biology", "Metalloenzyme mimics"]
+        },
+        "dithiolene": {
+            "name": "Dithiolene Ligands",
+            "description": "Sulfur-based ligands with extensive redox activity. Can form stable complexes with metals in unusual oxidation states. Important in molybdenum enzymes.",
+            "redox_states": ["Enedithiolate", "Dithiolene radical", "Dithione"],
+            "applications": ["Mo/W enzymes", "Conductive materials", "Solar energy conversion"]
+        },
+        "alpha_diimine": {
+            "name": "α-Diimine Ligands",
+            "description": "Include bipyridine, phenanthroline derivatives. Can undergo one-electron reduction to form radical anions. Widely used in photoredox catalysis and electrochemistry.",
+            "redox_states": ["Neutral diimine", "Radical anion", "Dianion"],
+            "applications": ["Photoredox catalysis", "Electrocatalysis", "CO2 reduction"]
+        },
+        "redox_nhc": {
+            "name": "Redox-Active N-Heterocyclic Carbenes",
+            "description": "NHCs with redox-active substituents (ferrocene, quinone) or backbone modifications. Combine strong σ-donation with redox activity.",
+            "redox_states": "Depends on substituent",
+            "applications": ["Tunable catalysis", "Electrochemical switches", "Stabilization of reactive intermediates"]
+        }
+    },
+    "mechanisms": {
+        "electron_reservoir": "Redox-active ligands act as electron reservoirs, storing electrons that can be delivered to substrates. This enables metal centers to access oxidation states they couldn't reach alone. For example, Ni(II) can effectively perform two-electron reductions when paired with a reducible ligand.",
+        "two_electron_processes": "First-row transition metals (Ni, Fe, Co) typically undergo one-electron redox changes. Redox-active ligands enable these metals to mimic noble metal behavior by storing the second electron, facilitating two-electron processes like oxidative addition/reductive elimination.",
+        "substrate_activation": "The stored electrons in redox-active ligands can be transferred to substrates directly. This is crucial for activating inert bonds (C-O, C-F, C-H) and small molecules (N2, CO2, O2). The ligand acts as a 'redox buffer' during catalytic cycles."
+    },
+    "applications": {
+        "nickel_catalysis": "Redox-active ligands are particularly important for nickel catalysis. Ni is ~1000x cheaper than Pd but traditionally limited by one-electron redox chemistry. Ligands like PDI enable Ni to catalyze cross-couplings (Suzuki, Heck) and C-O activation reactions previously requiring Pd.",
+        "c_o_activation": "C-O bond activation in aryl ethers and esters is challenging due to strong bonds (~85-90 kcal/mol). Ni-PDI complexes can cleave these bonds, enabling conversion of biomass-derived compounds (lignin model compounds) into valuable chemicals.",
+        "cross_coupling": "Redox-active ligands expand cross-coupling capabilities: (1) Enable use of cheaper metals (Ni, Fe instead of Pd), (2) Allow activation of stronger bonds (C-Cl, C-O vs C-I, C-Br), (3) Provide access to novel reactivity patterns through ligand-centered radicals.",
+        "small_molecule": "N2 fixation, CO2 reduction, and H2 activation can be facilitated by redox-active ligands. The ligand provides multiple electrons needed for multi-electron substrate transformations that single metals cannot perform efficiently."
+    },
+    "characterization": {
+        "spectroscopy": "Key methods for characterizing redox-active ligands: (1) EPR/ESR - detects paramagnetic ligand radical species, (2) UV-Vis NIR - intervalence charge transfer bands, (3) X-ray crystallography - bond length changes indicate oxidation state, (4) Cyclic voltammetry - reversible redox waves.",
+        "determination": "To determine if a ligand is redox-active: (1) Compare metal oxidation states from spectroscopy vs. charge balance, (2) Look for discrepancies indicating ligand oxidation/reduction, (3) Structural evidence (bond lengths consistent with reduced/oxidized ligand), (4) Redox potentials matching ligand-based processes."
+    }
+}
+
+def get_redox_context(query: str) -> str:
+    """Get relevant context from the redox-active ligand knowledge base"""
+    query_lower = query.lower()
+    context_parts = []
+    
+    # Check for fundamental concepts
+    if any(term in query_lower for term in ['what is', 'definition', 'innocent', 'non-innocent']):
+        context_parts.append(f"Definition: {REDOX_KNOWLEDGE['fundamentals']['definition']}")
+        if 'innocent' in query_lower or 'non-innocent' in query_lower:
+            context_parts.append(f"\nInnocent vs Non-Innocent: {REDOX_KNOWLEDGE['fundamentals']['innocent_vs_noninnocent']}")
+    
+    # Check for specific ligand types
+    ligand_keywords = {
+        'pdi': ['pdi', 'bis(imino)pyridine', 'bis-imino', 'pyridine diimine'],
+        'catecholate': ['catecholate', 'catechol', 'quinone', 'o-quinone', 'semiquinone'],
+        'dithiolene': ['dithiolene', 'dithiolate'],
+        'alpha_diimine': ['diimine', 'bipyridine', 'bipy', 'phenanthroline', 'phen'],
+        'redox_nhc': ['nhc', 'carbene', 'nheterocyclic carbene']
+    }
+    
+    for ligand_key, keywords in ligand_keywords.items():
+        if any(kw in query_lower for kw in keywords):
+            ligand_info = REDOX_KNOWLEDGE['ligand_classes'][ligand_key]
+            context_parts.append(f"\nLigand: {ligand_info['name']}\n{ligand_info['description']}")
+            if 'application' in query_lower or 'use' in query_lower:
+                context_parts.append(f"Applications: {', '.join(ligand_info['applications'])}")
+            break
+    
+    # Check for mechanism-related queries
+    if any(term in query_lower for term in ['mechanism', 'how', 'electron reservoir', 'two-electron']):
+        if 'electron reservoir' in query_lower or 'reservoir' in query_lower:
+            context_parts.append(f"\nElectron Reservoir: {REDOX_KNOWLEDGE['mechanisms']['electron_reservoir']}")
+        if 'two-electron' in query_lower:
+            context_parts.append(f"\nTwo-Electron Processes: {REDOX_KNOWLEDGE['mechanisms']['two_electron_processes']}")
+        if 'substrate' in query_lower or 'activation' in query_lower:
+            context_parts.append(f"\nSubstrate Activation: {REDOX_KNOWLEDGE['mechanisms']['substrate_activation']}")
+    
+    # Check for application-related queries
+    if any(term in query_lower for term in ['nickel', 'ni-catalyzed', 'ni catalyst']):
+        context_parts.append(f"\nNickel Catalysis: {REDOX_KNOWLEDGE['applications']['nickel_catalysis']}")
+    if 'c-o' in query_lower or 'co activation' in query_lower or 'c-o activation' in query_lower:
+        context_parts.append(f"\nC-O Activation: {REDOX_KNOWLEDGE['applications']['c_o_activation']}")
+    if 'cross-coupling' in query_lower or 'cross coupling' in query_lower or 'coupling' in query_lower:
+        context_parts.append(f"\nCross-Coupling: {REDOX_KNOWLEDGE['applications']['cross_coupling']}")
+    if any(term in query_lower for term in ['small molecule', 'n2', 'co2', 'h2', 'nitrogen', 'hydrogen']):
+        context_parts.append(f"\nSmall Molecule Activation: {REDOX_KNOWLEDGE['applications']['small_molecule']}")
+    
+    # Check for characterization queries
+    if any(term in query_lower for term in ['spectroscopy', 'characterization', 'epr', 'uv-vis', 'x-ray', 'crystallography', 'voltammetry']):
+        context_parts.append(f"\nSpectroscopy: {REDOX_KNOWLEDGE['characterization']['spectroscopy']}")
+    if any(term in query_lower for term in ['determine', 'how to', 'identify', 'evidence']):
+        context_parts.append(f"\nDetermination: {REDOX_KNOWLEDGE['characterization']['determination']}")
+    
+    return '\n'.join(context_parts)
+
+
+@app.route('/api/redox/chat', methods=['POST'])
+@limiter.limit("20 per minute")
+def redox_chat():
+    """Chat endpoint for redox-active ligand assistant"""
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        provider = data.get('provider', None)  # User-specified provider
+        api_key = data.get('api_key', None)    # User-specified API key
+        model = data.get('model', None)        # User-specified model
+        
+        if not user_message.strip():
+            return jsonify({'success': False, 'error': 'Empty message'}), 400
+        
+        # Get relevant context from knowledge base
+        context = get_redox_context(user_message)
+        
+        # System prompt for redox-active ligand assistant
+        system_prompt = """You are an expert assistant specializing in redox-active ligands and their applications in transition metal catalysis. Your expertise includes:
+
+1. **Ligand Types**: Bis(imino)pyridines (PDI), catecholates/o-quinones, dithiolenes, α-diimines, redox-active NHCs, and other non-innocent ligands.
+
+2. **Fundamental Concepts**: 
+   - Distinction between innocent and non-innocent ligands
+   - Metal-ligand cooperativity
+   - Electron reservoir function
+   - Two-electron processes with first-row metals
+
+3. **Applications**:
+   - Nickel-catalyzed C-O bond activation
+   - Cross-coupling reactions (Suzuki, Heck, etc.)
+   - Small molecule activation (N2, CO2, H2)
+   - Biomass conversion
+
+4. **Characterization Methods**:
+   - EPR/ESR spectroscopy
+   - UV-Vis NIR spectroscopy
+   - X-ray crystallography
+   - Cyclic voltammetry
+
+When answering:
+- Be accurate and scientifically rigorous
+- Provide specific examples when relevant
+- Explain mechanisms clearly
+- Connect concepts to practical applications
+- Mention key references or researchers when appropriate (e.g., Chirik, Wieghardt, Mindiola)
+- Use appropriate chemical terminology
+
+If a question is outside the scope of redox-active ligands or transition metal catalysis, politely redirect to relevant chemistry topics."""
+        
+        # Add context if available
+        if context:
+            system_prompt += f"\n\nRelevant context from knowledge base:\n{context}"
+        
+        # Get response from LLM - use user-provided credentials if available
+        response = None
+        llm_used = False
+        error_msg = None
+        
+        if api_key and provider:
+            # Use user-provided API key and provider
+            try:
+                from llm_providers import LLMProviderFactory
+                print(f"[Redox Chat] Creating {provider} provider with user API key...")
+                llm = LLMProviderFactory.create(provider, api_key=api_key)
+                if model:
+                    llm.model = model  # Override model if specified
+                print(f"[Redox Chat] Calling {provider} with model {llm.model}...")
+                response = llm.chat(system_prompt, user_message)
+                if response:
+                    llm_used = True
+                    print(f"[Redox Chat] SUCCESS with user-provided {provider}")
+                else:
+                    error_msg = f"No response from {provider}"
+                    print(f"[Redox Chat] No response from {provider}")
+            except Exception as e:
+                error_msg = str(e)
+                print(f"[Redox Chat] Error with user provider: {e}")
+                import traceback
+                traceback.print_exc()
+                # Fall through to default provider
+        
+        if not response:
+            # Try default provider (environment variables)
+            response = get_llm_response_sync(system_prompt, user_message)
+            if response:
+                llm_used = True
+        
+        if response:
+            # Generate relevant references
+            references = []
+            if 'pdi' in user_message.lower() or 'bis(imino)pyridine' in user_message.lower():
+                references.append({
+                    'title': 'Chirik, P. J. - PDI Chemistry Reviews',
+                    'url': 'https://pubs.acs.org/journals/orgnd7'
+                })
+            if 'catecholate' in user_message.lower() or 'quinone' in user_message.lower():
+                references.append({
+                    'title': 'Wieghardt, K. - Redox-Active Ligands Reviews',
+                    'url': 'https://pubs.acs.org/journals/inocaj'
+                })
+            if 'nickel' in user_message.lower() and 'c-o' in user_message.lower():
+                references.append({
+                    'title': 'Ni-Catalyzed C-O Activation',
+                    'url': 'https://pubs.acs.org/journals/orgnd7'
+                })
+            
+            return jsonify({
+                'success': True,
+                'response': response,
+                'references': references,
+                'llm_used': llm_used,
+                'provider': provider if api_key else 'default'
+            })
+        else:
+            # Fallback response if LLM unavailable
+            fallback_msg = get_redox_fallback_response(user_message)
+            if error_msg:
+                fallback_msg = f"**AI Error:** {error_msg}\n\n{fallback_msg}"
+            return jsonify({
+                'success': True,
+                'response': fallback_msg,
+                'references': [],
+                'llm_used': False,
+                'offline_mode': True,
+                'error': error_msg
+            })
+            
+    except Exception as e:
+        logger.error(f"Redox chat error: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': 'An internal error occurred'}), 500
+
+
+def get_redox_fallback_response(query: str) -> str:
+    """Provide fallback response when LLM is unavailable"""
+    query_lower = query.lower()
+    
+    # Direct matches from knowledge base
+    if 'what are redox' in query_lower or 'definition' in query_lower:
+        return REDOX_KNOWLEDGE['fundamentals']['definition']
+    
+    if 'innocent' in query_lower:
+        return REDOX_KNOWLEDGE['fundamentals']['innocent_vs_noninnocent']
+    
+    if 'pdi' in query_lower or 'bis(imino)pyridine' in query_lower:
+        ligand = REDOX_KNOWLEDGE['ligand_classes']['pdi']
+        return f"{ligand['name']}: {ligand['description']} Applications include: {', '.join(ligand['applications'])}."
+    
+    if 'catecholate' in query_lower or 'quinone' in query_lower:
+        ligand = REDOX_KNOWLEDGE['ligand_classes']['catecholate']
+        return f"{ligand['name']}: {ligand['description']} Redox states: {', '.join(ligand['redox_states'])}."
+    
+    if 'electron reservoir' in query_lower:
+        return REDOX_KNOWLEDGE['mechanisms']['electron_reservoir']
+    
+    if 'nickel' in query_lower:
+        return REDOX_KNOWLEDGE['applications']['nickel_catalysis']
+    
+    if 'c-o' in query_lower:
+        return REDOX_KNOWLEDGE['applications']['c_o_activation']
+    
+    # Generic response
+    return """I'm currently operating in offline mode with limited responses. For detailed questions about redox-active ligands, please ensure the AI service is connected. 
+
+In the meantime, here are some key topics I can discuss:
+- Bis(imino)pyridine (PDI) ligands and their applications
+- Catecholate/o-quinone redox chemistry
+- Nickel-catalyzed C-O bond activation
+- Metal-ligand cooperativity
+- Characterization methods for redox-active ligands
+
+Please try asking about one of these topics!"""
+
+
+# ==================== NIOCOBOT API (Nickel Catalysis Assistant) ====================
+
+import json
+import requests
+
+# Load NiCOBot data files
+NIOCOBOT_DATA_DIR = os.path.join(BACKEND_DIR, 'nicobot_data')
+
+def load_nicobot_data():
+    """Load NiCOBot electrophile and nucleophile data"""
+    data = {
+        'electrophiles': {},
+        'nucleophiles': {}
+    }
+    
+    try:
+        # Load electrophile data
+        e_lvg_path = os.path.join(NIOCOBOT_DATA_DIR, 'E_LVG_name_smiles.json')
+        if os.path.exists(e_lvg_path):
+            with open(e_lvg_path, 'r') as f:
+                data['electrophiles'] = json.load(f)
+        
+        # Load nucleophile data
+        nu_lvg_path = os.path.join(NIOCOBOT_DATA_DIR, 'Nu_LVG_name_smiles.json')
+        if os.path.exists(nu_lvg_path):
+            with open(nu_lvg_path, 'r') as f:
+                data['nucleophiles'] = json.load(f)
+                
+    except Exception as e:
+        print(f"[NiCOBot] Error loading data: {e}")
+    
+    return data
+
+NIOCOBOT_DATA = load_nicobot_data()
+
+# NiCOBot specialized knowledge base
+NIOCOBOT_KNOWLEDGE = {
+    "catalysis": {
+        "nickel_overview": "Nickel catalysis offers a cost-effective alternative to palladium for cross-coupling reactions. Nickel can activate strong bonds (C-Cl, C-O) that palladium cannot, making it valuable for sustainable chemistry using biomass-derived feedstocks.",
+        "advantages": "Nickel is approximately 1000x cheaper than palladium, can activate inert C-Cl and C-O bonds, supports multiple oxidation states (Ni(0), Ni(I), Ni(II), Ni(III)), and enables novel reactivity patterns.",
+        "mechanisms": "Ni-catalyzed reactions typically proceed through: (1) Oxidative addition of C-X bond to Ni(0), (2) Transmetalation with nucleophile, (3) Reductive elimination to form product. Single-electron pathways are also possible via Ni(I)/Ni(III) intermediates."
+    },
+    "c_o_activation": {
+        "overview": "C-O bond activation in aryl ethers and esters is challenging due to strong bonds (~85-90 kcal/mol). Nickel catalysts with appropriate ligands can cleave these bonds, enabling conversion of biomass-derived compounds.",
+        "leaving_groups": "Common C-O leaving groups include: Triflates (weak bond, most reactive), Tosylates (weak bond), Mesylates (weak bond), Acetates (medium bond), Pivalates (medium bond), Aryl ethers (inert bond, most challenging)",
+        "conditions": "Typical conditions: Ni(cod)2 or NiCl2 as precatalyst, phosphine or NHC ligands, base (Cs2CO3, K3PO4), 80-120°C, 12-24 hours."
+    },
+    "cross_coupling": {
+        "suzuki": "Suzuki-Miyaura coupling: Ni-catalyzed C-C bond formation between organoboron reagents and organic electrophiles. Advantage: boron reagents are non-toxic and stable.",
+        "kumada": "Kumada coupling: Uses Grignard reagents as nucleophiles. Very reactive but requires strict anhydrous conditions.",
+        "negishi": "Negishi coupling: Uses organozinc reagents. More functional group tolerant than Kumada.",
+        "stille": "Stille coupling: Uses organotin reagents. Wide substrate scope but toxicity concerns."
+    },
+    "electrophiles": {
+        "definition": "Electrophiles are electron-deficient species that accept electrons in reactions. In Ni-catalyzed C-O activation, electrophiles are typically aryl esters, ethers, or halides.",
+        "types": ["Triflates", "Tosylates", "Mesylates", "Acetates", "Pivalates", "Aryl methyl ethers", "Aryl halides"]
+    },
+    "nucleophiles": {
+        "definition": "Nucleophiles are electron-rich species that donate electrons. Common nucleophiles in Ni catalysis include organoboron, organomagnesium (Grignard), and organozinc reagents.",
+        "types": ["Boronic acids/esters", "Grignard reagents (R-MgX)", "Organozinc reagents (R-ZnX)", "Organosilanes"]
+    }
+}
+
+def get_nicobot_context(query: str) -> str:
+    """Get relevant context from NiCOBot knowledge base"""
+    context_parts = []
+    query_lower = query.lower()
+    
+    # Check for relevant topics
+    if 'nickel' in query_lower or 'ni-catalyzed' in query_lower:
+        context_parts.append(f"Nickel Catalysis: {NIOCOBOT_KNOWLEDGE['catalysis']['nickel_overview']}")
+    
+    if 'c-o' in query_lower or 'bond activation' in query_lower or 'ether' in query_lower or 'ester' in query_lower:
+        context_parts.append(f"\nC-O Activation: {NIOCOBOT_KNOWLEDGE['c_o_activation']['overview']}")
+        context_parts.append(f"\nLeaving Groups: {NIOCOBOT_KNOWLEDGE['c_o_activation']['leaving_groups']}")
+    
+    if 'suzuki' in query_lower:
+        context_parts.append(f"\nSuzuki Coupling: {NIOCOBOT_KNOWLEDGE['cross_coupling']['suzuki']}")
+    
+    if 'kumada' in query_lower:
+        context_parts.append(f"\nKumada Coupling: {NIOCOBOT_KNOWLEDGE['cross_coupling']['kumada']}")
+    
+    if 'negishi' in query_lower:
+        context_parts.append(f"\nNegishi Coupling: {NIOCOBOT_KNOWLEDGE['cross_coupling']['negishi']}")
+    
+    if 'electrophile' in query_lower:
+        context_parts.append(f"\nElectrophiles: {NIOCOBOT_KNOWLEDGE['electrophiles']['definition']}")
+        context_parts.append(f"Types: {', '.join(NIOCOBOT_KNOWLEDGE['electrophiles']['types'])}")
+    
+    if 'nucleophile' in query_lower:
+        context_parts.append(f"\nNucleophiles: {NIOCOBOT_KNOWLEDGE['nucleophiles']['definition']}")
+        context_parts.append(f"Types: {', '.join(NIOCOBOT_KNOWLEDGE['nucleophiles']['types'])}")
+    
+    return '\n'.join(context_parts)
+
+def query2smiles_nicobot(query: str) -> str:
+    """Convert molecule name to SMILES using PubChem API"""
+    try:
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{query}/property/IsomericSMILES/JSON"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            return data["PropertyTable"]["Properties"][0]["IsomericSMILES"]
+        return None
+    except Exception as e:
+        print(f"[NiCOBot] PubChem query error: {e}")
+        return None
+
+def check_e_or_nu(smiles: str) -> str:
+    """Check if a molecule is an electrophile or nucleophile based on SMILES"""
+    if 'Mg' in smiles or 'B' in smiles or 'Zn' in smiles:
+        return "nucleophile"
+    return "electrophile"
+
+def check_co_bond_strength(smiles: str) -> str:
+    """Estimate C-O bond strength based on functional groups"""
+    # Check for weak C-O bonds (triflates, tosylates, mesylates)
+    weak_patterns = ['S(=O)(=O)O', 'OS(=O)', 'S(=O)(=O)']
+    medium_patterns = ['OC(=O)', 'C(=O)O', 'C(=O)OC']
+    
+    for pattern in weak_patterns:
+        if pattern in smiles:
+            return "weak (triflate/tosylate/mesylate - very reactive)"
+    
+    for pattern in medium_patterns:
+        if pattern in smiles:
+            return "medium (ester/acetate - moderate reactivity)"
+    
+    return "inert (aryl ether - challenging substrate)"
+
+def find_similar_electrophile(smiles: str) -> list:
+    """Find similar electrophiles from the database"""
+    similar = []
+    for e_smiles, names in list(NIOCOBOT_DATA['electrophiles'].items())[:20]:
+        if len(similar) >= 5:
+            break
+        if names:
+            similar.append({
+                'smiles': e_smiles,
+                'name': names[0] if isinstance(names, list) else names
+            })
+    return similar
+
+def find_similar_nucleophile(smiles: str) -> list:
+    """Find similar nucleophiles from the database"""
+    similar = []
+    for n_smiles, names in list(NIOCOBOT_DATA['nucleophiles'].items())[:20]:
+        if len(similar) >= 5:
+            break
+        if names:
+            similar.append({
+                'smiles': n_smiles,
+                'name': names[0] if isinstance(names, list) else names
+            })
+    return similar
+
+@app.route('/api/nicobot/chat', methods=['POST'])
+@limiter.limit("20 per minute")
+def nicobot_chat():
+    """Chat endpoint for NiCOBot assistant"""
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        provider = data.get('provider', None)
+        api_key = data.get('api_key', None)
+        model = data.get('model', None)
+        
+        if not user_message.strip():
+            return jsonify({'success': False, 'error': 'Empty message'}), 400
+        
+        # Get relevant context
+        context = get_nicobot_context(user_message)
+        
+        # System prompt for NiCOBot
+        system_prompt = """You are NiCOBot, an expert AI assistant specializing in Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry. Your expertise includes:
+
+1. **Nickel Catalysis Fundamentals**:
+   - Oxidative addition, transmetalation, reductive elimination mechanisms
+   - Ni(0)/Ni(II) and Ni(I)/Ni(III) catalytic cycles
+   - Advantages over palladium catalysis (cost, C-Cl/C-O activation)
+
+2. **C-O Bond Activation**:
+   - Leaving group reactivity: triflates > tosylates > mesylates > acetates > pivalates > aryl ethers
+   - Bond dissociation energies and activation strategies
+   - Biomass conversion applications
+
+3. **Cross-Coupling Reactions**:
+   - Suzuki-Miyaura (organoboron reagents)
+   - Kumada (Grignard reagents)
+   - Negishi (organozinc reagents)
+   - Stille (organotin reagents)
+
+4. **Reaction Components**:
+   - Electrophiles: aryl halides, triflates, tosylates, mesylates, esters, ethers
+   - Nucleophiles: boronic acids, Grignard reagents, organozinc compounds
+   - Ligands: phosphines (PCy3, PPh3), NHCs, bipyridines
+   - Bases: Cs2CO3, K3PO4, NaOtBu
+
+5. **Practical Guidance**:
+   - Catalyst selection and loading
+   - Solvent and temperature optimization
+   - Functional group compatibility
+   - Troubleshooting failed reactions
+
+When answering:
+- Provide specific reaction conditions when applicable
+- Explain mechanistic rationale
+- Suggest optimal reagents and conditions
+- Cite relevant literature or researchers when appropriate (e.g., Weix, Jamison, Martin)
+- Be practical and actionable in your recommendations"""
+
+        if context:
+            system_prompt += f"\n\nRelevant context:\n{context}"
+        
+        # Get response from LLM
+        response = None
+        llm_used = False
+        error_msg = None
+        
+        if api_key and provider:
+            try:
+                from llm_providers import LLMProviderFactory
+                print(f"[NiCOBot] Creating {provider} provider with user API key...")
+                llm = LLMProviderFactory.create(provider, api_key=api_key)
+                if model:
+                    llm.model = model
+                response = llm.chat(system_prompt, user_message)
+                if response:
+                    llm_used = True
+            except Exception as e:
+                error_msg = str(e)
+                print(f"[NiCOBot] Error: {e}")
+        
+        if not response:
+            response = get_llm_response_sync(system_prompt, user_message)
+            if response:
+                llm_used = True
+        
+        if response:
+            return jsonify({
+                'success': True,
+                'response': response,
+                'llm_used': llm_used
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'response': get_nicobot_fallback_response(user_message),
+                'llm_used': False,
+                'offline_mode': True,
+                'error': error_msg
+            })
+            
+    except Exception as e:
+        logger.error(f"NiCOBot chat error: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': 'An internal error occurred'}), 500
+
+@app.route('/api/nicobot/smiles/<compound_name>')
+def nicobot_get_smiles(compound_name):
+    """Convert compound name to SMILES"""
+    smiles = query2smiles_nicobot(compound_name)
+    if smiles:
+        e_or_nu = check_e_or_nu(smiles)
+        co_strength = check_co_bond_strength(smiles)
+        return jsonify({
+            'success': True,
+            'name': compound_name,
+            'smiles': smiles,
+            'type': e_or_nu,
+            'co_bond_strength': co_strength
+        })
+    return jsonify({'success': False, 'error': 'Compound not found'}), 404
+
+@app.route('/api/nicobot/check', methods=['POST'])
+def nicobot_check_molecule():
+    """Check if a molecule is electrophile/nucleophile and C-O bond strength"""
+    try:
+        data = request.get_json()
+        smiles = data.get('smiles', '')
+        
+        if not smiles:
+            return jsonify({'success': False, 'error': 'No SMILES provided'}), 400
+        
+        result = {
+            'smiles': smiles,
+            'type': check_e_or_nu(smiles),
+            'co_bond_strength': check_co_bond_strength(smiles)
+        }
+        
+        # Find similar compounds
+        if result['type'] == 'electrophile':
+            result['similar_compounds'] = find_similar_electrophile(smiles)
+        else:
+            result['similar_compounds'] = find_similar_nucleophile(smiles)
+        
+        return jsonify({'success': True, 'result': result})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+def get_nicobot_fallback_response(query: str) -> str:
+    """Provide fallback response when LLM is unavailable"""
+    query_lower = query.lower()
+    
+    if 'c-o' in query_lower or 'bond activation' in query_lower:
+        return NIOCOBOT_KNOWLEDGE['c_o_activation']['overview']
+    
+    if 'nickel' in query_lower:
+        return NIOCOBOT_KNOWLEDGE['catalysis']['nickel_overview']
+    
+    if 'suzuki' in query_lower:
+        return NIOCOBOT_KNOWLEDGE['cross_coupling']['suzuki']
+    
+    if 'electrophile' in query_lower:
+        return f"{NIOCOBOT_KNOWLEDGE['electrophiles']['definition']} Types: {', '.join(NIOCOBOT_KNOWLEDGE['electrophiles']['types'])}"
+    
+    if 'nucleophile' in query_lower:
+        return f"{NIOCOBOT_KNOWLEDGE['nucleophiles']['definition']} Types: {', '.join(NIOCOBOT_KNOWLEDGE['nucleophiles']['types'])}"
+    
+    return """I'm currently in offline mode. I can help with:
+
+**Ni-Catalyzed Reactions:**
+- C-O bond activation (ethers, esters)
+- Cross-coupling (Suzuki, Kumada, Negishi)
+- Catalyst and ligand selection
+
+**Quick Topics:**
+- C-O bond activation
+- Nickel catalysis advantages
+- Electrophiles vs Nucleophiles
+- Suzuki coupling
+- Reaction conditions
+
+Please configure your API key in settings for full AI responses!"""
 
 
 # ==================== RUN ====================
 
 if __name__ == '__main__':
+    # Configuration from environment
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    PORT = int(os.environ.get('PORT', 5000))
+    HOST = os.environ.get('FLASK_HOST', '0.0.0.0')
+    
     print("\n" + "="*50)
     print("GenAI Research Flask Server")
     print("="*50)
     print(f"Static files served from: {STATIC_FOLDER}")
-    print(f"Access the site at: http://localhost:5000")
+    print(f"Access the site at: http://{HOST}:{PORT}")
+    print(f"Debug mode: {DEBUG}")
     print("="*50 + "\n")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    
+    app.run(debug=DEBUG, host=HOST, port=PORT)

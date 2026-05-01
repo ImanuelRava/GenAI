@@ -4,77 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GenAI Research | AI in Chemistry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --ai-primary: #3b82f6;
+            --ai-light: #dbeafe;
+            --ai-dark: #1d4ed8;
+            --tmc-primary: #8b5cf6;
+            --tmc-light: #ede9fe;
+            --tmc-dark: #6d28d9;
+            --ral-primary: #10b981;
+            --ral-light: #d1fae5;
+            --ral-dark: #059669;
+            --virus-primary: #ef4444;
+            --virus-light: #fee2e2;
+            --virus-dark: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-dark: #0f172a;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
             scroll-behavior: smooth;
+            height: auto;
+            min-height: 100vh;
         }
 
         body {
-            font-family: var(--font-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-main);
             line-height: 1.6;
-        }
-
-        /* --- Container --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         /* --- Header --- */
         header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 24px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .header-layout {
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            height: 72px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             text-decoration: none;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
+            position: relative;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
         }
 
         .logo-text {
@@ -83,353 +103,651 @@
         }
 
         .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             letter-spacing: -0.5px;
         }
 
         .logo-subtitle {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            text-transform: uppercase;
+            font-weight: 500;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
         }
 
         nav ul {
             display: flex;
             list-style: none;
-            gap: 24px;
+            gap: 8px;
         }
 
         nav a {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-
-
-
-
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
             font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
+        nav a:hover {
+            color: var(--text-main);
+            background: var(--bg-main);
         }
 
-        .btn-outline:hover {
-            background: var(--bg-gray);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-large {
-            padding: 14px 32px;
-            font-size: 1.1rem;
-            font-weight: 600;
+        nav a.active {
+            color: var(--ai-primary);
+            background: var(--ai-light);
         }
 
         /* --- Hero Section --- */
         .hero {
-            background-color: var(--bg-blue-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            padding: 120px 24px 80px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .hero-orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--ai-primary);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .hero-orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--tmc-primary);
+            bottom: -50px;
+            left: -100px;
+            animation-delay: 2s;
+        }
+
+        .hero-orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--ral-primary);
+            top: 50%;
+            left: 50%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .hero-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
             text-align: center;
-            padding: 80px 20px;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ral-primary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 16px;
-            letter-spacing: -1px;
+            color: white;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero p {
             font-size: 1.25rem;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.7);
             max-width: 600px;
-            margin: 0 auto 32px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
         }
 
-        /* --- Section Titles --- */
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-main);
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-outline-light {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            justify-content: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-stat {
             text-align: center;
-            margin-bottom: 40px;
+        }
+
+        .hero-stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .hero-stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
         }
 
         /* --- Projects Section --- */
         .projects-section {
-            padding: 64px 20px;
+            padding: 120px 24px;
+            background: var(--bg-main);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ai-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            gap: 32px;
         }
 
         .project-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
+            background: var(--bg-white);
+            border-radius: var(--radius-xl);
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .project-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
         }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-card.ai::before { background: linear-gradient(90deg, var(--ai-primary), var(--ai-dark)); }
+        .project-card.tmc::before { background: linear-gradient(90deg, var(--tmc-primary), var(--tmc-dark)); }
+        .project-card.ral::before { background: linear-gradient(90deg, var(--ral-primary), var(--ral-dark)); }
+        .project-card.virus::before { background: linear-gradient(90deg, var(--virus-primary), var(--virus-dark)); }
 
         .project-header {
-            padding: 24px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 32px 32px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
         }
 
-        .project-header h3 {
-            font-size: 1.35rem;
+        .project-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .project-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .project-card.ai .project-icon { background: var(--ai-light); }
+        .project-card.ai .project-icon svg { color: var(--ai-primary); }
+        .project-card.tmc .project-icon { background: var(--tmc-light); }
+        .project-card.tmc .project-icon svg { color: var(--tmc-primary); }
+        .project-card.ral .project-icon { background: var(--ral-light); }
+        .project-card.ral .project-icon svg { color: var(--ral-primary); }
+        .project-card.virus .project-icon { background: var(--virus-light); }
+        .project-card.virus .project-icon svg { color: var(--virus-primary); }
+
+        .project-info h3 {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-main);
             margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
-        .project-header p {
-            font-size: 0.95rem;
+        .project-info p {
             color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .project-body {
-            padding: 24px;
-        }
-
-        .project-visual {
-            background: linear-gradient(135deg, var(--bg-gray) 0%, var(--bg-blue-light) 100%);
-            border-radius: var(--radius);
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .project-molecule {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .molecule-ni { color: var(--primary); }
-        .molecule-n { color: var(--secondary); }
-        .molecule-ai { color: #ec4899; }
-        .molecule-virus { color: #ef4444; }
-        
-        .project-visual.ai-visual {
-            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
-        }
-        
-        .project-visual.virus-visual {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-        }
-
-        .molecule-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 24px 32px;
+            flex: 1;
         }
 
         .project-features {
-            list-style: none;
-            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .project-features li {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 0;
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            list-style: none;
         }
 
+        .project-features li svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .project-card.ai .project-features li svg { color: var(--ai-primary); }
+        .project-card.tmc .project-features li svg { color: var(--tmc-primary); }
+        .project-card.ral .project-features li svg { color: var(--ral-primary); }
+        .project-card.virus .project-features li svg { color: var(--virus-primary); }
+
         .project-footer {
-            padding: 16px 24px;
-            background: var(--bg-gray);
+            padding: 20px 32px;
+            background: var(--bg-main);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-top: 1px solid var(--border-color);
         }
 
         .project-tag {
             font-size: 0.8rem;
-            color: var(--primary);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .project-card.ai .project-tag { color: var(--ai-primary); }
+        .project-card.tmc .project-tag { color: var(--tmc-primary); }
+        .project-card.ral .project-tag { color: var(--ral-primary); }
+        .project-card.virus .project-tag { color: var(--virus-primary); }
+
         .project-arrow {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-
-        /* --- Features Section --- */
-        .features-section {
-            background: var(--bg-gray);
-            padding: 64px 20px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 32px;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            padding: 32px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
-            background: var(--bg-blue-light);
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
+            transition: all 0.3s ease;
         }
 
+        .project-card:hover .project-arrow {
+            transform: translateX(4px);
+        }
+
+        .project-card.ai .project-arrow { background: var(--ai-light); color: var(--ai-primary); }
+        .project-card.tmc .project-arrow { background: var(--tmc-light); color: var(--tmc-primary); }
+        .project-card.ral .project-arrow { background: var(--ral-light); color: var(--ral-primary); }
+        .project-card.virus .project-arrow { background: var(--virus-light); color: var(--virus-primary); }
+
+        /* --- Features Section --- */
+        .features-section {
+            padding: 120px 24px;
+            background: var(--bg-white);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 40px 28px;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+
+        .feature-icon svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .feature-card:nth-child(1) .feature-icon { background: var(--ai-light); }
+        .feature-card:nth-child(1) .feature-icon svg { color: var(--ai-primary); }
+        .feature-card:nth-child(2) .feature-icon { background: var(--tmc-light); }
+        .feature-card:nth-child(2) .feature-icon svg { color: var(--tmc-primary); }
+        .feature-card:nth-child(3) .feature-icon { background: var(--ral-light); }
+        .feature-card:nth-child(3) .feature-icon svg { color: var(--ral-primary); }
+        .feature-card:nth-child(4) .feature-icon { background: var(--virus-light); }
+        .feature-card:nth-child(4) .feature-icon svg { color: var(--virus-primary); }
+
         .feature-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
             color: var(--text-main);
             margin-bottom: 12px;
         }
 
         .feature-card p {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         /* --- CTA Section --- */
         .cta-section {
-            padding: 64px 20px;
-            text-align: center;
+            padding: 120px 24px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
         }
 
         .cta-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 32px;
-            max-width: 900px;
-            margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         .cta-card {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: 48px;
             text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
         }
+
+        .cta-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .cta-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-icon svg {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .cta-card:nth-child(1) .cta-icon { background: linear-gradient(135deg, var(--ai-primary), var(--tmc-primary)); }
+        .cta-card:nth-child(2) .cta-icon { background: linear-gradient(135deg, var(--ral-primary), var(--tmc-primary)); }
 
         .cta-card h3 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: white;
             margin-bottom: 12px;
         }
 
         .cta-card p {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 28px;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
-        .cta-image {
-            width: 80px;
-            height: 80px;
-            background: var(--bg-gray);
-            border-radius: var(--radius);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
+        .cta-card .btn-primary {
+            background: linear-gradient(135deg, var(--ai-primary), var(--tmc-primary));
+        }
+
+        .cta-card .btn-outline-light {
+            background: transparent;
         }
 
         /* --- Footer --- */
         footer {
-            background-color: var(--bg-dark);
+            background: var(--bg-dark);
             color: white;
-            padding: 48px 20px 24px;
+            padding: 80px 24px 32px;
         }
 
         .footer-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-            margin-bottom: 32px;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-top: 20px;
+            max-width: 320px;
         }
 
         .footer-section h4 {
             font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: white;
         }
 
-        .footer-section p,
         .footer-section a {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            line-height: 1.8;
-        }
-
-        .footer-section a {
-            text-decoration: none;
             display: block;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 0;
             transition: color 0.2s;
         }
 
@@ -439,7 +757,7 @@
 
         .footer-bottom {
             text-align: center;
-            padding-top: 24px;
+            padding-top: 32px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -449,38 +767,113 @@
         }
 
         /* --- Responsive --- */
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .footer-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .header-layout {
+            .header-inner {
                 flex-direction: column;
-                align-items: stretch;
+                height: auto;
+                padding: 16px 0;
+                gap: 16px;
             }
 
             nav ul {
+                flex-wrap: wrap;
                 justify-content: center;
+                gap: 4px;
             }
 
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .hero {
+                padding: 140px 20px 60px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .hero-stat-value {
+                font-size: 2rem;
+            }
+
+            .projects-section,
+            .features-section,
+            .cta-section {
+                padding: 80px 20px;
+            }
+
+            .project-features {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-brand p {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
     <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3b82f6"/>
+                                <stop offset="50%" style="stop-color:#8b5cf6"/>
+                                <stop offset="100%" style="stop-color:#10b981"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="32" cy="32" r="28" stroke="url(#logoGrad1)" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="22" r="7" fill="#3b82f6"/>
+                        <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
+                        <circle cx="42" cy="40" r="5" fill="#10b981"/>
+                        <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -501,111 +894,264 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <h1 id="hero-title">Accelerating Chemical Discovery</h1>
+        <div class="hero-bg">
+            <div class="hero-orb hero-orb-1"></div>
+            <div class="hero-orb hero-orb-2"></div>
+            <div class="hero-orb hero-orb-3"></div>
+            <div class="hero-grid"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Pioneering AI-Driven Chemistry Research
+            </div>
+            <h1 id="hero-title">Accelerating <span>Chemical Discovery</span></h1>
             <p id="hero-desc">Exploring the frontiers of Nickel Catalysis and AI-driven ligand design for next-generation chemistry research.</p>
-            <a href="#projects" class="btn btn-primary btn-large">Explore Our Research</a>
+            <div class="hero-buttons">
+                <a href="#projects" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    Explore Research
+                </a>
+                <a href="#" class="btn btn-outline-light">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Papers
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">4</div>
+                    <div class="hero-stat-label">Research Areas</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">50+</div>
+                    <div class="hero-stat-label">Publications</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">100%</div>
+                    <div class="hero-stat-label">AI-Powered</div>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Projects Section -->
     <section id="projects" class="projects-section">
         <div class="container">
-            <h2 class="section-title">Research Projects</h2>
+            <div class="section-header">
+                <div class="section-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    Research Projects
+                </div>
+                <h2 class="section-title">Explore Our Research</h2>
+                <p class="section-desc">Discover cutting-edge research across multiple domains of computational chemistry and artificial intelligence.</p>
+            </div>
             <div class="projects-grid">
                 <!-- Artificial Intelligence Card -->
-                <a href="AI/" class="project-card">
+                <a href="AI/" class="project-card ai">
                     <div class="project-header">
-                        <h3 id="ai-title">Artificial Intelligence</h3>
-                        <p>Machine learning for scientific discovery</p>
+                        <div class="project-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+                                <circle cx="7.5" cy="14.5" r="1.5"></circle>
+                                <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <h3 id="ai-title">Artificial Intelligence</h3>
+                            <p>Machine learning for scientific discovery</p>
+                        </div>
                     </div>
                     <div class="project-body">
-                        <div class="project-visual ai-visual">
-                            <div class="project-molecule molecule-ai">AI</div>
-                            <div class="molecule-label">Neural Networks</div>
-                        </div>
                         <ul class="project-features">
-                            <li>Deep Learning Models</li>
-                            <li>Natural Language Processing</li>
-                            <li>Computer Vision Applications</li>
-                            <li>Predictive Analytics</li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Deep Learning Models
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Natural Language Processing
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Computer Vision Applications
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Predictive Analytics
+                            </li>
                         </ul>
                     </div>
                     <div class="project-footer">
-                        <span class="project-tag" style="color: #ec4899;">Active Research</span>
-                        <span class="project-arrow">→</span>
+                        <span class="project-tag">Active Research</span>
+                        <span class="project-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </span>
                     </div>
                 </a>
 
                 <!-- Transition Metal Catalysis Card -->
-                <a href="TMC/" class="project-card">
+                <a href="TMC/" class="project-card tmc">
                     <div class="project-header">
-                        <h3 id="nicobot-title">Transition Metal Catalysis</h3>
-                        <p>Machine learning for reaction prediction</p>
+                        <div class="project-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 2v4"></path>
+                                <path d="M12 18v4"></path>
+                                <path d="m4.93 4.93 2.83 2.83"></path>
+                                <path d="m16.24 16.24 2.83 2.83"></path>
+                                <path d="M2 12h4"></path>
+                                <path d="M18 12h4"></path>
+                                <path d="m4.93 19.07 2.83-2.83"></path>
+                                <path d="m16.24 7.76 2.83-2.83"></path>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <h3 id="nicobot-title">Transition Metal Catalysis</h3>
+                            <p>Machine learning for reaction prediction</p>
+                        </div>
                     </div>
                     <div class="project-body">
-                        <div class="project-visual">
-                            <div class="project-molecule molecule-ni">Ni</div>
-                            <div class="molecule-label">Ni-Catalyst</div>
-                        </div>
                         <ul class="project-features">
-                            <li>C-O Bond Activation</li>
-                            <li>Citation Network Tools</li>
-                            <li>Data Extraction Pipeline</li>
-                            <li>Live TMC Interface</li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                C-O Bond Activation
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Citation Network Tools
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Data Extraction Pipeline
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Live TMC Interface
+                            </li>
                         </ul>
                     </div>
                     <div class="project-footer">
                         <span class="project-tag">Active Research</span>
-                        <span class="project-arrow">→</span>
+                        <span class="project-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </span>
                     </div>
                 </a>
 
                 <!-- Redox-Active Ligands Card -->
-                <a href="redox-ligands/" class="project-card">
+                <a href="redox-ligands/" class="project-card ral">
                     <div class="project-header">
-                        <h3 id="nitrogen-title">Redox-Active Ligands</h3>
-                        <p>AI-driven ligand optimization</p>
+                        <div class="project-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 2v7.31"></path>
+                                <path d="M14 9.3V1.99"></path>
+                                <path d="M8.5 2h7"></path>
+                                <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+                                <path d="M5.58 16.5h12.85"></path>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <h3 id="nitrogen-title">Redox-Active Ligands</h3>
+                            <p>AI-driven ligand optimization</p>
+                        </div>
                     </div>
                     <div class="project-body">
-                        <div class="project-visual">
-                            <div class="project-molecule molecule-n">N</div>
-                            <div class="molecule-label">N-Donor Ligand</div>
-                        </div>
                         <ul class="project-features">
-                            <li>Nitrogen Ligand Overview</li>
-                            <li>AI-Driven Optimization</li>
-                            <li>Quantum Descriptors</li>
-                            <li>Interactive Database</li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Nitrogen Ligand Overview
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                AI-Driven Optimization
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Quantum Descriptors
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Interactive Database
+                            </li>
                         </ul>
                     </div>
                     <div class="project-footer">
                         <span class="project-tag">Active Research</span>
-                        <span class="project-arrow">→</span>
+                        <span class="project-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </span>
                     </div>
                 </a>
 
                 <!-- Virology Card -->
-                <a href="virus/" class="project-card">
+                <a href="virus/" class="project-card virus">
                     <div class="project-header">
-                        <h3 id="virus-title">Virology</h3>
-                        <p>Computational virology and drug design</p>
+                        <div class="project-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <path d="M12 2v2"></path>
+                                <path d="M12 20v2"></path>
+                                <path d="m4.93 4.93 1.41 1.41"></path>
+                                <path d="m17.66 17.66 1.41 1.41"></path>
+                                <path d="M2 12h2"></path>
+                                <path d="M20 12h2"></path>
+                                <path d="m6.34 17.66-1.41 1.41"></path>
+                                <path d="m19.07 4.93-1.41 1.41"></path>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <h3 id="virus-title">Virology</h3>
+                            <p>Computational virology and drug design</p>
+                        </div>
                     </div>
                     <div class="project-body">
-                        <div class="project-visual virus-visual">
-                            <div class="project-molecule molecule-virus">🦠</div>
-                            <div class="molecule-label">Virology</div>
-                        </div>
                         <ul class="project-features">
-                            <li>Viral Protein Analysis</li>
-                            <li>Drug Target Identification</li>
-                            <li>Epidemic Modeling</li>
-                            <li>Vaccine Development</li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Viral Protein Analysis
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Drug Target Identification
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Epidemic Modeling
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Vaccine Development
+                            </li>
                         </ul>
                     </div>
                     <div class="project-footer">
-                        <span class="project-tag" style="color: #ef4444;">Active Research</span>
-                        <span class="project-arrow">→</span>
+                        <span class="project-tag">Active Research</span>
+                        <span class="project-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </span>
                     </div>
                 </a>
             </div>
@@ -615,25 +1161,63 @@
     <!-- Features Section -->
     <section class="features-section">
         <div class="container">
-            <h2 class="section-title">Our Capabilities</h2>
+            <div class="section-header">
+                <div class="section-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    Our Capabilities
+                </div>
+                <h2 class="section-title">What We Offer</h2>
+                <p class="section-desc">Advanced tools and methodologies for cutting-edge computational chemistry research.</p>
+            </div>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🧪</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2v7.5"></path>
+                            <path d="M4 15h16"></path>
+                            <path d="M4 15l2-4h12l2 4"></path>
+                            <path d="M6 19h12"></path>
+                            <path d="M8 19v3"></path>
+                            <path d="M16 19v3"></path>
+                        </svg>
+                    </div>
                     <h3>Computational Chemistry</h3>
-                    <p>Advanced quantum chemical calculations and molecular modeling for catalyst design and optimization.</p>
+                    <p>Advanced quantum chemical calculations and molecular modeling for catalyst design.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                            <path d="M7 7h.01"></path>
+                            <path d="M17 7h.01"></path>
+                            <path d="M7 17h.01"></path>
+                            <path d="M17 17h.01"></path>
+                        </svg>
+                    </div>
                     <h3>Machine Learning</h3>
-                    <p>Predictive models for reaction outcomes, catalyst activity, and ligand properties using state-of-the-art algorithms.</p>
+                    <p>Predictive models for reaction outcomes and catalyst activity using state-of-the-art algorithms.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"></path>
+                            <path d="m19 9-5 5-4-4-3 3"></path>
+                        </svg>
+                    </div>
                     <h3>Data Analytics</h3>
-                    <p>Comprehensive data extraction and analysis pipelines for chemical literature and experimental results.</p>
+                    <p>Comprehensive data extraction and analysis pipelines for chemical literature.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔬</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <circle cx="10" cy="13" r="2"></circle>
+                            <path d="m20 17-1.09-1.09a2 2 0 0 0-2.82 0L10 22"></path>
+                        </svg>
+                    </div>
                     <h3>Interactive Tools</h3>
                     <p>Web-based interfaces for exploring chemical data, visualizing molecules, and running predictions.</p>
                 </div>
@@ -646,16 +1230,27 @@
         <div class="container">
             <div class="cta-grid">
                 <div class="cta-card">
-                    <div class="cta-image">👨‍🔬</div>
+                    <div class="cta-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
                     <h3>Become a Contributor</h3>
                     <p>Join our research community and contribute to advancing AI-driven chemistry discovery.</p>
                     <a href="#" class="btn btn-primary">Get Started</a>
                 </div>
                 <div class="cta-card">
-                    <div class="cta-image">📚</div>
+                    <div class="cta-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                        </svg>
+                    </div>
                     <h3>Explore Publications</h3>
                     <p>Access our comprehensive database of research papers and computational results.</p>
-                    <a href="#" class="btn btn-outline">View Publications</a>
+                    <a href="#" class="btn btn-outline-light">View Publications</a>
                 </div>
             </div>
         </div>
@@ -665,8 +1260,22 @@
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-section">
-                    <h4>GenAI Research</h4>
+                <div class="footer-brand">
+                    <a href="index.html" class="logo-section" style="margin-bottom: 0;">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="32" cy="32" r="28" stroke="url(#logoGrad1)" stroke-width="3" fill="none"/>
+                                <circle cx="32" cy="22" r="7" fill="#3b82f6"/>
+                                <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
+                                <circle cx="42" cy="40" r="5" fill="#10b981"/>
+                                <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="logo-text">
+                            <span class="logo-title">GenAI Research</span>
+                            <span class="logo-subtitle">Innovate & Discover</span>
+                        </div>
+                    </a>
                     <p>Innovating at the intersection of artificial intelligence and computational chemistry. Your journey to discovery starts here.</p>
                 </div>
                 <div class="footer-section">
@@ -686,9 +1295,9 @@
                 </div>
                 <div class="footer-section">
                     <h4>Contact Us</h4>
-                    <p>Email: research@genai-chem.edu</p>
-                    <p>Location: Chemistry Department</p>
-                    <p>University Research Center</p>
+                    <a href="#">research@genai-chem.edu</a>
+                    <a href="#">Chemistry Department</a>
+                    <a href="#">University Research Center</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -698,7 +1307,7 @@
     </footer>
 
     <script>
-        // Data Injection (same as original)
+        // Data Injection
         const backendData = {
             "hero": {
                 "title": "Accelerating Chemical Discovery",
@@ -723,7 +1332,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('hero-title').innerText = backendData.hero.title;
+            document.getElementById('hero-title').innerHTML = backendData.hero.title.replace('Chemical Discovery', '<span>Chemical Discovery</span>');
             document.getElementById('hero-desc').innerText = backendData.hero.description;
             document.getElementById('ai-title').innerText = backendData.ai.sectionTitle;
             document.getElementById('nicobot-title').innerText = backendData.nicobot.sectionTitle;

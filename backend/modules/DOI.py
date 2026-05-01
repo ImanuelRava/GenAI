@@ -2,7 +2,11 @@
 import requests
 import pdfplumber
 import re
+import logging
 from typing import Tuple, List, Dict, Any, Optional
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------
 # Configuration
@@ -64,7 +68,11 @@ def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
 
     except requests.exceptions.HTTPError:
         raise ValueError(f"DOI not found: {doi}")
+    except requests.exceptions.Timeout:
+        logger.error(f"Request timeout for DOI: {doi}")
+        raise RuntimeError(f"Request timeout for {doi}")
     except Exception as e:
+        logger.error(f"Error fetching {doi}: {e}")
         raise RuntimeError(f"Error fetching {doi}: {e}")
 
 # ---------------------------------------------------------
@@ -135,5 +143,5 @@ def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, An
         return all_results
             
     except Exception as e:
-        print(f"API Error: {e}")
+        logger.error(f"API Error: {e}")
         return []

@@ -12,10 +12,12 @@ import os
 # CONFIGURATION - Edit these paths for your PythonAnywhere account
 # ============================================================
 
-USERNAME = 'hbsu'
+# Use environment variable for username, with fallback for development
+# Set PYTHONANYWHERE_USERNAME in your PythonAnywhere dashboard or .env file
+USERNAME = os.environ.get('PYTHONANYWHERE_USERNAME', 'hbsu')
 
 # Project home directory
-PROJECT_HOME = f'/home/{USERNAME}/genai-research'
+PROJECT_HOME = os.environ.get('PROJECT_HOME', f'/home/{USERNAME}/genai-research')
 
 # Backend directory path
 BACKEND_PATH = os.path.join(PROJECT_HOME, 'backend')

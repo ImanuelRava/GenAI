@@ -1,7 +1,11 @@
 # Local_Reference.py
 import networkx as nx
 import time
-from modules.DOI import extract_doi_from_pdf, get_paper_details, get_referenced_dois
+import logging
+from .DOI import extract_doi_from_pdf, get_paper_details, get_referenced_dois
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------
 # Backward Citation Network

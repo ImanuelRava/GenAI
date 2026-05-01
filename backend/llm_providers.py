@@ -432,47 +432,48 @@ class LLMProviderFactory:
     def get_default_provider() -> str:
         """Get the default provider based on available environment variables
         
-        Priority order (Hong Kong friendly first):
-        1. DeepSeek (DEEPSEEK_API_KEY) - Chinese company, works in HK
-        2. OpenRouter (OPENROUTER_API_KEY) - Works in HK, has free models
-        3. Hugging Face (HF_API_KEY) - FREE tier, works globally
-        4. Ollama (OLLAMA_BASE_URL) - 100% FREE, local only
-        5. Gemini (GEMINI_API_KEY) - May not work in HK
-        6. Groq (GROQ_API_KEY) - May not work in HK
+        Priority order (FREE providers first):
+        1. Groq (GROQ_API_KEY) - FREE tier, very fast, generous limits
+        2. Gemini (GEMINI_API_KEY) - FREE tier from Google
+        3. Hugging Face (HF_API_KEY) - FREE inference API
+        4. Ollama (OLLAMA_BASE_URL) - 100% FREE, runs locally
+        5. DeepSeek (DEEPSEEK_API_KEY) - Cheap, works in HK
+        6. OpenRouter (OPENROUTER_API_KEY) - Has free models
         7. OpenAI (OPENAI_API_KEY)
         8. Anthropic (ANTHROPIC_API_KEY)
         """
-        # Check Hong Kong friendly providers first
-        if os.environ.get('DEEPSEEK_API_KEY'):
+        # Check FREE providers first
+        if os.environ.get('GROQ_API_KEY'):
+            return 'groq'
+        elif os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY'):
+            return 'gemini'
+        elif os.environ.get('HF_API_KEY') or os.environ.get('HUGGINGFACE_API_KEY'):
+            return 'huggingface'
+        elif os.environ.get('OLLAMA_BASE_URL') or os.environ.get('OLLAMA_HOST'):
+            return 'ollama'
+        # Then check paid providers
+        elif os.environ.get('DEEPSEEK_API_KEY'):
             return 'deepseek'
         elif os.environ.get('OPENROUTER_API_KEY'):
             return 'openrouter'
-        elif os.environ.get('HF_API_KEY') or os.environ.get('HUGGINGFACE_API_KEY'):
-            return 'huggingface'
-        elif os.environ.get('OLLAMA_BASE_URL'):
-            return 'ollama'
-        # Then check other providers
-        elif os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY'):
-            return 'gemini'
-        elif os.environ.get('GROQ_API_KEY'):
-            return 'groq'
         elif os.environ.get('OPENAI_API_KEY'):
             return 'openai'
         elif os.environ.get('ANTHROPIC_API_KEY'):
             return 'anthropic'
         
-        return 'deepseek'  # Default to DeepSeek (works in Hong Kong)
+        return 'groq'  # Default to Groq (FREE tier available)
 
 
 def get_llm_response(system_prompt: str, user_message: str, 
-                     provider: str = None, **kwargs) -> Optional[str]:
+                     provider: str = None, api_key: str = None, **kwargs) -> Optional[str]:
     """
     Get response from LLM using configured provider
     
     Args:
         system_prompt: System message for the LLM
         user_message: User message/query
-        provider: LLM provider name (deepseek, openai, anthropic, ollama)
+        provider: LLM provider name (deepseek, openai, anthropic, ollama, groq, gemini, huggingface, openrouter)
+        api_key: User's API key (required for most providers except ollama)
         **kwargs: Additional arguments passed to the provider
     
     Returns:
@@ -482,7 +483,11 @@ def get_llm_response(system_prompt: str, user_message: str,
         provider = LLMProviderFactory.get_default_provider()
     
     try:
-        llm = LLMProviderFactory.create(provider)
+        # Pass api_key to provider if provided
+        if api_key:
+            llm = LLMProviderFactory.create(provider, api_key=api_key)
+        else:
+            llm = LLMProviderFactory.create(provider)
         return llm.chat(system_prompt, user_message, **kwargs)
     except Exception as e:
         print(f"LLM Error: {e}")
@@ -491,13 +496,14 @@ def get_llm_response(system_prompt: str, user_message: str,
 
 # Convenience functions for common tasks
 
-def generate_knowledge_graph(topic: str, provider: str = None) -> Optional[Dict]:
+def generate_knowledge_graph(topic: str, provider: str = None, api_key: str = None) -> Optional[Dict]:
     """
     Generate a knowledge graph for a given topic using LLM
     
     Args:
         topic: The topic to generate knowledge graph for
         provider: LLM provider to use
+        api_key: User's API key
     
     Returns:
         Dictionary with nodes and edges, or None if failed
@@ -523,7 +529,7 @@ Rules:
 
     user_message = f"Generate a knowledge graph for: {topic}"
     
-    response = get_llm_response(system_prompt, user_message, provider=provider)
+    response = get_llm_response(system_prompt, user_message, provider=provider, api_key=api_key)
     
     if response:
         try:
@@ -541,7 +547,7 @@ Rules:
     return None
 
 
-def explain_concept(concept: str, context: str = "", provider: str = None) -> Optional[str]:
+def explain_concept(concept: str, context: str = "", provider: str = None, api_key: str = None) -> Optional[str]:
     """
     Get an explanation for a chemistry concept
     
@@ -549,6 +555,7 @@ def explain_concept(concept: str, context: str = "", provider: str = None) -> Op
         concept: The concept to explain
         context: Additional context
         provider: LLM provider to use
+        api_key: User's API key
     
     Returns:
         Explanation string or None if failed
@@ -560,7 +567,7 @@ Keep the explanation accessible to graduate-level chemistry students."""
 
     user_message = f"Explain {concept} in the context of transition metal catalysis. Context: {context}"
     
-    return get_llm_response(system_prompt, user_message, provider=provider)
+    return get_llm_response(system_prompt, user_message, provider=provider, api_key=api_key)
 
 
 # Test function

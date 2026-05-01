@@ -24,8 +24,8 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { font-family: var(--font-main); background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; }
+        html { height: auto; min-height: 100vh; }
+        body { min-height: 100vh; font-family: var(--font-main); background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; }
 
         /* Header */
         header {
@@ -99,7 +99,7 @@
         }
 
 /* Playground Layout */
-        .playground-wrapper { flex: 1; display: flex; overflow: hidden; }
+        .playground-wrapper { flex: 1 1 auto; display: flex; overflow: hidden; }
         
         /* Control Panel */
         .control-panel { 

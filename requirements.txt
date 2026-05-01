@@ -1,6 +1,7 @@
 # Flask Web Framework
 Flask>=2.0.0
 flask-cors>=3.0.10
+flask-limiter>=3.0.0
 
 # Network Analysis
 networkx>=2.6.0

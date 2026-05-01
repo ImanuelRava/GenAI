@@ -2,7 +2,11 @@
 import pandas as pd
 import numpy as np
 import networkx as nx
+import logging
 from .DOI import get_paper_details
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------
 # Data Processing
@@ -13,7 +17,7 @@ def read_dois_from_excel(excel_file_like):
         # Assumes DOIs are in the first column
         return df.iloc[:, 0].dropna().tolist()
     except Exception as e:
-        print(f"Error reading Excel file: {e}")
+        logger.error(f"Error reading Excel file: {e}")
         return []
 
 def fetch_all_details(dois, progress_callback=None):
@@ -38,7 +42,7 @@ def fetch_all_details(dois, progress_callback=None):
                 "title": title
             }
         except Exception as e:
-            print(f"Error fetching details for DOI {doi}: {e}")
+            logger.error(f"Error fetching details for DOI {doi}: {e}")
             continue
     return details, labels
 

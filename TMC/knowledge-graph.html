@@ -5,559 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowledge Graph | TMC - GenAI Research</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="css/shared.css">
     <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #7c3aed;
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --pink: #ec4899;
-            --red: #ef4444;
-            --bg-main: #ffffff;
-            --bg-gray: #f3f4f6;
-            --bg-blue-light: #dbeafe;
-            --bg-purple-light: #ede9fe;
-            --bg-green-light: #d1fae5;
-            --bg-dark: #1f2937;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-main: #111827;
-            --text-secondary: #374151;
-            --text-muted: #6b7280;
-            --text-light: #9ca3af;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-gray);
-            color: var(--text-main);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Container --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* --- Header --- */
-        header {
-            background-color: var(--bg-gray);
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
-        .header-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-subtitle {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 24px;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-        }
-
-        /* --- Main Layout --- */
-        .main-wrapper {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* --- Right Sidebar --- */
-        .sidebar-right {
-            width: 300px;
-            background: var(--bg-main);
-            border-left: 1px solid var(--border-color);
-            padding: 16px;
-            flex-shrink: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-
-        .sidebar-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-main);
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
-        /* --- Topic Input --- */
-        .topic-input-section {
-            margin-bottom: 16px;
-        }
-
-        .topic-input-section label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .topic-input-wrapper {
-            display: flex;
-            gap: 8px;
-        }
-
-        .topic-input {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            background: var(--bg-main);
-            transition: border-color 0.2s;
-        }
-
-        .topic-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn-generate {
-            padding: 10px 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-generate:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-generate:disabled {
-            background: var(--text-muted);
-            cursor: not-allowed;
-        }
-
-        /* --- LLM Toggle --- */
-        .llm-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--border-color);
-            transition: 0.3s;
-            border-radius: 24px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--primary);
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-
-        .toggle-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* --- Quick Topics --- */
-        .quick-topics {
-            margin-bottom: 16px;
-        }
-
-        .quick-topics-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .quick-topic-btn {
-            display: inline-block;
-            padding: 6px 12px;
-            margin: 4px 4px 4px 0;
-            background: var(--bg-gray);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-topic-btn:hover {
-            background: var(--bg-blue-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* --- PDF Upload Section --- */
-        .pdf-upload-section {
-            margin-bottom: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .upload-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .btn-upload {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-upload:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-upload:disabled {
-            background: var(--text-muted);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .file-name {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* --- LLM Badge --- */
-        .llm-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-top: 12px;
-        }
-
-        .llm-badge.active {
-            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-            color: white;
-        }
-
-        .llm-badge.fallback {
-            background: var(--bg-gray);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-        }
-
-        /* --- Legend --- */
-        .legend {
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-            margin-top: auto;
-        }
-
-        .legend-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 6px 0;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        /* --- Graph Area --- */
+        /* Page-specific styles */
         .graph-area {
             flex: 1;
             background: var(--bg-main);
             position: relative;
             overflow: hidden;
         }
-
+        
         #graph-svg {
             width: 100%;
             height: 100%;
         }
-
-        /* --- Graph Styles --- */
+        
         .node {
             cursor: pointer;
         }
-
+        
         .node circle {
             stroke-width: 2px;
-            transition: all 0.2s;
+            transition: all var(--transition-normal);
         }
-
+        
         .node:hover circle {
             stroke-width: 3px;
             filter: brightness(1.1);
         }
-
+        
         .node.selected circle {
             stroke-width: 4px;
             stroke: var(--text-main);
         }
-
+        
         .node text {
             font-size: 11px;
             font-weight: 500;
             pointer-events: none;
         }
-
+        
         .edge {
             stroke: #9ca3af;
             stroke-width: 1.5px;
             fill: none;
         }
-
+        
         .edge-label {
             font-size: 9px;
             fill: var(--text-muted);
             pointer-events: none;
         }
-
-        /* --- Loading Overlay --- */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 100;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* --- Node Details Section --- */
+        
+        /* Node Details Section */
         .node-details-section {
-            margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid var(--border-color);
         }
-
-        .node-details-section.empty .node-details-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px 16px;
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        /* --- Node Info Card --- */
+        
         .node-info-card {
             background: var(--bg-gray);
             border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 14px;
         }
-
+        
         .node-info-card h4 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
-
+        
         .node-type-badge {
-            font-size: 0.65rem;
-            padding: 3px 10px;
-            border-radius: 12px;
+            font-size: 0.6rem;
+            padding: 3px 8px;
+            border-radius: 10px;
             text-transform: uppercase;
             font-weight: 600;
         }
-
+        
         .node-type-badge.reaction { background: var(--bg-blue-light); color: var(--primary); }
         .node-type-badge.catalyst { background: var(--bg-purple-light); color: var(--secondary); }
         .node-type-badge.reagent { background: var(--bg-green-light); color: var(--accent); }
@@ -566,128 +96,51 @@
         .node-type-badge.ligand { background: #e0e7ff; color: #4f46e5; }
         .node-type-badge.property { background: #f3e8ff; color: #9333ea; }
         .node-type-badge.concept { background: #cffafe; color: #0891b2; }
-        .node-type-badge.method { background: #d1fae5; color: #059669; }
-        .node-type-badge.theory { background: #ede9fe; color: #7c3aed; }
-
+        
         .node-info-card p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
-
-        /* --- AI Explanation Box --- */
+        
         .ai-explanation {
             background: var(--bg-blue-light);
             border-radius: var(--radius);
-            padding: 14px;
-            margin-top: 16px;
+            padding: 12px;
+            margin-top: 12px;
         }
-
+        
         .ai-explanation-title {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
-
+        
         .ai-explanation p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             margin: 0;
-            line-height: 1.6;
+            line-height: 1.5;
         }
-
-        /* --- Empty State --- */
+        
+        /* Empty state override */
         .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-muted);
-            text-align: center;
-            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .empty-state h4 {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            font-size: 0.85rem;
-        }
-
-        /* --- Footer --- */
-        footer {
-            background-color: var(--bg-dark);
-            color: white;
-            padding: 8px 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        footer p {
-            font-size: 0.7rem;
-            color: var(--text-light);
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 900px) {
-            .header-layout {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            nav ul {
-                justify-content: center;
-                gap: 12px;
-            }
-
-            .main-wrapper {
-                flex-direction: column;
-            }
-
-            .sidebar-right {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--border-color);
-                max-height: 300px;
-            }
-
-            .sidebar-header {
-                display: none;
-            }
-
-            .topic-input-section {
-                flex: 1;
-                min-width: 200px;
-                margin-bottom: 0;
-            }
-
-            .quick-topics {
-                display: none;
-            }
-
-            .legend {
-                display: none;
-            }
-
-            .node-details-section {
-                display: none;
-            }
+        
+        /* Loading overlay position */
+        .loading-overlay {
+            position: absolute;
         }
     </style>
 </head>
-<body>
+<body class="theme-purple">
 
     <!-- Header -->
     <header>
@@ -728,52 +181,76 @@
                 <div class="loading-spinner"></div>
                 <div class="loading-text">Generating knowledge graph...</div>
             </div>
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">🔗</div>
+                <h4>Knowledge Graph Generator</h4>
+                <p>Enter a topic or upload a PDF to generate an interactive knowledge graph powered by AI. Configure your API key in the sidebar to get started.</p>
+            </div>
         </main>
 
         <!-- Right Sidebar -->
         <aside class="sidebar-right">
             <div class="sidebar-header">
                 <span class="sidebar-title">AI Feature</span>
-                <div class="sidebar-subtitle">Knowledge Graph</div>
+                <div class="sidebar-subtitle">Knowledge Graph Generator</div>
             </div>
 
-            <!-- Topic Input -->
-            <div class="topic-input-section">
-                <label>Explore a Topic</label>
-                <div class="topic-input-wrapper">
-                    <input type="text" class="topic-input" id="topicInput" placeholder="e.g., Suzuki coupling..." value="cross-coupling">
-                    <button class="btn-generate" id="generateBtn" onclick="generateGraph()">Generate</button>
+            <!-- API Configuration -->
+            <div class="api-config-section">
+                <label class="section-label">🔑 API Configuration</label>
+                <div class="api-key-wrapper">
+                    <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Enter your API key...">
                 </div>
-                <div class="llm-toggle">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="llmToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span class="toggle-label">AI-Powered</span>
+                <select class="provider-select" id="providerSelect">
+                    <option value="groq">Groq (FREE tier)</option>
+                    <option value="gemini">Google Gemini (FREE)</option>
+                    <option value="deepseek">DeepSeek</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="huggingface">HuggingFace (FREE)</option>
+                    <option value="ollama">Ollama (Local)</option>
+                </select>
+                <div class="api-help">
+                    Get your API key: 
+                    <a href="https://console.groq.com" target="_blank">Groq</a> | 
+                    <a href="https://ai.google.dev" target="_blank">Gemini</a> |
+                    <a href="https://platform.deepseek.com" target="_blank">DeepSeek</a>
                 </div>
-                <div id="llmBadge"></div>
             </div>
 
-            <!-- Quick Topics -->
-            <div class="quick-topics">
-                <div class="quick-topics-title">Quick Topics</div>
-                <button class="quick-topic-btn" onclick="setTopic('Suzuki')">Suzuki</button>
-                <button class="quick-topic-btn" onclick="setTopic('Heck')">Heck</button>
-                <button class="quick-topic-btn" onclick="setTopic('Nickel')">Nickel</button>
-                <button class="quick-topic-btn" onclick="setTopic('cross-coupling')">Cross-Coupling</button>
-                <button class="quick-topic-btn" onclick="setTopic('oxidative addition')">Oxidative Addition</button>
-            </div>
-
-            <!-- PDF Upload Section -->
-            <div class="pdf-upload-section">
-                <div class="quick-topics-title">Upload PDF</div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">
-                    Upload a PDF to generate a knowledge graph from its content
-                </p>
-                <div class="upload-wrapper">
-                    <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handlePdfUpload(event)">
-                    <button class="btn-upload" onclick="document.getElementById('pdfInput').click()">
+            <!-- Mode Selection -->
+            <div class="mode-selection">
+                <label class="section-label">Input Mode</label>
+                <div class="mode-tabs">
+                    <button class="mode-tab active" id="tabKeyword" onclick="setMode('keyword')">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        Keyword
+                    </button>
+                    <button class="mode-tab" id="tabPdf" onclick="setMode('pdf')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Keyword Input -->
+            <div class="input-section" id="keywordSection">
+                <label class="section-label">Topic / Keyword</label>
+                <input type="text" class="text-input" id="topicInput" placeholder="e.g., Suzuki coupling, Heck reaction...">
+            </div>
+
+            <!-- PDF Upload -->
+            <div class="input-section" id="pdfSection" style="display: none;">
+                <label class="section-label">Upload PDF Document</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handlePdfSelect(event)">
+                    <button class="btn-upload" id="uploadBtn" onclick="document.getElementById('pdfInput').click()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="17 8 12 3 7 8"/>
                             <line x1="12" y1="3" x2="12" y2="15"/>
@@ -784,6 +261,35 @@
                 </div>
             </div>
 
+            <!-- Quick Topics -->
+            <div class="quick-actions" id="quickTopics">
+                <button class="quick-btn" onclick="setTopic('Suzuki coupling')">Suzuki</button>
+                <button class="quick-btn" onclick="setTopic('Heck reaction')">Heck</button>
+                <button class="quick-btn" onclick="setTopic('Nickel catalysis')">Nickel</button>
+                <button class="quick-btn" onclick="setTopic('Cross-coupling')">Cross-Coupling</button>
+                <button class="quick-btn" onclick="setTopic('Oxidative addition')">Oxidative Addition</button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn-generate" id="generateBtn" onclick="generateGraph()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    Generate
+                </button>
+                <button class="btn-download" id="downloadBtn" onclick="downloadGraph()" disabled title="Download graph as JSON">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Status -->
+            <div id="statusBadge"></div>
+
             <!-- Legend -->
             <div class="legend">
                 <div class="legend-title">Node Types</div>
@@ -793,17 +299,17 @@
                 <div class="legend-item"><div class="legend-dot" style="background: var(--warning);"></div> Mechanism</div>
                 <div class="legend-item"><div class="legend-dot" style="background: var(--pink);"></div> Product</div>
                 <div class="legend-item"><div class="legend-dot" style="background: #0891b2;"></div> Concept</div>
-                <div class="legend-item"><div class="legend-dot" style="background: #059669;"></div> Method</div>
             </div>
 
-            <!-- Node Details Section -->
-            <div class="node-details-section" id="nodeDetailsSection">
-                <div class="section-title">Node Details</div>
-                <div class="node-details-content" id="nodeDetailsContent">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔍</div>
-                        <h4>Select a Node</h4>
-                        <p>Click on any node in the graph to see detailed information and AI explanation.</p>
+            <!-- Node Details -->
+            <div class="node-details-section" id="nodeDetailsSection" style="display: none;">
+                <div class="section-label">Node Details</div>
+                <div class="node-info-card" id="nodeInfoCard">
+                    <h4 id="nodeTitle">-</h4>
+                    <p id="nodeDescription">-</p>
+                    <div class="ai-explanation" id="aiExplanation" style="display: none;">
+                        <div class="ai-explanation-title">✨ AI Explanation</div>
+                        <p id="explanationText">-</p>
                     </div>
                 </div>
             </div>
@@ -831,9 +337,20 @@
         };
 
         // State
-        let simulation = null;
+        let currentMode = 'keyword';
         let currentGraph = null;
-        let selectedNode = null;
+        let selectedPdfFile = null;
+        let simulation = null;
+
+        // Set input mode
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('tabKeyword').classList.toggle('active', mode === 'keyword');
+            document.getElementById('tabPdf').classList.toggle('active', mode === 'pdf');
+            document.getElementById('keywordSection').style.display = mode === 'keyword' ? 'block' : 'none';
+            document.getElementById('pdfSection').style.display = mode === 'pdf' ? 'block' : 'none';
+            document.getElementById('quickTopics').style.display = mode === 'keyword' ? 'flex' : 'none';
+        }
 
         // Set topic from quick buttons
         function setTopic(topic) {
@@ -841,227 +358,126 @@
             generateGraph();
         }
 
-        // Handle PDF upload
-        async function handlePdfUpload(event) {
+        // Handle PDF file selection
+        function handlePdfSelect(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (file) {
+                selectedPdfFile = file;
+                document.getElementById('pdfFileName').textContent = file.name;
+                document.getElementById('uploadBtn').classList.add('has-file');
+                document.getElementById('uploadBtn').innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    ${file.name}
+                `;
+            }
+        }
 
-            // Show filename
-            document.getElementById('pdfFileName').textContent = file.name;
+        // Generate knowledge graph
+        async function generateGraph() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const provider = document.getElementById('providerSelect').value;
+
+            if (!apiKey && provider !== 'ollama') {
+                showStatus('error', 'Please enter your API key');
+                return;
+            }
 
             const btn = document.getElementById('generateBtn');
             const loading = document.getElementById('loadingOverlay');
-            const loadingText = loading.querySelector('.loading-text');
+            const emptyState = document.getElementById('emptyState');
 
             btn.disabled = true;
             loading.style.display = 'flex';
-            loadingText.textContent = 'Extracting knowledge from PDF...';
+            emptyState.style.display = 'none';
 
             try {
-                const formData = new FormData();
-                formData.append('file', file);
+                let response;
+                
+                if (currentMode === 'keyword') {
+                    const topic = document.getElementById('topicInput').value.trim();
+                    if (!topic) {
+                        showStatus('error', 'Please enter a topic');
+                        return;
+                    }
 
-                const response = await fetch('/api/knowledge-graph/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+                    loading.querySelector('.loading-text').textContent = 'AI is generating knowledge graph...';
+
+                    response = await fetch('/api/knowledge-graph', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            topic: topic,
+                            provider: provider,
+                            api_key: apiKey,
+                            use_llm: true
+                        })
+                    });
+                } else {
+                    // PDF mode
+                    if (!selectedPdfFile) {
+                        showStatus('error', 'Please select a PDF file');
+                        return;
+                    }
+
+                    loading.querySelector('.loading-text').textContent = 'Extracting knowledge from PDF...';
+
+                    const formData = new FormData();
+                    formData.append('file', selectedPdfFile);
+                    formData.append('provider', provider);
+                    formData.append('api_key', apiKey);
+
+                    response = await fetch('/api/knowledge-graph/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
 
                 const data = await response.json();
 
                 if (data.success) {
                     currentGraph = data.graph;
                     renderGraph(data.graph);
-
-                    // Update topic input with PDF name
-                    document.getElementById('topicInput').value = data.topic;
-
-                    // Update LLM badge
-                    document.getElementById('llmBadge').innerHTML = `<span class="llm-badge active">📄 PDF: ${file.name}</span>`;
-
-                    // Reset node details
-                    resetNodeDetails();
-                } else {
-                    alert('Error: ' + (data.error || 'Failed to process PDF'));
-                }
-            } catch (error) {
-                console.error('PDF upload error:', error);
-                alert('Failed to upload PDF. Please make sure the server is running and try again.');
-            } finally {
-                btn.disabled = false;
-                loading.style.display = 'none';
-                // Clear the input so the same file can be selected again
-                event.target.value = '';
-            }
-        }
-
-        // Reset node details to empty state
-        function resetNodeDetails() {
-            d3.selectAll('.node').classed('selected', false);
-            selectedNode = null;
-            document.getElementById('nodeDetailsContent').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🔍</div>
-                    <h4>Select a Node</h4>
-                    <p>Click on any node in the graph to see detailed information and AI explanation.</p>
-                </div>
-            `;
-        }
-
-        // Generate knowledge graph
-        async function generateGraph() {
-            const topic = document.getElementById('topicInput').value.trim();
-            if (!topic) return;
-
-            const btn = document.getElementById('generateBtn');
-            const loading = document.getElementById('loadingOverlay');
-            const useLLM = document.getElementById('llmToggle').checked;
-
-            btn.disabled = true;
-            loading.style.display = 'flex';
-
-            // Update loading text based on LLM toggle
-            const loadingText = loading.querySelector('.loading-text');
-            if (useLLM) {
-                loadingText.textContent = 'AI is generating knowledge graph...';
-            } else {
-                loadingText.textContent = 'Loading knowledge graph...';
-            }
-
-            try {
-                // Try to call the backend API
-                let graphData;
-                let llmUsed = false;
-                try {
-                    const response = await fetch('/api/knowledge-graph', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ topic: topic, use_llm: useLLM })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        graphData = data.graph;
-                        llmUsed = data.llm_used || false;
-                    } else {
-                        throw new Error('API error');
+                    document.getElementById('downloadBtn').disabled = false;
+                    showStatus('success', `Generated ${data.graph.nodes.length} nodes`);
+                    
+                    if (data.topic) {
+                        document.getElementById('topicInput').value = data.topic;
                     }
-                } catch (e) {
-                    // Use local mock data if API not available
-                    graphData = getMockGraph(topic);
-                    llmUsed = false;
+                } else {
+                    showStatus('error', data.error || 'Failed to generate graph');
                 }
-
-                currentGraph = graphData;
-                renderGraph(graphData);
-
-                // Update LLM badge
-                const badgeClass = llmUsed ? 'active' : 'fallback';
-                const badgeText = llmUsed ? '✨ AI Generated' : '📚 Predefined';
-                document.getElementById('llmBadge').innerHTML = `<span class="llm-badge ${badgeClass}">${badgeText}</span>`;
-
-                // Reset node details
-                resetNodeDetails();
-
             } catch (error) {
-                console.error('Error generating graph:', error);
-                alert('Failed to generate knowledge graph. Please try again.');
+                console.error('Error:', error);
+                showStatus('error', 'Connection failed. Is the server running?');
             } finally {
                 btn.disabled = false;
                 loading.style.display = 'none';
             }
         }
 
-        // Mock graph data for fallback
-        function getMockGraph(topic) {
-            const topicLower = topic.toLowerCase();
+        // Show status
+        function showStatus(type, message) {
+            const badge = document.getElementById('statusBadge');
+            badge.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
+        }
+
+        // Download graph as JSON
+        function downloadGraph() {
+            if (!currentGraph) return;
             
-            if (topicLower.includes('suzuki')) {
-                return {
-                    nodes: [
-                        {id: "suzuki", label: "Suzuki-Miyaura", type: "reaction", description: "Pd-catalyzed cross-coupling between organoboron and organic halide"},
-                        {id: "palladium", label: "Pd Catalyst", type: "catalyst", description: "Palladium(0) complex essential for Suzuki reaction"},
-                        {id: "boronic", label: "Organoboron", type: "reagent", description: "R-B(OH)2 nucleophilic partner"},
-                        {id: "halide", label: "Organic Halide", type: "reagent", description: "R'-X electrophilic partner"},
-                        {id: "base", label: "Base", type: "reagent", description: "Required for transmetalation"},
-                        {id: "oxidative", label: "Oxidative Addition", type: "mechanism", description: "Pd inserts into C-X bond"},
-                        {id: "transmetalation", label: "Transmetalation", type: "mechanism", description: "R group transfers to Pd"},
-                        {id: "reductive", label: "Reductive Elimination", type: "mechanism", description: "C-C bond formation"},
-                        {id: "biaryl", label: "Biaryl Product", type: "product", description: "R-R' coupled product"}
-                    ],
-                    edges: [
-                        {source: "suzuki", target: "palladium", label: "catalyzed by"},
-                        {source: "suzuki", target: "boronic", label: "uses"},
-                        {source: "suzuki", target: "halide", label: "uses"},
-                        {source: "oxidative", target: "transmetalation", label: "→"},
-                        {source: "transmetalation", target: "reductive", label: "→"},
-                        {source: "reductive", target: "biaryl", label: "produces"}
-                    ]
-                };
-            }
+            const dataStr = JSON.stringify(currentGraph, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             
-            if (topicLower.includes('heck')) {
-                return {
-                    nodes: [
-                        {id: "heck", label: "Heck Reaction", type: "reaction", description: "Pd-catalyzed coupling of aryl halide with alkene"},
-                        {id: "palladium", label: "Pd Catalyst", type: "catalyst", description: "Pd(0)/Pd(II) catalytic cycle"},
-                        {id: "aryl_halide", label: "Aryl Halide", type: "reagent", description: "Ar-X electrophile"},
-                        {id: "alkene", label: "Alkene", type: "reagent", description: "C=C partner"},
-                        {id: "migratory", label: "Migratory Insertion", type: "mechanism", description: "Alkene inserts into Pd-Ar bond"},
-                        {id: "beta_hydride", label: "β-Hydride Elim.", type: "mechanism", description: "Forms substituted alkene"},
-                        {id: "styrene", label: "Styrene Product", type: "product", description: "Ar-CH=CH2 type product"}
-                    ],
-                    edges: [
-                        {source: "heck", target: "palladium", label: "catalyzed by"},
-                        {source: "heck", target: "aryl_halide", label: "uses"},
-                        {source: "heck", target: "alkene", label: "uses"},
-                        {source: "migratory", target: "beta_hydride", label: "→"},
-                        {source: "beta_hydride", target: "styrene", label: "produces"}
-                    ]
-                };
-            }
-            
-            if (topicLower.includes('nickel')) {
-                return {
-                    nodes: [
-                        {id: "nickel", label: "Nickel Catalysis", type: "catalyst", description: "Cost-effective alternative to Pd"},
-                        {id: "c_o", label: "C-O Activation", type: "mechanism", description: "Ni activates C-O bonds in biomass"},
-                        {id: "c_cl", label: "C-Cl Activation", type: "mechanism", description: "Ni activates aryl chlorides"},
-                        {id: "biomass", label: "Biomass", type: "reagent", description: "Sustainable feedstocks"},
-                        {id: "redox_ligand", label: "Redox-Active Ligand", type: "ligand", description: "Participates in electron transfer"},
-                        {id: "low_cost", label: "Cost Advantage", type: "property", description: "~1000x cheaper than Pd"}
-                    ],
-                    edges: [
-                        {source: "nickel", target: "c_o", label: "enables"},
-                        {source: "nickel", target: "c_cl", label: "enables"},
-                        {source: "c_o", target: "biomass", label: "activates"},
-                        {source: "nickel", target: "redox_ligand", label: "uses"},
-                        {source: "nickel", target: "low_cost", label: "has"}
-                    ]
-                };
-            }
-            
-            // Default cross-coupling graph
-            return {
-                nodes: [
-                    {id: "cross_coupling", label: "Cross-Coupling", type: "reaction", description: "Metal-catalyzed C-C bond formation"},
-                    {id: "oxidative_addition", label: "Oxidative Addition", type: "mechanism", description: "M(0) → M(II), inserts into C-X"},
-                    {id: "transmetalation", label: "Transmetalation", type: "mechanism", description: "Exchange of ligands"},
-                    {id: "reductive_elim", label: "Reductive Elimination", type: "mechanism", description: "M(II) → M(0), forms product"},
-                    {id: "palladium", label: "Palladium", type: "catalyst", description: "Most common catalyst"},
-                    {id: "nickel", label: "Nickel", type: "catalyst", description: "Cheaper alternative"},
-                    {id: "ligand", label: "Ligand", type: "ligand", description: "Controls reactivity"},
-                    {id: "product", label: "C-C Product", type: "product", description: "Coupled molecule"}
-                ],
-                edges: [
-                    {source: "cross_coupling", target: "oxidative_addition", label: "step 1"},
-                    {source: "oxidative_addition", target: "transmetalation", label: "step 2"},
-                    {source: "transmetalation", target: "reductive_elim", label: "step 3"},
-                    {source: "reductive_elim", target: "product", label: "produces"},
-                    {source: "cross_coupling", target: "palladium", label: "catalyzed by"},
-                    {source: "cross_coupling", target: "nickel", label: "catalyzed by"},
-                    {source: "palladium", target: "ligand", label: "requires"},
-                    {source: "nickel", target: "ligand", label: "requires"}
-                ]
-            };
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'knowledge-graph.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         // Render graph with D3
@@ -1075,10 +491,8 @@
 
             svg.attr('viewBox', [0, 0, width, height]);
 
-            // Create a group for zooming
             const g = svg.append('g');
 
-            // Add zoom behavior
             const zoom = d3.zoom()
                 .scaleExtent([0.3, 3])
                 .on('zoom', (event) => {
@@ -1087,7 +501,7 @@
 
             svg.call(zoom);
 
-            // Create arrow marker
+            // Arrow marker
             svg.append('defs').append('marker')
                 .attr('id', 'arrowhead')
                 .attr('viewBox', '-0 -5 10 10')
@@ -1100,14 +514,13 @@
                 .attr('d', 'M 0,-5 L 10,0 L 0,5')
                 .attr('fill', '#9ca3af');
 
-            // Create force simulation
             simulation = d3.forceSimulation(data.nodes)
                 .force('link', d3.forceLink(data.edges).id(d => d.id).distance(120))
                 .force('charge', d3.forceManyBody().strength(-400))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(50));
 
-            // Draw edges
+            // Edges
             const edge = g.append('g')
                 .selectAll('path')
                 .data(data.edges)
@@ -1115,7 +528,7 @@
                 .attr('class', 'edge')
                 .attr('marker-end', 'url(#arrowhead)');
 
-            // Draw edge labels
+            // Edge labels
             const edgeLabel = g.append('g')
                 .selectAll('text')
                 .data(data.edges)
@@ -1125,48 +538,46 @@
                 .attr('dy', -5)
                 .text(d => d.label);
 
-            // Draw nodes
+            // Nodes
             const node = g.append('g')
                 .selectAll('g')
                 .data(data.nodes)
                 .join('g')
                 .attr('class', 'node')
                 .call(d3.drag()
-                    .on('start', dragstarted)
+                    .on('start', dragStarted)
                     .on('drag', dragged)
-                    .on('end', dragended))
-                .on('click', (event, d) => showNodeInfo(d));
+                    .on('end', dragEnded))
+                .on('click', (event, d) => showNodeDetails(d));
 
-            // Add circles
             node.append('circle')
-                .attr('r', 30)
+                .attr('r', 24)
                 .attr('fill', d => typeColors[d.type] || '#6b7280')
-                .attr('stroke', d => d3.color(typeColors[d.type] || '#6b7280').darker(0.5));
+                .attr('stroke', '#fff');
 
-            // Add labels
             node.append('text')
                 .attr('dy', 4)
                 .attr('text-anchor', 'middle')
-                .attr('fill', 'white')
-                .text(d => d.label.length > 12 ? d.label.substring(0, 10) + '...' : d.label);
+                .attr('fill', '#fff')
+                .text(d => d.label.substring(0, 3));
 
-            // Update positions on tick
             simulation.on('tick', () => {
                 edge.attr('d', d => {
+                    const dx = d.target.x - d.source.x;
+                    const dy = d.target.y - d.source.y;
                     return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
                 });
 
                 edgeLabel.attr('transform', d => {
-                    const midX = (d.source.x + d.target.x) / 2;
-                    const midY = (d.source.y + d.target.y) / 2;
-                    return `translate(${midX}, ${midY})`;
+                    const x = (d.source.x + d.target.x) / 2;
+                    const y = (d.source.y + d.target.y) / 2;
+                    return `translate(${x},${y})`;
                 });
 
-                node.attr('transform', d => `translate(${d.x}, ${d.y})`);
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
             });
 
-            // Drag functions
-            function dragstarted(event, d) {
+            function dragStarted(event, d) {
                 if (!event.active) simulation.alphaTarget(0.3).restart();
                 d.fx = d.x;
                 d.fy = d.y;
@@ -1177,83 +588,55 @@
                 d.fy = event.y;
             }
 
-            function dragended(event, d) {
+            function dragEnded(event, d) {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
             }
         }
 
-        // Show node info
-        function showNodeInfo(node) {
-            // Remove previous selection
-            d3.selectAll('.node').classed('selected', false);
+        // Show node details
+        async function showNodeDetails(node) {
+            const section = document.getElementById('nodeDetailsSection');
+            const titleEl = document.getElementById('nodeTitle');
+            const descEl = document.getElementById('nodeDescription');
+            const aiExp = document.getElementById('aiExplanation');
 
-            // Add selection to clicked node
-            d3.selectAll('.node')
-                .filter(d => d.id === node.id)
-                .classed('selected', true);
+            section.style.display = 'block';
+            titleEl.innerHTML = `${node.label} <span class="node-type-badge ${node.type}">${node.type}</span>`;
+            descEl.textContent = node.description || 'No description available.';
+            aiExp.style.display = 'none';
 
-            selectedNode = node;
-
-            const content = document.getElementById('nodeDetailsContent');
-
-            // Show node info with loading state for AI explanation
-            content.innerHTML = `
-                <div class="node-info-card">
-                    <h4>
-                        ${node.label}
-                        <span class="node-type-badge ${node.type}">${node.type}</span>
-                    </h4>
-                    <p>${node.description}</p>
-                </div>
-                <div id="aiExplanation">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">Loading AI explanation...</p>
-                </div>
-            `;
-
-            // Fetch LLM explanation
-            fetch('/api/knowledge-graph/explain', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ node: node.label, context: node.description })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.explanation) {
-                    document.getElementById('aiExplanation').innerHTML = `
-                        <div class="ai-explanation">
-                            <div class="ai-explanation-title">✨ AI Explanation</div>
-                            <p>${data.explanation}</p>
-                        </div>
-                    `;
-                } else {
-                    document.getElementById('aiExplanation').innerHTML = '';
+            // Get AI explanation if API key is provided
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const provider = document.getElementById('providerSelect').value;
+            
+            if (apiKey || provider === 'ollama') {
+                try {
+                    aiExp.style.display = 'block';
+                    document.getElementById('explanationText').textContent = 'Loading explanation...';
+                    
+                    const response = await fetch('/api/explain-node', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            node: node,
+                            provider: provider,
+                            api_key: apiKey
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('explanationText').textContent = data.explanation;
+                    } else {
+                        document.getElementById('explanationText').textContent = 'Could not generate explanation.';
+                    }
+                } catch (e) {
+                    document.getElementById('explanationText').textContent = 'Failed to get AI explanation.';
                 }
-            })
-            .catch(() => {
-                document.getElementById('aiExplanation').innerHTML = '';
-            });
+            }
         }
-
-        // Initialize with default graph
-        window.addEventListener('load', () => {
-            generateGraph();
-        });
-
-        // Handle resize
-        window.addEventListener('resize', () => {
-            if (currentGraph) {
-                renderGraph(currentGraph);
-            }
-        });
-
-        // Handle Enter key
-        document.getElementById('topicInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                generateGraph();
-            }
-        });
     </script>
 </body>
 </html>
