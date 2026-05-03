@@ -1,4 +1,4 @@
-# Local_Reference.py
+# Backward_Reference.py
 import networkx as nx
 import time
 import logging
@@ -37,15 +37,12 @@ def build_reference_network(pdf_path, progress_callback=None):
     
     if progress_callback: progress_callback(f"Found {total_refs} references. Fetching details...")
 
-    # 4. Build Network (First Pass: Direct References)
-    # We use a small sleep to be polite to the API, though caching helps significantly
+    # 4. Build Network
     for i, doi in enumerate(ref_dois):
         if progress_callback and i % 5 == 0: 
             progress_callback(f"Processing reference {i+1}/{total_refs}...")
             
         try:
-            # Small polite delay if the item wasn't cached
-            # (If cached, this returns instantly, making the delay negligible)
             author, year, cites, _, title = get_paper_details(doi)
             
             G.add_node(doi, author=author or "Unknown", year=year or 0, 
@@ -53,14 +50,11 @@ def build_reference_network(pdf_path, progress_callback=None):
             G.add_edge(main_doi, doi) # Main paper -> Reference
             valid_refs.append(doi)
             
-            # Be nice to the API for uncached requests
             time.sleep(0.3) 
         except Exception:
             continue
 
     # 5. Check Cross-References (References citing each other)
-    # NOTE: This can be slow. Limited to first 20 valid refs to keep UI responsive.
-    # You can increase this limit if needed.
     cross_ref_limit = 20
     check_list = valid_refs[:cross_ref_limit]
     
@@ -91,11 +85,7 @@ def build_reference_network(pdf_path, progress_callback=None):
 
     # 2. Sort by Global Citations
     sorted_nodes = sorted(all_papers_list, key=lambda x: x['Global Citation Count'], reverse=True)
-    
-    # Get IDs of the top 30 papers
     top_30_ids = [item['DOI'] for item in sorted_nodes[:30]]
-
-    # Ensure Main Paper is in Top 30
     if main_doi not in top_30_ids:
         top_30_ids.pop()
         top_30_ids.insert(0, main_doi)
@@ -104,10 +94,9 @@ def build_reference_network(pdf_path, progress_callback=None):
     G_viz = G.subgraph(top_30_ids).copy()
 
     # ---------------------------------------------------------
-    # SUGGESTION LOGIC (UPDATED)
+    # SUGGESTION LOGIC
     # ---------------------------------------------------------
     
-    # NEW: Filter valid refs to only those in Top 30
     valid_refs_top_30 = [r for r in valid_refs if r in top_30_ids]
     
     suggestions = []
@@ -115,7 +104,7 @@ def build_reference_network(pdf_path, progress_callback=None):
 
     # --- CRITERIA 1: Top Global Impact References (Only within Top 30) ---
     all_refs_data = []
-    for doi in valid_refs_top_30: # Iterate ONLY top 30
+    for doi in valid_refs_top_30:
         if not G.has_node(doi): continue
 
         node_data = G.nodes[doi]
@@ -148,12 +137,12 @@ def build_reference_network(pdf_path, progress_callback=None):
 
     # --- CRITERIA 2: High Local Citation References (Only within Top 30) ---
     local_cite_list = []
-    for doi in valid_refs_top_30: # Iterate ONLY top 30
+    for doi in valid_refs_top_30:
         if doi in selected_ids:
             continue
             
         if G.has_node(doi):
-            local_count = G.in_degree(doi) # Check against Full Graph G
+            local_count = G.in_degree(doi)
             node_data = G.nodes[doi]
             
             paper_data = {

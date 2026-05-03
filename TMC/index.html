@@ -5,27 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TMC | GenAI Research</title>
     <link rel="stylesheet" href="css/shared.css">
+    <style>
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-purple">
 
-    <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="../index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logoGradTMC" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#8b5cf6"/>
-                            <stop offset="50%" style="stop-color:#3b82f6"/>
-                            <stop offset="100%" style="stop-color:#10b981"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="32" cy="32" r="28" stroke="url(#logoGradTMC)" stroke-width="3" fill="none"/>
-                    <circle cx="32" cy="22" r="7" fill="#8b5cf6"/>
-                    <circle cx="22" cy="40" r="5" fill="#3b82f6"/>
-                    <circle cx="42" cy="40" r="5" fill="#10b981"/>
-                    <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -35,18 +76,16 @@
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="../AI/">Artificial Intelligence</a></li>
-                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
-                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../AI/" >Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" class="active-tmc">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Main Layout -->
     <div class="main-wrapper">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">Transition Metal Catalysis</span>
@@ -119,9 +158,7 @@
             </ul>
         </aside>
 
-        <!-- Content Area -->
         <main class="content-area">
-            <!-- Welcome Panel -->
             <div id="welcome" class="content-panel active">
                 <div class="welcome-panel">
                     <div class="welcome-icon">
@@ -143,7 +180,6 @@
                 </div>
             </div>
 
-            <!-- Introduction Panel -->
             <div id="introduction" class="content-panel">
                 <div class="content-header">
                     <h2>Introduction</h2>
@@ -151,7 +187,7 @@
                 </div>
                 <div class="content-body">
                     <p>Nickel-catalyzed C-O bond activation represents a transformative approach in synthetic chemistry, enabling the conversion of abundant and renewable oxygenated feedstocks into valuable chemical products. This research area bridges fundamental organometallic chemistry with practical applications in sustainable synthesis.</p>
-                    
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">4</div>
@@ -188,7 +224,6 @@
                 </div>
             </div>
 
-            <!-- Data Extraction Panel -->
             <div id="data-extraction" class="content-panel">
                 <div class="content-header">
                     <h2>Data Extraction</h2>
@@ -196,7 +231,7 @@
                 </div>
                 <div class="content-body">
                     <p>We utilize OpenChemIE tool to automate the extraction of chemical information from scientific literature. The collected data is then structured and can be stored in a searchable database.</p>
-                    
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">500+</div>
@@ -234,7 +269,6 @@
                 </div>
             </div>
 
-            <!-- Citation Network Panel -->
             <div id="citation" class="content-panel">
                 <div class="content-header">
                     <h2>Citation Network</h2>
@@ -242,7 +276,7 @@
                 </div>
                 <div class="content-body">
                     <p>The citation network visualization enables researchers to explore the interconnected landscape of nickel catalysis research. Identify seminal works, trace the evolution of ideas, and discover new connections between research areas.</p>
-                    
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">200+</div>
@@ -279,7 +313,6 @@
                 </div>
             </div>
 
-            <!-- TMC Live Panel -->
             <div id="nicobot-live" class="content-panel" style="position: relative;">
                 <button class="settings-btn" id="settingsBtn" title="AI Settings">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -330,7 +363,6 @@
                 </div>
             </div>
 
-            <!-- Quiz Panel -->
             <div id="quiz" class="content-panel">
                 <div class="content-header">
                     <h2>Chemistry Quiz</h2>
@@ -338,7 +370,7 @@
                 </div>
                 <div class="content-body">
                     <p>Test your understanding of nickel catalysis concepts through our interactive quiz system. Questions range from fundamental mechanistic principles to advanced applications of AI in chemistry.</p>
-                    
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">50+</div>
@@ -376,7 +408,6 @@
                 </div>
             </div>
 
-            <!-- Knowledge Graph Panel -->
             <div id="knowledge-graph" class="content-panel">
                 <div class="content-header">
                     <h2>Knowledge Graph</h2>
@@ -384,7 +415,7 @@
                 </div>
                 <div class="content-body">
                     <p>Our interactive knowledge graph tool uses AI to automatically generate visual representations of chemical concepts, reactions, and their relationships. Simply enter a topic or upload a PDF to explore connections in nickel catalysis and related chemistry.</p>
-                    
+
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">AI</div>
@@ -425,31 +456,107 @@
         </main>
     </div>
 
-    <!-- Settings Modal -->
     <div class="settings-overlay" id="settingsOverlay">
-        <div class="settings-modal">
+        <div class="settings-modal" style="max-width: 500px;">
             <div class="settings-header">
                 <h3>NiCOBot AI Settings</h3>
                 <button class="settings-close" id="settingsClose">&times;</button>
             </div>
             <div class="settings-body">
                 <div class="settings-group">
-                    <label class="settings-label">LLM Provider</label>
-                    <select class="settings-select" id="providerSelect">
+                    <label class="settings-label">Select LLM Provider</label>
+                    <div class="provider-cards" id="providerCards">
+                        <div class="provider-card" data-provider="deepseek">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">DeepSeek</div>
+                                <div class="provider-desc">Fast & affordable AI</div>
+                            </div>
+                            <div class="provider-badge">Popular</div>
+                        </div>
+                        <div class="provider-card" data-provider="groq">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Groq</div>
+                                <div class="provider-desc">FREE - Ultra fast</div>
+                            </div>
+                            <div class="provider-badge free">FREE</div>
+                        </div>
+                        <div class="provider-card" data-provider="gemini">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Google Gemini</div>
+                                <div class="provider-desc">FREE - Powerful</div>
+                            </div>
+                            <div class="provider-badge free">FREE</div>
+                        </div>
+                        <div class="provider-card" data-provider="openai">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <circle cx="12" cy="12" r="4"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">OpenAI</div>
+                                <div class="provider-desc">GPT-4 models</div>
+                            </div>
+                        </div>
+                        <div class="provider-card" data-provider="openrouter">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">OpenRouter</div>
+                                <div class="provider-desc">Multi-model access</div>
+                            </div>
+                        </div>
+                        <div class="provider-card" data-provider="ollama">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Ollama</div>
+                                <div class="provider-desc">Local - No API key</div>
+                            </div>
+                            <div class="provider-badge local">LOCAL</div>
+                        </div>
+                    </div>
+                    <select class="settings-select" id="providerSelect" style="display: none;">
+                        <option value="deepseek">DeepSeek</option>
                         <option value="groq">Groq (FREE)</option>
                         <option value="gemini">Google Gemini (FREE)</option>
-                        <option value="huggingface">Hugging Face (FREE)</option>
-                        <option value="openrouter">OpenRouter</option>
-                        <option value="deepseek">DeepSeek</option>
                         <option value="openai">OpenAI</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="ollama">Ollama (Local)</option>
                     </select>
                 </div>
 
-                <div class="settings-group">
-                    <label class="settings-label">API Key</label>
+                <div class="settings-group" id="apiKeyGroup">
+                    <label class="settings-label">API Key <span style="color: #ef4444;">*</span></label>
                     <input type="password" class="settings-input" id="apiKeyInput" placeholder="Enter your API key...">
                     <div class="settings-hint" id="apiKeyHint">
-                        Get a free API key from <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+                        <a href="https://platform.deepseek.com" target="_blank">Get your DeepSeek API key</a>
                     </div>
                 </div>
 
@@ -468,57 +575,86 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
     </footer>
 
     <script>
-        // Provider configuration
         const PROVIDER_CONFIG = {
-            groq: { name: 'Groq', url: 'https://console.groq.com', models: [
-                { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
-                { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B (Fast)' }
-            ]},
-            gemini: { name: 'Google Gemini', url: 'https://ai.google.dev', models: [
-                { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
-                { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
-            ]},
-            huggingface: { name: 'Hugging Face', url: 'https://huggingface.co/settings/tokens', models: [
-                { value: 'meta-llama/Llama-3.2-3B-Instruct', label: 'Llama 3.2 3B' }
-            ]},
-            openrouter: { name: 'OpenRouter', url: 'https://openrouter.ai/keys', models: [
-                { value: 'meta-llama/llama-3-8b-instruct:free', label: 'Llama 3 8B (FREE)' }
-            ]},
-            deepseek: { name: 'DeepSeek', url: 'https://platform.deepseek.com', models: [
-                { value: 'deepseek-chat', label: 'DeepSeek Chat (Recommended)' }
-            ]},
-            openai: { name: 'OpenAI', url: 'https://platform.openai.com/api-keys', models: [
-                { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' }
-            ]}
+            deepseek: {
+                name: 'DeepSeek',
+                url: 'https://platform.deepseek.com',
+                requiresKey: true,
+                models: [
+                    { value: 'deepseek-chat', label: 'DeepSeek Chat (Recommended)' },
+                    { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' }
+                ]
+            },
+            groq: {
+                name: 'Groq',
+                url: 'https://console.groq.com',
+                requiresKey: true,
+                models: [
+                    { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
+                    { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B (Fast)' }
+                ]
+            },
+            gemini: {
+                name: 'Google Gemini',
+                url: 'https://ai.google.dev',
+                requiresKey: true,
+                models: [
+                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
+                    { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+                ]
+            },
+            openai: {
+                name: 'OpenAI',
+                url: 'https://platform.openai.com/api-keys',
+                requiresKey: true,
+                models: [
+                    { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' },
+                    { value: 'gpt-4o', label: 'GPT-4o' }
+                ]
+            },
+            openrouter: {
+                name: 'OpenRouter',
+                url: 'https://openrouter.ai/keys',
+                requiresKey: true,
+                models: [
+                    { value: 'meta-llama/llama-3-8b-instruct:free', label: 'Llama 3 8B (FREE)' },
+                    { value: 'deepseek/deepseek-chat', label: 'DeepSeek Chat' }
+                ]
+            },
+            ollama: {
+                name: 'Ollama',
+                url: 'https://ollama.ai',
+                requiresKey: false,
+                models: [
+                    { value: 'llama3', label: 'Llama 3' },
+                    { value: 'mistral', label: 'Mistral' },
+                    { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+                ]
+            }
         };
 
-        // Load/Save settings
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('nicobotSettings') || '{}');
-            return { provider: settings.provider || 'groq', apiKey: settings.apiKey || '', model: settings.model || '' };
+            return { provider: settings.provider || 'deepseek', apiKey: settings.apiKey || '', model: settings.model || '' };
         }
 
         function saveSettings(settings) {
             localStorage.setItem('nicobotSettings', JSON.stringify(settings));
         }
 
-        // Panel Navigation
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         const panels = document.querySelectorAll('.content-panel');
 
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 const panelId = item.dataset.panel;
-                
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
-                
                 panels.forEach(panel => {
                     panel.classList.remove('active');
                     if (panel.id === panelId) {
@@ -528,16 +664,50 @@
             });
         });
 
-        // Settings Modal
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsOverlay = document.getElementById('settingsOverlay');
         const settingsClose = document.getElementById('settingsClose');
         const settingsCancel = document.getElementById('settingsCancel');
         const settingsSave = document.getElementById('settingsSave');
         const providerSelect = document.getElementById('providerSelect');
+        const providerCards = document.getElementById('providerCards');
         const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKeyGroup = document.getElementById('apiKeyGroup');
         const modelSelect = document.getElementById('modelSelect');
         const apiKeyHint = document.getElementById('apiKeyHint');
+
+        function selectProviderCard(provider) {
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.provider === provider) {
+                    card.classList.add('selected');
+                }
+            });
+            providerSelect.value = provider;
+            updateModelOptions();
+            updateApiKeyVisibility(provider);
+            const config = PROVIDER_CONFIG[provider];
+            if (config && config.requiresKey) {
+                apiKeyHint.innerHTML = `<a href="${config.url}" target="_blank">Get your ${config.name} API key</a>`;
+            } else if (provider === 'ollama') {
+                apiKeyHint.innerHTML = `<span style="color: #10b981;">No API key needed - Ollama runs locally!</span>`;
+            }
+        }
+
+        function updateApiKeyVisibility(provider) {
+            const config = PROVIDER_CONFIG[provider];
+            if (config && !config.requiresKey) {
+                apiKeyGroup.style.display = 'none';
+            } else {
+                apiKeyGroup.style.display = 'block';
+            }
+        }
+
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', () => {
+                selectProviderCard(card.dataset.provider);
+            });
+        });
 
         function updateModelOptions() {
             const provider = providerSelect.value;
@@ -551,15 +721,13 @@
                     modelSelect.appendChild(option);
                 });
             }
-            apiKeyHint.innerHTML = `Get your API key from <a href="${config?.url || '#'}" target="_blank">${config?.url || 'provider'}</a>`;
         }
 
         async function updateApiStatus() {
             const settings = loadSettings();
             const apiStatus = document.getElementById('apiStatus');
             const apiStatusText = document.getElementById('apiStatusText');
-            
-            // First check if user has configured their own API key
+
             if (settings.apiKey) {
                 apiStatus.classList.remove('disconnected');
                 apiStatus.classList.add('connected');
@@ -567,8 +735,15 @@
                 settingsBtn.classList.add('configured');
                 return;
             }
-            
-            // Check if backend has API keys configured
+
+            if (settings.provider === 'ollama') {
+                apiStatus.classList.remove('disconnected');
+                apiStatus.classList.add('connected');
+                apiStatusText.innerHTML = `Connected to <strong>Ollama (Local)</strong>`;
+                settingsBtn.classList.add('configured');
+                return;
+            }
+
             try {
                 const response = await fetch('/api/llm/status');
                 if (response.ok) {
@@ -585,21 +760,17 @@
             } catch (e) {
                 console.log('Could not check backend LLM status:', e);
             }
-            
-            // No API key available
+
             apiStatus.classList.remove('connected');
             apiStatus.classList.add('disconnected');
             apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
             settingsBtn.classList.remove('configured');
         }
 
-        providerSelect.addEventListener('change', updateModelOptions);
-
         settingsBtn.addEventListener('click', () => {
             const settings = loadSettings();
-            providerSelect.value = settings.provider;
+            selectProviderCard(settings.provider);
             apiKeyInput.value = settings.apiKey;
-            updateModelOptions();
             modelSelect.value = settings.model;
             settingsOverlay.classList.add('active');
         });
@@ -621,7 +792,6 @@
             if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
         });
 
-        // Chat functionality
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
@@ -666,9 +836,6 @@
 
         async function sendMessage(message) {
             const settings = loadSettings();
-            
-            // Allow message if user has API key OR if backend has one configured
-            // The backend will handle the case where no API key is available
 
             addMessage(message, true);
             addTypingIndicator();
@@ -687,7 +854,7 @@
 
                 removeTypingIndicator();
                 const data = await response.json();
-                
+
                 if (data.success) {
                     addMessage(data.response, false);
                 } else {
@@ -699,9 +866,9 @@
             }
         }
 
-        function askQuestion(question) {
-            chatInput.value = question;
-            sendMessage(question);
+        function askQuestion(q) {
+            chatInput.value = q;
+            sendMessage(q);
         }
 
         sendBtn.addEventListener('click', () => {
@@ -719,7 +886,6 @@
             }
         });
 
-        // Initialize
         updateApiStatus();
         updateModelOptions();
     </script>

@@ -6,6 +6,49 @@
     <title>TMC Live | TMC - GenAI Research</title>
     <link rel="stylesheet" href="css/shared.css">
     <style>
+        /* Content Panel - Add padding to prevent touching outer container */
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+
         /* Page-specific styles */
         /* Page-specific styles */
         html { height: auto; min-height: 100vh; }
@@ -25,21 +68,26 @@
         iframe { width: 100%; height: 100%; border: none; }
         
     </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-purple">
 
     <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="../index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -49,10 +97,10 @@
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="../AI/">Artificial Intelligence</a></li>
-                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
-                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../AI/" >Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" class="active-tmc">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
                 </ul>
             </nav>
         </div>

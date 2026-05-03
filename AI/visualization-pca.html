@@ -6,65 +6,118 @@
     <title>PCA Visualization | AI Education - GenAI Research</title>
     <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
+        /* Content Panel - Add padding to prevent touching outer container */
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+
         /* Page-specific styles */
         /* Playground Layout */
         .playground-wrapper { flex: 1 1 auto; display: flex; overflow: hidden; }
         
         /* Control Panel */
-        .control-panel { width: 260px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 16px; overflow-y: auto; flex-shrink: 0; }
-        .control-section { margin-bottom: 20px; }
-        .control-section h3 { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
-        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .control-row label { font-size: 0.8rem; color: var(--text-secondary); }
+        .control-panel { width: 280px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 20px; overflow-y: auto; flex-shrink: 0; }
+        .control-section { margin-bottom: 24px; }
+        .control-section h3 { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .control-row label { font-size: 0.85rem; color: var(--text-secondary); }
         
         /* Toggle Buttons */
-        .toggle-group { display: flex; gap: 4px; flex-wrap: wrap; }
-        .toggle-btn { padding: 5px 10px; font-size: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-main); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
+        .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .toggle-btn { padding: 6px 12px; font-size: 0.8rem; border: 1px solid var(--border-color); background: var(--bg-main); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
         .toggle-btn:hover { background: var(--bg-gray); }
         .toggle-btn.active { background: var(--ai-primary); color: white; border-color: var(--ai-primary); }
         
         /* Stats */
-        .stats-box { background: var(--bg-gray); border-radius: var(--radius); padding: 10px; }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.8rem; }
+        .stats-box { background: var(--bg-gray); border-radius: var(--radius); padding: 14px; border-left: 4px solid var(--ral-primary); }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; }
+        .stat-row:last-child { margin-bottom: 0; }
         .stat-label { color: var(--text-muted); }
-        .stat-value { font-weight: 600; color: var(--ai-primary); }
+        .stat-value { font-weight: 600; color: var(--ral-primary); }
         
         /* Select & Input */
-        select, input[type="number"] { padding: 5px 8px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.8rem; background: var(--bg-main); width: 90px; }
+        select, input[type="number"] { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.85rem; background: var(--bg-main); width: 100px; }
         
         /* Canvas Area */
-        .canvas-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .canvas-area { flex: 1; display: flex; flex-direction: column; position: relative; background: var(--bg-dark); }
         .canvas-container { flex: 1; position: relative; overflow: hidden; }
         #main-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: grab; }
         #main-canvas:active { cursor: grabbing; }
         
         /* Info Panel */
-        .info-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(31, 41, 55, 0.9); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .legend-inline { display: flex; gap: 20px; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: white; }
+        .info-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(31, 41, 55, 0.95); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); }
+        .legend-inline { display: flex; gap: 24px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: white; }
         .legend-color { width: 12px; height: 12px; border-radius: 50%; }
-        .legend-line { width: 20px; height: 3px; border-radius: 2px; }
-        .info-text { font-size: 0.8rem; color: var(--text-muted); }
+        .legend-line { width: 24px; height: 3px; border-radius: 2px; }
+        .info-text { font-size: 0.85rem; color: var(--text-muted); }
         
         /* Tooltip */
-        .tooltip { position: fixed; background: rgba(0, 0, 0, 0.8); color: white; padding: 6px 10px; border-radius: var(--radius); font-size: 0.75rem; pointer-events: none; display: none; z-index: 1000; }
+        .tooltip { position: fixed; background: rgba(0, 0, 0, 0.9); color: white; padding: 8px 12px; border-radius: var(--radius); font-size: 0.8rem; pointer-events: none; display: none; z-index: 1000; }
+        
+        /* Button styles */
+        .btn-block { width: 100%; margin-bottom: 10px; }
+        .btn-block:last-child { margin-bottom: 0; }
         
     </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-blue">
 
     <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="../index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -74,10 +127,10 @@
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="./" class="active">Artificial Intelligence</a></li>
-                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
-                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../AI/" class="active-ai">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" >Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
                 </ul>
             </nav>
         </div>

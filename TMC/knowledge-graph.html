@@ -7,71 +7,778 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Page-specific styles */
+        /* ========================================
+           KNOWLEDGE GRAPH STYLES
+           Clean, minimal design matching design system
+           ======================================== */
+        
+        /* Content Panel */
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+
+        /* ========================================
+           GRAPH AREA
+           ======================================== */
         .graph-area {
             flex: 1;
             background: var(--bg-main);
             position: relative;
             overflow: hidden;
+            order: 2;
         }
-        
+
         #graph-svg {
             width: 100%;
             height: 100%;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* ========================================
+           NODE STYLES
+           ======================================== */
         .node {
             cursor: pointer;
+            transition: filter 0.2s ease;
         }
-        
+
         .node circle {
             stroke-width: 2px;
-            transition: all var(--transition-normal);
+            transition: all 0.2s ease;
         }
-        
+
         .node:hover circle {
             stroke-width: 3px;
             filter: brightness(1.1);
         }
-        
+
         .node.selected circle {
-            stroke-width: 4px;
+            stroke-width: 3px;
             stroke: var(--text-main);
         }
-        
+
         .node text {
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             pointer-events: none;
         }
-        
+
+        /* ========================================
+           EDGE STYLES
+           ======================================== */
         .edge {
-            stroke: #9ca3af;
+            stroke: var(--border-color);
             stroke-width: 1.5px;
             fill: none;
+            transition: stroke-width 0.2s ease, opacity 0.2s ease;
         }
-        
+
+        .edge.highlighted {
+            stroke-width: 2.5px;
+            stroke: var(--section-primary);
+        }
+
+        .edge.dimmed {
+            opacity: 0.2;
+        }
+
         .edge-label {
             font-size: 9px;
             fill: var(--text-muted);
             pointer-events: none;
+            font-weight: 500;
         }
-        
+
+        /* ========================================
+           GRAPH CONTROLS
+           ======================================== */
+        .graph-controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .control-btn:hover {
+            border-color: var(--section-primary);
+            background: var(--section-bg-light);
+        }
+
+        .control-btn svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        .control-btn:hover svg {
+            color: var(--section-primary);
+        }
+
+        /* ========================================
+           MINIMAP
+           ======================================== */
+        .minimap-container {
+            position: absolute;
+            bottom: 24px;
+            left: 396px;
+            width: 180px;
+            height: 130px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .minimap-header {
+            padding: 8px 12px;
+            background: var(--section-bg-light);
+            color: var(--section-primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .minimap-viewport {
+            stroke: var(--section-primary);
+            stroke-width: 2;
+            fill: rgba(139, 92, 246, 0.1);
+            rx: 4;
+        }
+
+        /* ========================================
+           NODE SEARCH
+           ======================================== */
+        .search-container {
+            position: absolute;
+            top: 24px;
+            left: 396px;
+            right: 24px;
+            max-width: 360px;
+            z-index: 100;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 4px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .search-wrapper:focus-within {
+            border-color: var(--section-primary);
+            box-shadow: 0 0 0 3px var(--section-bg-light);
+        }
+
+        .search-icon {
+            padding: 10px;
+            color: var(--text-light);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            outline: none;
+            padding-right: 12px;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border-bottom: 1px solid var(--bg-gray);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--bg-gray);
+        }
+
+        .search-result-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.85rem;
+        }
+
+        .search-result-type {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: capitalize;
+        }
+
+        /* ========================================
+           GRAPH STATS
+           ======================================== */
+        .graph-stats {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .stat-pill .stat-icon {
+            width: 14px;
+            height: 14px;
+            color: var(--section-primary);
+        }
+
+        .stat-pill .stat-value {
+            color: var(--section-primary);
+        }
+
+        /* ========================================
+           LOADING OVERLAY
+           ======================================== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--section-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .loading-subtext {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .loading-progress {
+            width: 180px;
+            height: 3px;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--section-primary);
+            border-radius: 2px;
+            animation: loadingProgress 2s ease-in-out infinite;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; margin-left: 0; }
+            50% { width: 70%; margin-left: 15%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+
+        /* ========================================
+           EMPTY STATE
+           ======================================== */
+        .empty-state {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--section-bg-light);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+        }
+
+        .empty-state-icon svg {
+            width: 48px;
+            height: 48px;
+            color: var(--section-primary);
+        }
+
+        .empty-state h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .empty-state-features {
+            display: flex;
+            gap: 28px;
+            margin-top: 32px;
+        }
+
+        .empty-feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .empty-feature-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-feature-icon svg {
+            width: 20px;
+            height: 20px;
+            color: var(--section-primary);
+        }
+
+        .empty-feature span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ========================================
+           SIDEBAR LEFT
+           ======================================== */
+        .sidebar-left {
+            width: 360px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 72px);
+            order: 1;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: var(--section-bg-light);
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--section-primary);
+        }
+
+        .sidebar-subtitle {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 4px;
+            color: var(--text-main);
+        }
+
+        /* Sidebar sections */
+        .sidebar-section {
+            padding: 16px 20px;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .section-label svg {
+            width: 14px;
+            height: 14px;
+            color: var(--section-primary);
+        }
+
+        /* API Config */
+        .api-config-section {
+            background: var(--bg-gray);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .api-key-wrapper {
+            position: relative;
+        }
+
+        .api-key-input {
+            padding-right: 40px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+        }
+
+        .api-key-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .api-key-toggle:hover {
+            color: var(--section-primary);
+        }
+
+        .provider-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+            appearance: none;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-white);
+        }
+
+        .text-input {
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+        }
+
+        .api-help {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        .api-help a {
+            color: var(--section-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .api-help a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mode tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-gray);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-tab.active {
+            background: var(--bg-white);
+            color: var(--section-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mode-tab:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: var(--section-bg-light);
+            border-color: var(--section-primary);
+            color: var(--section-primary);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            padding-top: 4px;
+        }
+
+        .btn-generate {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--section-primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            background: var(--section-primary-dark);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download:hover:not(:disabled) {
+            border-color: var(--section-primary);
+            background: var(--section-bg-light);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-download svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        .btn-download:hover:not(:disabled) svg {
+            color: var(--section-primary);
+        }
+
+        /* Legend */
+        .legend {
+            background: var(--bg-gray);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .legend-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
         /* Node Details Section */
         .node-details-section {
             padding-top: 16px;
-            border-top: 1px solid var(--border-color);
         }
-        
+
         .node-info-card {
             background: var(--bg-gray);
-            border-radius: var(--radius);
+            border-radius: 10px;
             padding: 14px;
         }
-        
+
         .node-info-card h4 {
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-main);
             margin-bottom: 6px;
             display: flex;
@@ -79,81 +786,179 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-        
+
         .node-type-badge {
             font-size: 0.6rem;
             padding: 3px 8px;
             border-radius: 10px;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        
-        .node-type-badge.reaction { background: var(--bg-blue-light); color: var(--primary); }
-        .node-type-badge.catalyst { background: var(--bg-purple-light); color: var(--secondary); }
-        .node-type-badge.reagent { background: var(--bg-green-light); color: var(--accent); }
-        .node-type-badge.mechanism { background: #fef3c7; color: var(--warning); }
-        .node-type-badge.product { background: #fce7f3; color: var(--pink); }
+
+        .node-type-badge.reaction { background: var(--ai-light); color: var(--ai-primary); }
+        .node-type-badge.catalyst { background: var(--tmc-light); color: var(--tmc-primary); }
+        .node-type-badge.reagent { background: var(--ral-light); color: var(--ral-primary); }
+        .node-type-badge.mechanism { background: #fef3c7; color: #d97706; }
+        .node-type-badge.product { background: #fce7f3; color: #db2777; }
         .node-type-badge.ligand { background: #e0e7ff; color: #4f46e5; }
         .node-type-badge.property { background: #f3e8ff; color: #9333ea; }
         .node-type-badge.concept { background: #cffafe; color: #0891b2; }
-        
+
         .node-info-card p {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             line-height: 1.5;
         }
-        
+
         .ai-explanation {
-            background: var(--bg-blue-light);
-            border-radius: var(--radius);
+            background: var(--section-bg-light);
+            border-radius: 8px;
             padding: 12px;
-            margin-top: 12px;
+            margin-top: 10px;
         }
-        
+
         .ai-explanation-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--primary);
+            font-weight: 700;
+            color: var(--section-primary);
             margin-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
+
         .ai-explanation p {
             font-size: 0.8rem;
             color: var(--text-secondary);
             margin: 0;
             line-height: 1.5;
         }
-        
-        /* Empty state override */
-        .empty-state {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+
+        /* File upload */
+        .btn-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 18px;
+            background: var(--bg-white);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        
-        /* Loading overlay position */
-        .loading-overlay {
+
+        .btn-upload:hover {
+            border-color: var(--section-primary);
+            color: var(--section-primary);
+            background: var(--section-bg-light);
+        }
+
+        .btn-upload.has-file {
+            border-style: solid;
+            border-color: var(--ral-primary);
+            color: var(--ral-primary);
+            background: var(--ral-light);
+        }
+
+        .file-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        /* ========================================
+           TOOLTIP
+           ======================================== */
+        .node-tooltip {
             position: absolute;
+            padding: 10px 14px;
+            background: var(--text-main);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 300;
+            max-width: 220px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .node-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tooltip-title {
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .tooltip-type {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            text-transform: capitalize;
+        }
+
+        /* ========================================
+           RESPONSIVE ADJUSTMENTS
+           ======================================== */
+        @media (max-width: 1200px) {
+            .minimap-container {
+                width: 150px;
+                height: 110px;
+                left: 356px;
+            }
+            
+            .graph-stats {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar-left {
+                width: 320px;
+            }
+            
+            .search-container {
+                left: 336px;
+            }
+            
+            .minimap-container {
+                left: 336px;
+                display: none;
+            }
         }
     </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-purple">
 
     <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="../index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -163,10 +968,10 @@
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="../AI/">Artificial Intelligence</a></li>
-                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
-                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../AI/" >Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" class="active-tmc">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
                 </ul>
             </nav>
         </div>
@@ -174,57 +979,57 @@
 
     <!-- Main Layout -->
     <div class="main-wrapper">
-        <!-- Graph Area -->
-        <main class="graph-area">
-            <svg id="graph-svg"></svg>
-            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">Generating knowledge graph...</div>
-            </div>
-            <div class="empty-state" id="emptyState">
-                <div class="empty-state-icon">🔗</div>
-                <h4>Knowledge Graph Generator</h4>
-                <p>Enter a topic or upload a PDF to generate an interactive knowledge graph powered by AI. Configure your API key in the sidebar to get started.</p>
-            </div>
-        </main>
-
-        <!-- Right Sidebar -->
-        <aside class="sidebar-right">
+        <!-- Left Sidebar -->
+        <aside class="sidebar-left">
             <div class="sidebar-header">
                 <span class="sidebar-title">AI Feature</span>
                 <div class="sidebar-subtitle">Knowledge Graph Generator</div>
             </div>
 
             <!-- API Configuration -->
-            <div class="api-config-section">
-                <label class="section-label">🔑 API Configuration</label>
-                <div class="api-key-wrapper">
-                    <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Enter your API key...">
-                </div>
-                <select class="provider-select" id="providerSelect">
-                    <option value="groq">Groq (FREE tier)</option>
-                    <option value="gemini">Google Gemini (FREE)</option>
-                    <option value="deepseek">DeepSeek</option>
-                    <option value="openai">OpenAI</option>
-                    <option value="openrouter">OpenRouter</option>
-                    <option value="huggingface">HuggingFace (FREE)</option>
-                    <option value="ollama">Ollama (Local)</option>
-                </select>
-                <div class="api-help">
-                    Get your API key: 
-                    <a href="https://console.groq.com" target="_blank">Groq</a> | 
-                    <a href="https://ai.google.dev" target="_blank">Gemini</a> |
-                    <a href="https://platform.deepseek.com" target="_blank">DeepSeek</a>
+            <div class="sidebar-section">
+                <label class="section-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                    </svg>
+                    API Configuration
+                </label>
+                <div class="api-config-section">
+                    <div class="api-key-wrapper">
+                        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Enter your API key...">
+                        <button class="api-key-toggle" onclick="toggleApiKey()" title="Show/Hide API Key">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eyeIcon">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <select class="provider-select" id="providerSelect">
+                        <option value="groq">Groq (FREE tier)</option>
+                        <option value="gemini">Google Gemini (FREE)</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="huggingface">HuggingFace (FREE)</option>
+                        <option value="ollama">Ollama (Local)</option>
+                    </select>
+                    <div class="api-help">
+                        Get your API key: 
+                        <a href="https://console.groq.com" target="_blank">Groq</a> | 
+                        <a href="https://ai.google.dev" target="_blank">Gemini</a> |
+                        <a href="https://platform.deepseek.com" target="_blank">DeepSeek</a>
+                    </div>
                 </div>
             </div>
 
             <!-- Mode Selection -->
-            <div class="mode-selection">
+            <div class="sidebar-section">
                 <label class="section-label">Input Mode</label>
                 <div class="mode-tabs">
                     <button class="mode-tab active" id="tabKeyword" onclick="setMode('keyword')">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                         </svg>
                         Keyword
                     </button>
@@ -239,18 +1044,18 @@
             </div>
 
             <!-- Keyword Input -->
-            <div class="input-section" id="keywordSection">
+            <div class="sidebar-section" id="keywordSection">
                 <label class="section-label">Topic / Keyword</label>
                 <input type="text" class="text-input" id="topicInput" placeholder="e.g., Suzuki coupling, Heck reaction...">
             </div>
 
             <!-- PDF Upload -->
-            <div class="input-section" id="pdfSection" style="display: none;">
+            <div class="sidebar-section" id="pdfSection" style="display: none;">
                 <label class="section-label">Upload PDF Document</label>
                 <div class="file-upload-wrapper">
                     <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handlePdfSelect(event)">
                     <button class="btn-upload" id="uploadBtn" onclick="document.getElementById('pdfInput').click()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="17 8 12 3 7 8"/>
                             <line x1="12" y1="3" x2="12" y2="15"/>
@@ -262,380 +1067,810 @@
             </div>
 
             <!-- Quick Topics -->
-            <div class="quick-actions" id="quickTopics">
-                <button class="quick-btn" onclick="setTopic('Suzuki coupling')">Suzuki</button>
-                <button class="quick-btn" onclick="setTopic('Heck reaction')">Heck</button>
-                <button class="quick-btn" onclick="setTopic('Nickel catalysis')">Nickel</button>
-                <button class="quick-btn" onclick="setTopic('Cross-coupling')">Cross-Coupling</button>
-                <button class="quick-btn" onclick="setTopic('Oxidative addition')">Oxidative Addition</button>
+            <div class="sidebar-section" id="quickTopics">
+                <label class="section-label">Quick Topics</label>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="setTopic('Suzuki coupling')">Suzuki</button>
+                    <button class="quick-btn" onclick="setTopic('Heck reaction')">Heck</button>
+                    <button class="quick-btn" onclick="setTopic('Nickel catalysis')">Nickel</button>
+                    <button class="quick-btn" onclick="setTopic('Cross-coupling')">Cross-Coupling</button>
+                    <button class="quick-btn" onclick="setTopic('Oxidative addition')">Oxidative Addition</button>
+                </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn-generate" id="generateBtn" onclick="generateGraph()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                    </svg>
-                    Generate
-                </button>
-                <button class="btn-download" id="downloadBtn" onclick="downloadGraph()" disabled title="Download graph as JSON">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                </button>
+            <div class="sidebar-section">
+                <div class="action-buttons">
+                    <button class="btn-generate" id="generateBtn" onclick="generateGraph()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        Generate
+                    </button>
+                    <button class="btn-download" id="downloadBtn" onclick="downloadGraph()" disabled title="Download graph as JSON">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-
-            <!-- Status -->
-            <div id="statusBadge"></div>
 
             <!-- Legend -->
-            <div class="legend">
-                <div class="legend-title">Node Types</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--primary);"></div> Reaction</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--secondary);"></div> Catalyst</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--accent);"></div> Reagent</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--warning);"></div> Mechanism</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--pink);"></div> Product</div>
-                <div class="legend-item"><div class="legend-dot" style="background: #0891b2;"></div> Concept</div>
+            <div class="sidebar-section">
+                <div class="legend">
+                    <div class="legend-title">Node Types</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Reaction</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #8b5cf6;"></div> Catalyst</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #10b981;"></div> Reagent</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #f59e0b;"></div> Mechanism</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #ec4899;"></div> Product</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #6366f1;"></div> Ligand</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #9333ea;"></div> Property</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #06b6d4;"></div> Concept</div>
+                </div>
             </div>
 
-            <!-- Node Details -->
-            <div class="node-details-section" id="nodeDetailsSection" style="display: none;">
-                <div class="section-label">Node Details</div>
-                <div class="node-info-card" id="nodeInfoCard">
-                    <h4 id="nodeTitle">-</h4>
-                    <p id="nodeDescription">-</p>
+            <!-- Node Details (shown when node selected) -->
+            <div class="sidebar-section node-details-section" id="nodeDetailsSection" style="display: none;">
+                <label class="section-label">Selected Node</label>
+                <div class="node-info-card">
+                    <h4>
+                        <span id="nodeDetailName">Node Name</span>
+                        <span class="node-type-badge" id="nodeDetailType">type</span>
+                    </h4>
+                    <p id="nodeDetailDesc">Node description will appear here...</p>
                     <div class="ai-explanation" id="aiExplanation" style="display: none;">
-                        <div class="ai-explanation-title">✨ AI Explanation</div>
-                        <p id="explanationText">-</p>
+                        <div class="ai-explanation-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                                <path d="M12 16v-4"/>
+                                <path d="M12 8h.01"/>
+                            </svg>
+                            AI Explanation
+                        </div>
+                        <p id="aiExplanationText">Loading...</p>
                     </div>
                 </div>
             </div>
         </aside>
+
+        <!-- Graph Area -->
+        <div class="graph-area" id="graphArea">
+            <!-- Search Container -->
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <div class="search-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </div>
+                    <input type="text" class="search-input" id="nodeSearchInput" placeholder="Search nodes...">
+                </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+
+            <!-- Graph Stats -->
+            <div class="graph-stats" id="graphStats" style="display: none;">
+                <div class="stat-pill">
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="12" r="8"/>
+                    </svg>
+                    <span>Nodes: </span>
+                    <span class="stat-value" id="nodeCount">0</span>
+                </div>
+                <div class="stat-pill">
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                    <span>Edges: </span>
+                    <span class="stat-value" id="edgeCount">0</span>
+                </div>
+            </div>
+
+            <!-- Graph Controls -->
+            <div class="graph-controls">
+                <button class="control-btn" onclick="zoomIn()" title="Zoom In">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        <line x1="11" y1="8" x2="11" y2="14"/>
+                        <line x1="8" y1="11" x2="14" y2="11"/>
+                    </svg>
+                </button>
+                <button class="control-btn" onclick="zoomOut()" title="Zoom Out">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        <line x1="8" y1="11" x2="14" y2="11"/>
+                    </svg>
+                </button>
+                <button class="control-btn" onclick="fitGraph()" title="Fit to Screen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                    </svg>
+                </button>
+                <button class="control-btn" onclick="resetGraph()" title="Reset View">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Minimap -->
+            <div class="minimap-container" id="minimapContainer" style="display: none;">
+                <div class="minimap-header">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    </svg>
+                    Overview
+                </div>
+                <svg id="minimap-svg" width="100%" height="calc(100% - 28px)"></svg>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="19" cy="6" r="2"/>
+                        <circle cx="5" cy="6" r="2"/>
+                        <circle cx="19" cy="18" r="2"/>
+                        <circle cx="5" cy="18" r="2"/>
+                        <line x1="12" y1="9" x2="12" y2="3"/>
+                        <line x1="14.5" y1="10.5" x2="18" y2="7"/>
+                        <line x1="9.5" y1="10.5" x2="6" y2="7"/>
+                        <line x1="14.5" y1="13.5" x2="18" y2="17"/>
+                        <line x1="9.5" y1="13.5" x2="6" y2="17"/>
+                    </svg>
+                </div>
+                <h4>Knowledge Graph Generator</h4>
+                <p>Enter a topic or upload a PDF to generate an interactive knowledge graph visualization of chemical reactions and concepts.</p>
+                <div class="empty-state-features">
+                    <div class="empty-feature">
+                        <div class="empty-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                        </div>
+                        <span>Keyword Input</span>
+                    </div>
+                    <div class="empty-feature">
+                        <div class="empty-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <span>PDF Analysis</span>
+                    </div>
+                    <div class="empty-feature">
+                        <div class="empty-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <span>AI Powered</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Generating Knowledge Graph</div>
+                <div class="loading-subtext">Analyzing concepts and relationships...</div>
+                <div class="loading-progress">
+                    <div class="loading-progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Graph SVG -->
+            <svg id="graph-svg" style="display: none;"></svg>
+
+            <!-- Tooltip -->
+            <div class="node-tooltip" id="nodeTooltip">
+                <div class="tooltip-title"></div>
+                <div class="tooltip-type"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>Powered by LLM Knowledge Engine | AI in Chemistry Initiative</p>
-    </footer>
-
     <script>
-        // Node type colors
-        const typeColors = {
-            'reaction': '#3b82f6',
-            'catalyst': '#7c3aed',
-            'reagent': '#10b981',
-            'mechanism': '#f59e0b',
-            'product': '#ec4899',
-            'ligand': '#4f46e5',
-            'property': '#9333ea',
-            'concept': '#0891b2',
-            'method': '#059669',
-            'theory': '#7c3aed'
-        };
-
-        // State
-        let currentMode = 'keyword';
-        let currentGraph = null;
-        let selectedPdfFile = null;
+        // ========================================
+        // STATE MANAGEMENT
+        // ========================================
+        let graphData = null;
         let simulation = null;
+        let svg, g, zoom;
+        let currentMode = 'keyword';
+        let selectedNode = null;
 
-        // Set input mode
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('tabKeyword').classList.toggle('active', mode === 'keyword');
-            document.getElementById('tabPdf').classList.toggle('active', mode === 'pdf');
-            document.getElementById('keywordSection').style.display = mode === 'keyword' ? 'block' : 'none';
-            document.getElementById('pdfSection').style.display = mode === 'pdf' ? 'block' : 'none';
-            document.getElementById('quickTopics').style.display = mode === 'keyword' ? 'flex' : 'none';
-        }
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGraph();
+            setupEventListeners();
+        });
 
-        // Set topic from quick buttons
-        function setTopic(topic) {
-            document.getElementById('topicInput').value = topic;
-            generateGraph();
-        }
+        function initializeGraph() {
+            const graphArea = document.getElementById('graphArea');
+            const width = graphArea.clientWidth;
+            const height = graphArea.clientHeight;
 
-        // Handle PDF file selection
-        function handlePdfSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                selectedPdfFile = file;
-                document.getElementById('pdfFileName').textContent = file.name;
-                document.getElementById('uploadBtn').classList.add('has-file');
-                document.getElementById('uploadBtn').innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    ${file.name}
-                `;
-            }
-        }
+            svg = d3.select('#graph-svg')
+                .attr('width', width)
+                .attr('height', height);
 
-        // Generate knowledge graph
-        async function generateGraph() {
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            const provider = document.getElementById('providerSelect').value;
-
-            if (!apiKey && provider !== 'ollama') {
-                showStatus('error', 'Please enter your API key');
-                return;
-            }
-
-            const btn = document.getElementById('generateBtn');
-            const loading = document.getElementById('loadingOverlay');
-            const emptyState = document.getElementById('emptyState');
-
-            btn.disabled = true;
-            loading.style.display = 'flex';
-            emptyState.style.display = 'none';
-
-            try {
-                let response;
-                
-                if (currentMode === 'keyword') {
-                    const topic = document.getElementById('topicInput').value.trim();
-                    if (!topic) {
-                        showStatus('error', 'Please enter a topic');
-                        return;
-                    }
-
-                    loading.querySelector('.loading-text').textContent = 'AI is generating knowledge graph...';
-
-                    response = await fetch('/api/knowledge-graph', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            topic: topic,
-                            provider: provider,
-                            api_key: apiKey,
-                            use_llm: true
-                        })
-                    });
-                } else {
-                    // PDF mode
-                    if (!selectedPdfFile) {
-                        showStatus('error', 'Please select a PDF file');
-                        return;
-                    }
-
-                    loading.querySelector('.loading-text').textContent = 'Extracting knowledge from PDF...';
-
-                    const formData = new FormData();
-                    formData.append('file', selectedPdfFile);
-                    formData.append('provider', provider);
-                    formData.append('api_key', apiKey);
-
-                    response = await fetch('/api/knowledge-graph/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-                }
-
-                const data = await response.json();
-
-                if (data.success) {
-                    currentGraph = data.graph;
-                    renderGraph(data.graph);
-                    document.getElementById('downloadBtn').disabled = false;
-                    showStatus('success', `Generated ${data.graph.nodes.length} nodes`);
-                    
-                    if (data.topic) {
-                        document.getElementById('topicInput').value = data.topic;
-                    }
-                } else {
-                    showStatus('error', data.error || 'Failed to generate graph');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus('error', 'Connection failed. Is the server running?');
-            } finally {
-                btn.disabled = false;
-                loading.style.display = 'none';
-            }
-        }
-
-        // Show status
-        function showStatus(type, message) {
-            const badge = document.getElementById('statusBadge');
-            badge.innerHTML = `<span class="status-badge ${type}">${message}</span>`;
-        }
-
-        // Download graph as JSON
-        function downloadGraph() {
-            if (!currentGraph) return;
-            
-            const dataStr = JSON.stringify(currentGraph, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'knowledge-graph.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // Render graph with D3
-        function renderGraph(data) {
-            const svg = d3.select('#graph-svg');
-            svg.selectAll('*').remove();
-
-            const container = document.querySelector('.graph-area');
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-
-            svg.attr('viewBox', [0, 0, width, height]);
-
-            const g = svg.append('g');
-
-            const zoom = d3.zoom()
-                .scaleExtent([0.3, 3])
+            // Add zoom behavior
+            zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
                 .on('zoom', (event) => {
                     g.attr('transform', event.transform);
                 });
 
             svg.call(zoom);
 
+            // Create main group
+            g = svg.append('g');
+
+            // Add defs for gradients and markers
+            const defs = svg.append('defs');
+            
             // Arrow marker
-            svg.append('defs').append('marker')
+            defs.append('marker')
                 .attr('id', 'arrowhead')
-                .attr('viewBox', '-0 -5 10 10')
-                .attr('refX', 20)
+                .attr('viewBox', '-10 -5 10 10')
+                .attr('refX', -10)
                 .attr('refY', 0)
-                .attr('orient', 'auto')
                 .attr('markerWidth', 6)
                 .attr('markerHeight', 6)
+                .attr('orient', 'auto')
                 .append('path')
-                .attr('d', 'M 0,-5 L 10,0 L 0,5')
-                .attr('fill', '#9ca3af');
+                .attr('d', 'M-10,-5L0,0L-10,5')
+                .attr('fill', '#94a3b8');
+        }
 
+        function setupEventListeners() {
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            // Search functionality
+            const searchInput = document.getElementById('nodeSearchInput');
+            searchInput.addEventListener('input', handleSearch);
+
+            // Enter key to generate
+            document.getElementById('topicInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') generateGraph();
+            });
+
+            // Window resize
+            window.addEventListener('resize', () => {
+                if (svg) {
+                    const graphArea = document.getElementById('graphArea');
+                    svg.attr('width', graphArea.clientWidth)
+                       .attr('height', graphArea.clientHeight);
+                }
+            });
+        }
+
+        // ========================================
+        // MODE SWITCHING
+        // ========================================
+        function setMode(mode) {
+            currentMode = mode;
+            
+            document.getElementById('tabKeyword').classList.toggle('active', mode === 'keyword');
+            document.getElementById('tabPdf').classList.toggle('active', mode === 'pdf');
+            
+            document.getElementById('keywordSection').style.display = mode === 'keyword' ? 'block' : 'none';
+            document.getElementById('pdfSection').style.display = mode === 'pdf' ? 'block' : 'none';
+            document.getElementById('quickTopics').style.display = mode === 'keyword' ? 'block' : 'none';
+        }
+
+        function setTopic(topic) {
+            document.getElementById('topicInput').value = topic;
+        }
+
+        function handlePdfSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('uploadBtn').classList.add('has-file');
+                document.getElementById('pdfFileName').textContent = file.name;
+            }
+        }
+
+        // ========================================
+        // API KEY TOGGLE
+        // ========================================
+        function toggleApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const icon = document.getElementById('eyeIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            }
+        }
+
+        // ========================================
+        // GRAPH GENERATION
+        // ========================================
+        async function generateGraph() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const provider = document.getElementById('providerSelect').value;
+            
+            let input = '';
+            if (currentMode === 'keyword') {
+                input = document.getElementById('topicInput').value.trim();
+                if (!input) {
+                    showStatus('Please enter a topic or keyword', 'error');
+                    return;
+                }
+            } else {
+                const pdfFile = document.getElementById('pdfInput').files[0];
+                if (!pdfFile) {
+                    showStatus('Please select a PDF file', 'error');
+                    return;
+                }
+                // For demo, just use filename
+                input = pdfFile.name.replace('.pdf', '');
+            }
+
+            if (!apiKey) {
+                showStatus('Please enter your API key', 'error');
+                return;
+            }
+
+            // Show loading
+            showLoading(true);
+            hideEmptyState();
+
+            try {
+                const result = await callLLMAPI(provider, apiKey, input);
+                graphData = result;
+                renderGraph(result);
+                showStats(result.nodes.length, result.edges.length);
+                showMinimap();
+                document.getElementById('downloadBtn').disabled = false;
+                showStatus('Graph generated successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating graph:', error);
+                showStatus('Error: ' + error.message, 'error');
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function callLLMAPI(provider, apiKey, input) {
+            const prompts = {
+                groq: {
+                    url: 'https://api.groq.com/openai/v1/chat/completions',
+                    model: 'llama-3.3-70b-versatile',
+                    headers: (key) => ({ 'Authorization': `Bearer ${key}` })
+                },
+                gemini: {
+                    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                    model: 'gemini-2.0-flash',
+                    isGemini: true
+                },
+                deepseek: {
+                    url: 'https://api.deepseek.com/chat/completions',
+                    model: 'deepseek-chat',
+                    headers: (key) => ({ 'Authorization': `Bearer ${key}` })
+                },
+                openai: {
+                    url: 'https://api.openai.com/v1/chat/completions',
+                    model: 'gpt-4o-mini',
+                    headers: (key) => ({ 'Authorization': `Bearer ${key}` })
+                },
+                openrouter: {
+                    url: 'https://openrouter.ai/api/v1/chat/completions',
+                    model: 'meta-llama/llama-3.3-70b-instruct',
+                    headers: (key) => ({ 'Authorization': `Bearer ${key}` })
+                }
+            };
+
+            const systemPrompt = `You are a chemistry knowledge graph expert. Generate a knowledge graph about the given topic related to transition metal catalysis.
+Return ONLY a valid JSON object with this structure:
+{
+  "nodes": [
+    {"id": "unique_id", "name": "Display Name", "type": "reaction|catalyst|reagent|mechanism|product|ligand|property|concept", "description": "Brief description"}
+  ],
+  "edges": [
+    {"source": "source_id", "target": "target_id", "label": "relationship"}
+  ]
+}
+Include 8-15 nodes and 10-20 edges. Focus on chemical reactions, catalysts, mechanisms, and their relationships.`;
+
+            const config = prompts[provider];
+            if (!config) {
+                throw new Error('Unsupported provider');
+            }
+
+            let response;
+            if (config.isGemini) {
+                response = await fetch(config.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `${systemPrompt}\n\nTopic: ${input}`
+                            }]
+                        }]
+                    })
+                });
+            } else {
+                response = await fetch(config.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...config.headers(apiKey)
+                    },
+                    body: JSON.stringify({
+                        model: config.model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: `Topic: ${input}` }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+            }
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            let content;
+            
+            if (config.isGemini) {
+                content = data.candidates[0].content.parts[0].text;
+            } else {
+                content = data.choices[0].message.content;
+            }
+
+            // Extract JSON from response
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                throw new Error('No valid JSON in response');
+            }
+
+            return JSON.parse(jsonMatch[0]);
+        }
+
+        // ========================================
+        // GRAPH RENDERING
+        // ========================================
+        function renderGraph(data) {
+            // Clear previous graph
+            g.selectAll('*').remove();
+
+            const graphArea = document.getElementById('graphArea');
+            const width = graphArea.clientWidth;
+            const height = graphArea.clientHeight;
+
+            // Show SVG, hide empty state
+            document.getElementById('graph-svg').style.display = 'block';
+
+            // Color scale for node types
+            const colorScale = {
+                reaction: '#3b82f6',
+                catalyst: '#8b5cf6',
+                reagent: '#10b981',
+                mechanism: '#f59e0b',
+                product: '#ec4899',
+                ligand: '#6366f1',
+                property: '#9333ea',
+                concept: '#06b6d4'
+            };
+
+            // Create force simulation
             simulation = d3.forceSimulation(data.nodes)
                 .force('link', d3.forceLink(data.edges).id(d => d.id).distance(120))
                 .force('charge', d3.forceManyBody().strength(-400))
                 .force('center', d3.forceCenter(width / 2, height / 2))
-                .force('collision', d3.forceCollide().radius(50));
+                .force('collision', d3.forceCollide().radius(40));
 
-            // Edges
-            const edge = g.append('g')
-                .selectAll('path')
+            // Draw edges
+            const edges = g.append('g')
+                .selectAll('line')
                 .data(data.edges)
-                .join('path')
+                .enter()
+                .append('line')
                 .attr('class', 'edge')
                 .attr('marker-end', 'url(#arrowhead)');
 
-            // Edge labels
-            const edgeLabel = g.append('g')
+            // Draw edge labels
+            const edgeLabels = g.append('g')
                 .selectAll('text')
                 .data(data.edges)
-                .join('text')
+                .enter()
+                .append('text')
                 .attr('class', 'edge-label')
                 .attr('text-anchor', 'middle')
                 .attr('dy', -5)
-                .text(d => d.label);
+                .text(d => d.label || '');
 
-            // Nodes
-            const node = g.append('g')
+            // Draw nodes
+            const nodes = g.append('g')
                 .selectAll('g')
                 .data(data.nodes)
-                .join('g')
+                .enter()
+                .append('g')
                 .attr('class', 'node')
                 .call(d3.drag()
                     .on('start', dragStarted)
                     .on('drag', dragged)
                     .on('end', dragEnded))
-                .on('click', (event, d) => showNodeDetails(d));
+                .on('click', (event, d) => selectNode(d))
+                .on('mouseover', (event, d) => showTooltip(event, d))
+                .on('mouseout', hideTooltip);
 
-            node.append('circle')
-                .attr('r', 24)
-                .attr('fill', d => typeColors[d.type] || '#6b7280')
-                .attr('stroke', '#fff');
+            // Node circles
+            nodes.append('circle')
+                .attr('r', 20)
+                .attr('fill', d => colorScale[d.type] || '#94a3b8')
+                .attr('stroke', d => colorScale[d.type] || '#94a3b8')
+                .attr('stroke-opacity', 0.3);
 
-            node.append('text')
-                .attr('dy', 4)
+            // Node labels
+            nodes.append('text')
+                .attr('dy', 30)
                 .attr('text-anchor', 'middle')
-                .attr('fill', '#fff')
-                .text(d => d.label.substring(0, 3));
+                .text(d => d.name.length > 15 ? d.name.substring(0, 15) + '...' : d.name);
 
+            // Update positions on tick
             simulation.on('tick', () => {
-                edge.attr('d', d => {
-                    const dx = d.target.x - d.source.x;
-                    const dy = d.target.y - d.source.y;
-                    return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
-                });
+                edges
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
 
-                edgeLabel.attr('transform', d => {
-                    const x = (d.source.x + d.target.x) / 2;
-                    const y = (d.source.y + d.target.y) / 2;
-                    return `translate(${x},${y})`;
-                });
+                edgeLabels
+                    .attr('x', d => (d.source.x + d.target.x) / 2)
+                    .attr('y', d => (d.source.y + d.target.y) / 2);
 
-                node.attr('transform', d => `translate(${d.x},${d.y})`);
+                nodes.attr('transform', d => `translate(${d.x},${d.y})`);
             });
 
-            function dragStarted(event, d) {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
+            // Fit graph to view
+            setTimeout(() => fitGraph(), 500);
+        }
+
+        // Drag functions
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // ========================================
+        // GRAPH CONTROLS
+        // ========================================
+        function zoomIn() {
+            svg.transition().call(zoom.scaleBy, 1.3);
+        }
+
+        function zoomOut() {
+            svg.transition().call(zoom.scaleBy, 0.7);
+        }
+
+        function fitGraph() {
+            if (!graphData) return;
+            
+            const graphArea = document.getElementById('graphArea');
+            const width = graphArea.clientWidth;
+            const height = graphArea.clientHeight;
+            
+            const bounds = g.node().getBBox();
+            const dx = bounds.width;
+            const dy = bounds.height;
+            const x = bounds.x + dx / 2;
+            const y = bounds.y + dy / 2;
+            
+            const scale = Math.min(0.9 * width / dx, 0.9 * height / dy, 1.5);
+            const translate = [width / 2 - scale * x, height / 2 - scale * y];
+            
+            svg.transition()
+                .duration(500)
+                .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+        }
+
+        function resetGraph() {
+            svg.transition().call(zoom.transform, d3.zoomIdentity);
+        }
+
+        // ========================================
+        // NODE SELECTION & TOOLTIP
+        // ========================================
+        function selectNode(node) {
+            selectedNode = node;
+            
+            // Update UI
+            document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+            d3.selectAll('.node').filter(d => d.id === node.id).classed('selected', true);
+            
+            // Show details
+            document.getElementById('nodeDetailsSection').style.display = 'block';
+            document.getElementById('nodeDetailName').textContent = node.name;
+            document.getElementById('nodeDetailType').textContent = node.type;
+            document.getElementById('nodeDetailType').className = 'node-type-badge ' + node.type;
+            document.getElementById('nodeDetailDesc').textContent = node.description || 'No description available';
+            
+            // Highlight connected edges
+            d3.selectAll('.edge')
+                .classed('highlighted', d => d.source.id === node.id || d.target.id === node.id)
+                .classed('dimmed', d => d.source.id !== node.id && d.target.id !== node.id);
+        }
+
+        function showTooltip(event, node) {
+            const tooltip = document.getElementById('nodeTooltip');
+            tooltip.querySelector('.tooltip-title').textContent = node.name;
+            tooltip.querySelector('.tooltip-type').textContent = node.type;
+            
+            tooltip.style.left = (event.pageX + 15) + 'px';
+            tooltip.style.top = (event.pageY - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            document.getElementById('nodeTooltip').classList.remove('visible');
+        }
+
+        // ========================================
+        // SEARCH
+        // ========================================
+        function handleSearch(event) {
+            const query = event.target.value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!query || !graphData) {
+                resultsContainer.classList.remove('active');
+                return;
             }
 
-            function dragged(event, d) {
-                d.fx = event.x;
-                d.fy = event.y;
+            const matches = graphData.nodes.filter(n => 
+                n.name.toLowerCase().includes(query) || 
+                n.type.toLowerCase().includes(query)
+            ).slice(0, 10);
+
+            if (matches.length === 0) {
+                resultsContainer.classList.remove('active');
+                return;
             }
 
-            function dragEnded(event, d) {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
+            const colorScale = {
+                reaction: '#3b82f6',
+                catalyst: '#8b5cf6',
+                reagent: '#10b981',
+                mechanism: '#f59e0b',
+                product: '#ec4899',
+                ligand: '#6366f1',
+                property: '#9333ea',
+                concept: '#06b6d4'
+            };
+
+            resultsContainer.innerHTML = matches.map(n => `
+                <div class="search-result-item" onclick="focusNode('${n.id}')">
+                    <div class="search-result-dot" style="background: ${colorScale[n.type] || '#94a3b8'}"></div>
+                    <div class="search-result-info">
+                        <div class="search-result-name">${n.name}</div>
+                        <div class="search-result-type">${n.type}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            resultsContainer.classList.add('active');
+        }
+
+        function focusNode(nodeId) {
+            const node = graphData.nodes.find(n => n.id === nodeId);
+            if (node && node.x && node.y) {
+                const graphArea = document.getElementById('graphArea');
+                const width = graphArea.clientWidth;
+                const height = graphArea.clientHeight;
+                
+                svg.transition()
+                    .duration(500)
+                    .call(zoom.transform, d3.zoomIdentity.translate(width/2 - node.x, height/2 - node.y).scale(1.5));
+                
+                selectNode(node);
+            }
+            document.getElementById('searchResults').classList.remove('active');
+            document.getElementById('nodeSearchInput').value = '';
+        }
+
+        // ========================================
+        // UI HELPERS
+        // ========================================
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('emptyState').style.display = 'flex';
+            document.getElementById('graph-svg').style.display = 'none';
+        }
+
+        function showStats(nodes, edges) {
+            document.getElementById('graphStats').style.display = 'flex';
+            document.getElementById('nodeCount').textContent = nodes;
+            document.getElementById('edgeCount').textContent = edges;
+        }
+
+        function showMinimap() {
+            document.getElementById('minimapContainer').style.display = 'block';
+        }
+
+        function showStatus(message, type) {
+            // Show browser notification
+            showBrowserNotification(message, type);
+        }
+
+        function showBrowserNotification(message, type) {
+            if (!('Notification' in window)) return;
+            
+            if (Notification.permission === 'granted') {
+                new Notification('Knowledge Graph', {
+                    body: message,
+                    icon: type === 'success' ? '✅' : '⚠️',
+                    badge: type === 'success' ? '✅' : '⚠️'
+                });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Knowledge Graph', {
+                            body: message,
+                            icon: type === 'success' ? '✅' : '⚠️'
+                        });
+                    }
+                });
             }
         }
 
-        // Show node details
-        async function showNodeDetails(node) {
-            const section = document.getElementById('nodeDetailsSection');
-            const titleEl = document.getElementById('nodeTitle');
-            const descEl = document.getElementById('nodeDescription');
-            const aiExp = document.getElementById('aiExplanation');
-
-            section.style.display = 'block';
-            titleEl.innerHTML = `${node.label} <span class="node-type-badge ${node.type}">${node.type}</span>`;
-            descEl.textContent = node.description || 'No description available.';
-            aiExp.style.display = 'none';
-
-            // Get AI explanation if API key is provided
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            const provider = document.getElementById('providerSelect').value;
+        function downloadGraph() {
+            if (!graphData) return;
             
-            if (apiKey || provider === 'ollama') {
-                try {
-                    aiExp.style.display = 'block';
-                    document.getElementById('explanationText').textContent = 'Loading explanation...';
-                    
-                    const response = await fetch('/api/explain-node', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            node: node,
-                            provider: provider,
-                            api_key: apiKey
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        document.getElementById('explanationText').textContent = data.explanation;
-                    } else {
-                        document.getElementById('explanationText').textContent = 'Could not generate explanation.';
-                    }
-                } catch (e) {
-                    document.getElementById('explanationText').textContent = 'Failed to get AI explanation.';
-                }
-            }
+            const blob = new Blob([JSON.stringify(graphData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'knowledge-graph.json';
+            a.click();
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

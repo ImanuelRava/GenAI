@@ -6,6 +6,49 @@
     <title>GenAI Research | AI in Chemistry</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Content Panel - Add padding to prevent touching outer container */
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+
         :root {
             --ai-primary: #3b82f6;
             --ai-light: #dbeafe;
@@ -851,6 +894,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="css/header.css">
 </head>
 <body>
 
@@ -860,18 +904,14 @@
             <a href="index.html" class="logo-section">
                 <div class="logo-icon">
                     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6"/>
-                                <stop offset="50%" style="stop-color:#8b5cf6"/>
-                                <stop offset="100%" style="stop-color:#10b981"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="32" cy="32" r="28" stroke="url(#logoGrad1)" stroke-width="3" fill="none"/>
-                        <circle cx="32" cy="22" r="7" fill="#3b82f6"/>
-                        <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
-                        <circle cx="42" cy="40" r="5" fill="#10b981"/>
-                        <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <div class="logo-text">
@@ -1264,11 +1304,14 @@
                     <a href="index.html" class="logo-section" style="margin-bottom: 0;">
                         <div class="logo-icon">
                             <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="32" cy="32" r="28" stroke="url(#logoGrad1)" stroke-width="3" fill="none"/>
-                                <circle cx="32" cy="22" r="7" fill="#3b82f6"/>
-                                <circle cx="22" cy="40" r="5" fill="#8b5cf6"/>
-                                <circle cx="42" cy="40" r="5" fill="#10b981"/>
-                                <path d="M32 29 L22 35 M32 29 L42 35 M22 40 L42 40" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                                <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                                <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                                <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                                <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                                <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                                <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                                <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                                <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="white" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <div class="logo-text">

@@ -37,13 +37,7 @@ ATOM_FEATURES = {
 
 
 def generate_sample_graph(num_nodes: int = 6) -> Dict[str, Any]:
-    """
-    Generate a sample graph for GNN message passing visualization.
-    Returns nodes, edges, and initial features.
-    """
     np.random.seed(42)
-    
-    # Create nodes in a circular layout
     nodes = []
     center_x, center_y = 300, 200
     radius = 120
@@ -58,17 +52,13 @@ def generate_sample_graph(num_nodes: int = 6) -> Dict[str, Any]:
             'state': 'default',
             'message': 0
         })
-    
-    # Create edges (ring + cross connections)
     edges = []
     for i in range(num_nodes):
-        # Ring connections
         edges.append({
             'source': i,
             'target': (i + 1) % num_nodes,
             'type': 'ring'
         })
-        # Cross connections
         if i < num_nodes // 2:
             edges.append({
                 'source': i,
@@ -76,7 +66,6 @@ def generate_sample_graph(num_nodes: int = 6) -> Dict[str, Any]:
                 'type': 'cross'
             })
     
-    # Build adjacency list
     adjacency = {i: [] for i in range(num_nodes)}
     for edge in edges:
         adjacency[edge['source']].append(edge['target'])
@@ -94,14 +83,9 @@ def generate_sample_graph(num_nodes: int = 6) -> Dict[str, Any]:
 
 def simulate_message_passing(nodes: List[Dict], edges: List[Dict], 
                             current_step: int) -> Dict[str, Any]:
-    """
-    Simulate one step of message passing in a GNN.
-    Returns updated nodes and edges with message flow visualization.
-    """
     num_nodes = len(nodes)
     
     if current_step >= num_nodes:
-        # Reset all nodes
         for node in nodes:
             node['state'] = 'default'
             node['feature'] = round(np.random.random(), 3)
@@ -111,16 +95,11 @@ def simulate_message_passing(nodes: List[Dict], edges: List[Dict],
             'message': None,
             'complete': True
         }
-    
-    # Reset edge states
     for edge in edges:
         edge['active'] = False
-    
-    # Process current node
     target_node = nodes[current_step]
     target_node['state'] = 'processing'
-    
-    # Calculate message from neighbors
+
     neighbor_features = []
     message_value = 0
     
@@ -128,14 +107,12 @@ def simulate_message_passing(nodes: List[Dict], edges: List[Dict],
         neighbor = nodes[neighbor_id]
         neighbor_features.append(neighbor['feature'])
         message_value += neighbor['feature']
-        
-        # Activate edge
+
         for edge in edges:
             if (edge['source'] == current_step and edge['target'] == neighbor_id) or \
                (edge['target'] == current_step and edge['source'] == neighbor_id):
                 edge['active'] = True
     
-    # Calculate new feature (mean aggregation + activation)
     new_feature = message_value / len(target_node['neighbors']) if target_node['neighbors'] else 0
     
     message_info = {
@@ -145,8 +122,7 @@ def simulate_message_passing(nodes: List[Dict], edges: List[Dict],
         'message_sum': round(message_value, 3),
         'new_feature': round(new_feature, 3)
     }
-    
-    # Update node after "processing"
+
     target_node['feature'] = round(new_feature, 3)
     target_node['state'] = 'updated'
     
@@ -159,19 +135,12 @@ def simulate_message_passing(nodes: List[Dict], edges: List[Dict],
 
 
 def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
-    """
-    Get molecular graph data for visualization.
-    Returns atoms (nodes) and bonds (edges) with positions.
-    """
     center_x, center_y = 300, 175
     
     if molecule_type == 'benzene':
-        # Benzene ring - C6H6
         radius = 70
         atoms = []
         bonds = []
-        
-        # Carbon atoms in ring
         for i in range(6):
             angle = (i / 6) * 2 * np.pi - np.pi / 2
             atoms.append({
@@ -182,8 +151,6 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
                 'color': ELEMENT_COLORS['C'],
                 'features': ATOM_FEATURES['C']
             })
-        
-        # Hydrogen atoms
         for i in range(6):
             angle = (i / 6) * 2 * np.pi - np.pi / 2
             atoms.append({
@@ -194,8 +161,7 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
                 'color': ELEMENT_COLORS['H'],
                 'features': ATOM_FEATURES['H']
             })
-        
-        # C-C aromatic bonds
+
         for i in range(6):
             bonds.append({
                 'source': i,
@@ -203,7 +169,6 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
                 'type': 'aromatic',
                 'color': '#10b981'
             })
-            # C-H bonds
             bonds.append({
                 'source': i,
                 'target': i + 6,
@@ -226,7 +191,6 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
         }
     
     elif molecule_type == 'ethanol':
-        # Ethanol - CH3CH2OH
         atoms = [
             {'id': 0, 'element': 'C', 'x': center_x - 80, 'y': center_y, 
              'color': ELEMENT_COLORS['C'], 'features': ATOM_FEATURES['C']},
@@ -274,7 +238,6 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
         }
     
     elif molecule_type == 'caffeine':
-        # Simplified caffeine structure
         scale = 0.8
         atoms = [
             {'id': 0, 'element': 'N', 'x': center_x - 60 * scale, 'y': center_y - 60 * scale, 
@@ -332,13 +295,7 @@ def get_molecule_data(molecule_type: str) -> Dict[str, Any]:
 
 
 def get_gnn_embedding_demo() -> Dict[str, Any]:
-    """
-    Generate demo data showing how GNN embeddings evolve through layers.
-    """
     np.random.seed(42)
-    
-    # Simulated node embeddings through 3 GNN layers
-    # Start with random embeddings, progressively separate classes
     num_nodes_per_class = 10
     num_classes = 3
     

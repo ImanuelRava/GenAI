@@ -1,27 +1,11 @@
-"""
-PCA Visualization Module
-Generates data for Principal Component Analysis visualizations
-"""
-
 import numpy as np
 from typing import Dict, List, Any, Tuple
 
 
 def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
-    """
-    Generate 2D data for PCA projection visualization.
-    
-    Args:
-        data_type: 'clusters', 'linear', or 'random'
-        n_samples: Number of data points
-    
-    Returns:
-        Dictionary with data points and PCA results
-    """
     np.random.seed(42)
     
     if data_type == 'clusters':
-        # Two distinct clusters
         n_per_cluster = n_samples // 2
         
         cluster1_x = np.random.randn(n_per_cluster) * 1.5 - 3
@@ -35,23 +19,20 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
         labels = [0] * n_per_cluster + [1] * n_per_cluster
         
     elif data_type == 'linear':
-        # Linear correlation with noise
         t = np.linspace(-4, 4, n_samples)
         X = t + np.random.randn(n_samples) * 0.5
         Y = t * 0.7 + np.random.randn(n_samples) * 0.8
         labels = [0] * n_samples
         
-    else:  # random
+    else:
         X = np.random.randn(n_samples) * 2
         Y = np.random.randn(n_samples) * 2
         labels = [0] * n_samples
-    
-    # Center the data
+
     mean_x, mean_y = np.mean(X), np.mean(Y)
     X_centered = X - mean_x
     Y_centered = Y - mean_y
-    
-    # Compute covariance matrix
+
     cov_xx = np.mean(X_centered ** 2)
     cov_yy = np.mean(Y_centered ** 2)
     cov_xy = np.mean(X_centered * Y_centered)
@@ -104,7 +85,7 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
     for i in range(len(X)):
         data_points.append({
             'x': center_x + X[i] * scale,
-            'y': center_y - Y[i] * scale,  # Flip Y for canvas
+            'y': center_y - Y[i] * scale,
             'label': labels[i]
         })
         projected_points.append({
@@ -132,44 +113,27 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
 
 
 def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
-    """
-    Generate scree plot data for variance explained visualization.
-    
-    Args:
-        num_features: Number of original features
-        data_type: 'structured', 'moderate', or 'random'
-    
-    Returns:
-        Dictionary with eigenvalues and cumulative variance
-    """
     np.random.seed(42)
     
     if data_type == 'structured':
-        # First few components explain most variance
         base_eigenvalues = np.array([5.0, 3.0, 1.5, 0.8, 0.5, 0.3, 0.2, 0.15, 0.1, 0.05])
         
     elif data_type == 'moderate':
-        # More gradual decline
         base_eigenvalues = np.array([3.0, 2.5, 2.0, 1.5, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3])
         
-    else:  # random
-        # Nearly equal eigenvalues
+    else:
         base_eigenvalues = np.array([1.3, 1.2, 1.1, 1.05, 1.0, 0.95, 0.9, 0.85, 0.8, 0.75])
-    
-    # Adjust to requested number of features
+
     if num_features <= 10:
         eigenvalues = base_eigenvalues[:num_features]
     else:
-        # Extend with small values
         eigenvalues = np.concatenate([
             base_eigenvalues,
             np.linspace(0.05, 0.02, num_features - 10)
         ])
     
-    # Normalize to sum to num_features (each original feature has variance 1)
     eigenvalues = eigenvalues * num_features / np.sum(eigenvalues)
     
-    # Calculate variance explained
     total_variance = np.sum(eigenvalues)
     variance_explained = eigenvalues / total_variance * 100
     cumulative_variance = np.cumsum(variance_explained)
@@ -191,19 +155,9 @@ def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
 
 
 def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
-    """
-    Generate PCA visualization for chemistry datasets.
-    
-    Args:
-        dataset: 'drug', 'solvents', or 'elements'
-    
-    Returns:
-        Dictionary with PCA-projected chemistry data
-    """
     np.random.seed(42)
     
     if dataset == 'drug':
-        # Drug molecules with different properties
         molecules = [
             {'name': 'Aspirin', 'class': 'NSAID', 'mw': 180, 'logp': 1.2, 'tpsa': 63},
             {'name': 'Ibuprofen', 'class': 'NSAID', 'mw': 206, 'logp': 3.5, 'tpsa': 37},
@@ -234,7 +188,6 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
         }
         
     elif dataset == 'solvents':
-        # Common solvents
         molecules = [
             {'name': 'Water', 'class': 'Protic', 'mw': 18, 'logp': -0.8, 'tpsa': 25},
             {'name': 'Methanol', 'class': 'Protic', 'mw': 32, 'logp': -0.7, 'tpsa': 20},
@@ -261,8 +214,7 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             'Alkane': '#ef4444'
         }
         
-    else:  # elements
-        # Chemical elements
+    else:
         molecules = [
             {'name': 'H', 'class': 'Nonmetal', 'mw': 1, 'logp': 0, 'tpsa': 0},
             {'name': 'C', 'class': 'Nonmetal', 'mw': 12, 'logp': 0, 'tpsa': 0},

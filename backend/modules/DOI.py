@@ -1,26 +1,15 @@
-# DOI.py
 import requests
 import pdfplumber
 import re
 import logging
 from typing import Tuple, List, Dict, Any, Optional
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------
-USER_AGENT = "CitationNetworkExplorer/1.0 (mailto:user@example.com)"
+USER_AGENT = "GenAI-Research-Platform/1.0"
 HEADERS = {'User-Agent': USER_AGENT}
 
-# ---------------------------------------------------------
-# DOI Extraction
-# ---------------------------------------------------------
 def extract_doi_from_pdf(pdf_path) -> str:
-    """
-    Extracts the first found DOI from a PDF file.
-    """
     doi_pattern = r'10\.\d{4,9}/[-._;()/:A-Z0-9]+'
     
     with pdfplumber.open(pdf_path) as pdf:
@@ -33,34 +22,22 @@ def extract_doi_from_pdf(pdf_path) -> str:
                     return doi.rstrip('.;,)')
     raise ValueError("No DOI found in the PDF.")
 
-# ---------------------------------------------------------
-# Paper Details Fetching (Cached)
-# ---------------------------------------------------------
 def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
-    """
-    Fetches author, year, citation count, references, and title for a DOI.
-    Cached to minimize API calls.
-    Returns: (author, year, citations, references, title)
-    """
     url = f"https://api.crossref.org/works/{doi}"
     try:
         resp = requests.get(url, timeout=15, headers=HEADERS)
         resp.raise_for_status()
         
         msg = resp.json()['message']
-
-        # Year
         date_info = msg.get('published-print') or msg.get('published-online') or msg.get('published', {})
         year = date_info.get('date-parts', [[None]])[0][0]
 
-        # Author (Last author)
         authors = msg.get('author', [])
         author = "Unknown"
         if authors:
             last_author = authors[-1]
             author = last_author.get('family') or last_author.get('name') or "Unknown"
 
-        # Title
         title_list = msg.get('title', [])
         title = title_list[0] if title_list else "No Title"
 
@@ -75,19 +52,12 @@ def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
         logger.error(f"Error fetching {doi}: {e}")
         raise RuntimeError(f"Error fetching {doi}: {e}")
 
-# ---------------------------------------------------------
-# Cross-Reference Logic
-# ---------------------------------------------------------
 def get_referenced_dois(references: List) -> List[str]:
     if not references: return []
     return [ref['DOI'] for ref in references if ref and 'DOI' in ref]
 
 def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, Any]]:
-    """Fetches papers that cite the given DOI using OpenAlex API."""
     base_url = "https://api.openalex.org"
-    
-    # Step 1: Get OpenAlex ID for the DOI
-    # We use a generic search to get the ID first to ensure the filter works
     search_url = f"{base_url}/works/doi:{doi}"
     
     try:

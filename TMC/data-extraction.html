@@ -5,40 +5,753 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Extraction | TMC - GenAI Research</title>
     <link rel="stylesheet" href="css/shared.css">
-    <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Page-specific styles */
+        /* Content Panel - Add padding to prevent touching outer container */
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+
         /* Page-specific styles */
         html { height: auto; min-height: 100vh; }
         body { min-height: 100vh; }
         
-        .iframe-container { flex: 1; position: relative; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* Clean Sidebar Styles */
+        .sidebar-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 0;
+            border-top: none;
+        }
+        .sidebar-section:first-child {
+            padding-top: 20px;
+        }
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
         
-        .step-list { list-style: none; }
-        .step-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-gray); border-radius: var(--radius); border-left: 4px solid var(--ral-primary); }
-        .step-number { width: 32px; height: 32px; background: var(--ral-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
-        .step-content h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-        .step-content p { margin-bottom: 0; font-size: 0.85rem; }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--tmc-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         
-        .sidebar-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .sidebar-section-title svg {
+            width: 14px;
+            height: 14px;
+        }
         
+        .sidebar-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .info-box {
+            background: var(--tmc-light);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        
+        .info-box h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--tmc-primary);
+            margin-bottom: 4px;
+        }
+        
+        .info-box p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        /* Step Flow - Compact */
+        .step-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .step-flow-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-gray);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .step-flow-item:hover {
+            background: var(--tmc-light);
+        }
+        
+        .step-flow-number {
+            width: 24px;
+            height: 24px;
+            background: var(--tmc-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-flow-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        
+        .step-flow-arrow {
+            display: flex;
+            justify-content: center;
+            padding: 2px 0;
+        }
+        
+        .step-flow-arrow svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-light);
+        }
+        
+        /* Data List - Clean */
+        .data-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .data-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: var(--bg-gray);
+            border-radius: 6px;
+            border-left: 3px solid var(--tmc-primary);
+            transition: all 0.2s ease;
+        }
+        
+        .data-list-item:hover {
+            background: var(--tmc-light);
+        }
+        
+        .data-list-item svg {
+            width: 16px;
+            height: 16px;
+            color: var(--tmc-primary);
+            flex-shrink: 0;
+        }
+        
+        .data-list-content h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+        
+        .data-list-content p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 2px 0 0 0;
+        }
+
+        /* Extraction Tool Styles */
+        .extraction-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 100%;
+            padding-bottom: 40px;
+        }
+
+        .input-section {
+            background: var(--bg-gray);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .input-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .provider-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .provider-btn {
+            padding: 10px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .provider-btn:hover {
+            border-color: var(--tmc-primary);
+        }
+
+        .provider-btn.active {
+            background: var(--tmc-primary);
+            border-color: var(--tmc-primary);
+            color: white;
+        }
+
+        .provider-btn .provider-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .provider-btn.active .provider-desc {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Mode Selector Styles */
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--tmc-primary);
+            background: var(--tmc-light);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-color: var(--tmc-primary);
+            color: white;
+        }
+
+        .mode-btn svg {
+            margin-bottom: 4px;
+        }
+
+        .mode-btn span {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .mode-btn small {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .mode-btn.active small {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .input-section-mode {
+            margin-bottom: 16px;
+        }
+
+        .api-key-section {
+            margin-bottom: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .api-key-section label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .api-key-section label .required {
+            color: #ef4444;
+        }
+
+        .api-key-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .api-key-input-wrapper input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .api-key-input-wrapper input:focus {
+            outline: none;
+            border-color: var(--tmc-primary);
+        }
+
+        .toggle-visibility {
+            padding: 8px 12px;
+            background: var(--bg-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .toggle-visibility:hover {
+            background: var(--tmc-light);
+        }
+
+        .api-key-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .api-key-hint a {
+            color: var(--tmc-primary);
+        }
+
+        .model-select-area {
+            margin-bottom: 16px;
+        }
+
+        .model-select-area label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .model-select-area select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .model-select-area select:focus {
+            outline: none;
+            border-color: var(--tmc-primary);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--tmc-primary);
+            background: var(--tmc-light);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--tmc-primary);
+            background: var(--tmc-light);
+        }
+
+        .file-upload-area svg {
+            width: 48px;
+            height: 48px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .file-upload-area p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .file-upload-area .file-name {
+            color: var(--tmc-primary);
+            font-weight: 600;
+        }
+
+        .text-input-area {
+            margin-bottom: 16px;
+        }
+
+        .text-input-area textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .text-input-area textarea:focus {
+            outline: none;
+            border-color: var(--tmc-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px 24px;
+            background: var(--tmc-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #7c3aed;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: white;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--tmc-primary);
+            color: var(--tmc-primary);
+        }
+
+        /* Results Section - VERY VISIBLE */
+        .results-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: 16px;
+            border: 4px solid #8b5cf6;
+            overflow: hidden;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+            margin-top: 20px;
+        }
+
+        .results-section.has-data {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            animation: pulse-border 2s ease-in-out;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.5); }
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: none;
+        }
+
+        .results-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results-header h3 svg {
+            stroke: white;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-json-btn {
+            padding: 10px 18px;
+            background: white;
+            color: #8b5cf6;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-json-btn:hover {
+            background: #f0fdf4;
+            color: #10b981;
+            transform: translateY(-1px);
+        }
+
+        .export-btn {
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: white;
+            color: #8b5cf6;
+        }
+
+        .results-content {
+            padding: 20px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .result-category {
+            margin-bottom: 20px;
+        }
+
+        .result-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-category h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--tmc-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .result-tag {
+            padding: 6px 12px;
+            background: var(--tmc-light);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        .result-detail {
+            padding: 12px;
+            background: var(--bg-gray);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .result-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-detail-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-detail-value {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status message */
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .status-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status-message.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-message.info {
+            background: var(--tmc-light);
+            color: var(--tmc-primary);
+            border: 1px solid var(--tmc-primary);
+        }
+
+        .status-message.warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fcd34d;
+        }
+
     </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-purple">
 
     <!-- Header -->
     <header>
-        <div class="container header-layout">
+        <div class="header-inner">
             <a href="../index.html" class="logo-section">
-                <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="32" r="30" stroke="#3b82f6" stroke-width="2"/>
-                    <circle cx="32" cy="24" r="8" fill="#3b82f6"/>
-                    <circle cx="24" cy="40" r="6" fill="#7c3aed"/>
-                    <circle cx="40" cy="40" r="6" fill="#10b981"/>
-                    <line x1="32" y1="32" x2="24" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                    <line x1="32" y1="32" x2="40" y2="34" stroke="#3b82f6" stroke-width="2"/>
-                </svg>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
                     <span class="logo-title">GenAI Research</span>
                     <span class="logo-subtitle">Innovate & Discover</span>
@@ -48,10 +761,10 @@
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="../AI/">Artificial Intelligence</a></li>
-                    <li><a href="./" class="active">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
-                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../AI/" >Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" class="active-tmc">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
                 </ul>
             </nav>
         </div>
@@ -62,88 +775,396 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-section">
-                <div class="sidebar-section-title">About This Tool</div>
-                <p class="sidebar-text">Automated extraction of chemical reaction data from scientific literature using PDF parsing and natural language processing.</p>
-                
+                <div class="sidebar-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    About This Tool
+                </div>
+                <p class="sidebar-text">AI-powered extraction of chemical reaction data from scientific literature. Bring your own API key for the LLM provider of your choice.</p>
                 <div class="info-box">
-                    <h4>OpenChemie App</h4>
-                    <p>Advanced NLP algorithms and chemical entity recognition to parse PDF documents.</p>
+                    <h4>BYO API Key</h4>
+                    <p>Your API key is sent directly to the LLM provider and is not stored on our servers.</p>
                 </div>
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-section-title">How It Works</div>
-                <ul class="step-list">
-                    <li class="step-item">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Upload PDF</h4>
-                            <p>Upload your scientific paper or article</p>
-                        </div>
-                    </li>
-                    <li class="step-item">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>AI Analysis</h4>
-                            <p>NLP extracts chemical entities and data</p>
-                        </div>
-                    </li>
-                    <li class="step-item">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Extract Data</h4>
-                            <p>Get structured reaction information</p>
-                        </div>
-                    </li>
-                    <li class="step-item">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Export Results</h4>
-                            <p>Download data in various formats</p>
-                        </div>
-                    </li>
-                </ul>
+                <div class="sidebar-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    How It Works
+                </div>
+                <div class="step-flow">
+                    <div class="step-flow-item">
+                        <div class="step-flow-number">1</div>
+                        <span class="step-flow-text">Select Provider & Enter API Key</span>
+                    </div>
+                    <div class="step-flow-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <polyline points="19 12 12 19 5 12"/>
+                        </svg>
+                    </div>
+                    <div class="step-flow-item">
+                        <div class="step-flow-number">2</div>
+                        <span class="step-flow-text">Upload PDF or Text</span>
+                    </div>
+                    <div class="step-flow-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <polyline points="19 12 12 19 5 12"/>
+                        </svg>
+                    </div>
+                    <div class="step-flow-item">
+                        <div class="step-flow-number">3</div>
+                        <span class="step-flow-text">AI Extraction</span>
+                    </div>
+                    <div class="step-flow-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <polyline points="19 12 12 19 5 12"/>
+                        </svg>
+                    </div>
+                    <div class="step-flow-item">
+                        <div class="step-flow-number">4</div>
+                        <span class="step-flow-text">Export Results</span>
+                    </div>
+                </div>
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-section-title">Extracted Data</div>
-                <ul class="step-list">
-                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
-                        <div class="step-content">
+                <div class="sidebar-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Extracted Data
+                </div>
+                <div class="data-list">
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 2v4"/>
+                            <path d="M12 18v4"/>
+                        </svg>
+                        <div class="data-list-content">
                             <h4>Reactants & Products</h4>
                             <p>Chemical structures and compounds</p>
                         </div>
-                    </li>
-                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
-                        <div class="step-content">
+                    </div>
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+                        </svg>
+                        <div class="data-list-content">
                             <h4>Reaction Conditions</h4>
                             <p>Temperature, time, solvents</p>
                         </div>
-                    </li>
-                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
-                        <div class="step-content">
+                    </div>
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 2v7.31"/>
+                            <path d="M14 9.3V1.99"/>
+                            <path d="M8.5 2h7"/>
+                            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"/>
+                        </svg>
+                        <div class="data-list-content">
                             <h4>Catalysts & Ligands</h4>
                             <p>Metal catalysts and ligand systems</p>
                         </div>
-                    </li>
-                    <li class="step-item" style="padding: 8px 0; border-bottom: none;">
-                        <div class="step-content">
+                    </div>
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <div class="data-list-content">
                             <h4>Yields & Selectivity</h4>
                             <p>Reaction outcomes and metrics</p>
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
         </aside>
 
         <!-- Content Area -->
         <main class="content-area">
             <div class="content-header">
-                <h2>OpenChemie Extraction Tool</h2>
-                <p>Extract structured chemical data from PDF documents</p>
+                <h2>Chemical Data Extraction Tool</h2>
+                <p>Extract structured chemical reaction data using AI-powered LLM analysis</p>
             </div>
-            <div class="iframe-container">
-                <iframe src="https://openchemie-app.streamlit.app/?embed=true" allow-scripts allow-same-origin></iframe>
+            
+            <div class="extraction-container">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h3>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                        Select LLM Provider
+                    </h3>
+                    <div class="provider-selector" id="providerSelector">
+                        <button class="provider-btn active" data-provider="deepseek">
+                            DeepSeek
+                            <span class="provider-desc">Cost-effective • Vision</span>
+                        </button>
+                        <button class="provider-btn" data-provider="openai">
+                            OpenAI
+                            <span class="provider-desc">GPT-4o • Vision</span>
+                        </button>
+                        <button class="provider-btn" data-provider="gemini">
+                            Gemini
+                            <span class="provider-desc">Google AI • Vision</span>
+                        </button>
+                        <button class="provider-btn" data-provider="groq">
+                            Groq
+                            <span class="provider-desc">Ultra fast</span>
+                        </button>
+                        <button class="provider-btn" data-provider="ollama">
+                            Ollama
+                            <span class="provider-desc">Local (No key)</span>
+                        </button>
+                        <button class="provider-btn" data-provider="anthropic">
+                            Anthropic
+                            <span class="provider-desc">Claude • Vision</span>
+                        </button>
+                    </div>
+
+                    <!-- API Key Input -->
+                    <div class="api-key-section" id="apiKeySection">
+                        <label>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                            </svg>
+                            API Key <span class="required">*</span>
+                        </label>
+                        <div class="api-key-input-wrapper">
+                            <input type="password" id="apiKeyInput" placeholder="Enter your API key...">
+                            <button class="toggle-visibility" id="toggleVisibility" title="Toggle visibility">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="api-key-hint" id="apiKeyHint">
+                            Get your DeepSeek API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a>
+                        </p>
+                    </div>
+
+                    <div class="model-select-area">
+                        <label for="modelSelect">Model (optional - leave empty for default)</label>
+                        <select id="modelSelect">
+                            <option value="">Default Model</option>
+                            <!-- DeepSeek -->
+                            <optgroup label="DeepSeek" data-provider="deepseek">
+                                <option value="deepseek-chat">DeepSeek Chat</option>
+                                <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+                            </optgroup>
+                            <!-- OpenAI -->
+                            <optgroup label="OpenAI" data-provider="openai">
+                                <option value="gpt-4o">GPT-4o</option>
+                                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                            </optgroup>
+                            <!-- Gemini -->
+                            <optgroup label="Gemini" data-provider="gemini">
+                                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                            </optgroup>
+                            <!-- Groq -->
+                            <optgroup label="Groq" data-provider="groq">
+                                <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                                <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+                            </optgroup>
+                            <!-- Ollama -->
+                            <optgroup label="Ollama" data-provider="ollama">
+                                <option value="llama3">Llama 3</option>
+                                <option value="mistral">Mistral</option>
+                            </optgroup>
+                            <!-- Anthropic -->
+                            <optgroup label="Anthropic" data-provider="anthropic">
+                                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                                <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Extraction Mode Selector -->
+                    <h3>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        Extraction Mode
+                    </h3>
+                    <div class="mode-selector" id="modeSelector">
+                        <button class="mode-btn" data-mode="text">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                            <span>From Text</span>
+                            <small>Paste or type text</small>
+                        </button>
+                        <button class="mode-btn active" data-mode="pdf">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span>From PDF</span>
+                            <small>Upload a PDF file</small>
+                        </button>
+                    </div>
+
+                    <!-- Text Input Section -->
+                    <div class="input-section-mode" id="textInputSection" style="display: none;">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                            Enter Text
+                        </h3>
+                        <div class="text-input-area">
+                            <textarea id="textInput" placeholder="Paste scientific text containing chemical reaction data here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- PDF Input Section -->
+                    <div class="input-section-mode" id="pdfInputSection">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            Upload PDF Document
+                        </h3>
+                        <div class="file-upload-area" id="dropZone">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p>Drag & drop PDF file here or <span class="file-name">click to browse</span></p>
+                            <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+                        </div>
+                        
+                        <!-- PDF Content Preview -->
+                        <div id="pdfPreview" style="display: none; margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                    </svg>
+                                    <span id="pdfPreviewTitle">PDF Content Preview</span>
+                                </span>
+                                <button id="togglePdfPreview" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+                                    Collapse
+                                </button>
+                            </div>
+                            <div id="pdfPreviewContent" style="padding: 16px; max-height: 300px; overflow-y: auto;">
+                                <pre id="pdfPreviewText" style="white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 0.85rem; color: #334155; margin: 0;"></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Vision Extraction Option -->
+                        <div class="vision-option" id="visionOption" style="display: none; background: linear-gradient(135deg, #ede9fe 0%, #f8fafc 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 16px; margin-top: 16px;">
+                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                                <input type="checkbox" id="enableVision" style="width: 20px; height: 20px; margin-top: 2px; accent-color: #8b5cf6;">
+                                <div>
+                                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        Extract from Images (Vision AI)
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #64748b;">
+                                        Analyze chemical structures, reaction schemes, and tables in PDF images. 
+                                        <strong>Requires DeepSeek, OpenAI, Gemini, or Anthropic.</strong>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- ChemExtract AI Option -->
+                        <div class="vision-option" id="chemextractOption" style="display: none; background: linear-gradient(135deg, #dbeafe 0%, #f8fafc 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin-top: 16px;">
+                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                                <input type="checkbox" id="enableChemExtract" style="width: 20px; height: 20px; margin-top: 2px; accent-color: #3b82f6;">
+                                <div>
+                                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                            <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4"/>
+                                        </svg>
+                                        ChemExtract AI (Recommended)
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #64748b;">
+                                        Comprehensive multimodal extraction: combines text + image analysis, figure/table detection, and SMILES extraction.
+                                        <strong>Advanced AI-powered chemistry extraction. Best for scientific papers.</strong>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="extractBtn">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            Extract Data
+                        </button>
+                        <button class="btn-secondary" id="clearBtn">Clear</button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                            Extraction Results
+                        </h3>
+                        <div class="export-buttons">
+                            <button class="view-json-btn" id="viewJsonBtn">View Raw JSON</button>
+                            <button class="export-btn" id="exportJsonBtn">Export JSON</button>
+                        </div>
+                    </div>
+                    <div class="results-content" id="resultsContent">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <p>Select a mode and enter your API key to extract chemical data</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -152,5 +1173,1122 @@
     <footer>
         <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
     </footer>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:5000';
+
+        // Provider API key URLs
+        const PROVIDER_INFO = {
+            deepseek: {
+                name: 'DeepSeek',
+                keyUrl: 'https://platform.deepseek.com/',
+                needsKey: true
+            },
+            openai: {
+                name: 'OpenAI',
+                keyUrl: 'https://platform.openai.com/api-keys',
+                needsKey: true
+            },
+            gemini: {
+                name: 'Gemini',
+                keyUrl: 'https://aistudio.google.com/app/apikey',
+                needsKey: true
+            },
+            groq: {
+                name: 'Groq',
+                keyUrl: 'https://console.groq.com/keys',
+                needsKey: true
+            },
+            ollama: {
+                name: 'Ollama',
+                keyUrl: null,
+                needsKey: false
+            },
+            anthropic: {
+                name: 'Anthropic',
+                keyUrl: 'https://console.anthropic.com/settings/keys',
+                needsKey: true
+            }
+        };
+
+        // State
+        let selectedProvider = 'deepseek';
+        let selectedModel = '';
+        let extractionMode = 'pdf';  // 'text' or 'pdf'
+        let extractedData = null;
+        let pdfText = '';
+        let uploadedPdfFile = null;  // Store the PDF file for vision extraction
+
+        // Vision-capable providers
+        const VISION_PROVIDERS = ['deepseek', 'openai', 'gemini', 'anthropic'];
+
+        // DOM Elements
+        const providerSelector = document.getElementById('providerSelector');
+        const modelSelect = document.getElementById('modelSelect');
+        const apiKeySection = document.getElementById('apiKeySection');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKeyHint = document.getElementById('apiKeyHint');
+        const toggleVisibility = document.getElementById('toggleVisibility');
+        const modeSelector = document.getElementById('modeSelector');
+        const textInputSection = document.getElementById('textInputSection');
+        const pdfInputSection = document.getElementById('pdfInputSection');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const textInput = document.getElementById('textInput');
+        const extractBtn = document.getElementById('extractBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultsContent = document.getElementById('resultsContent');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
+        const viewJsonBtn = document.getElementById('viewJsonBtn');
+        const visionOption = document.getElementById('visionOption');
+        const enableVision = document.getElementById('enableVision');
+        const chemextractOption = document.getElementById('chemextractOption');
+        const enableChemExtract = document.getElementById('enableChemExtract');
+        
+        // PDF Preview elements
+        const pdfPreview = document.getElementById('pdfPreview');
+        const pdfPreviewTitle = document.getElementById('pdfPreviewTitle');
+        const pdfPreviewText = document.getElementById('pdfPreviewText');
+        const pdfPreviewContent = document.getElementById('pdfPreviewContent');
+        const togglePdfPreview = document.getElementById('togglePdfPreview');
+        let pdfPreviewExpanded = true;
+
+        // Mode Selection - Switch between Text and PDF
+        modeSelector.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mode-btn');
+            if (btn) {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                extractionMode = btn.dataset.mode;
+                updateInputSections();
+            }
+        });
+
+        // Update input sections based on mode
+        function updateInputSections() {
+            if (extractionMode === 'text') {
+                textInputSection.style.display = 'block';
+                pdfInputSection.style.display = 'none';
+            } else {
+                textInputSection.style.display = 'none';
+                pdfInputSection.style.display = 'block';
+                // Show vision option if provider supports it
+                updateVisionOption();
+            }
+        }
+
+        // Provider Selection
+        providerSelector.addEventListener('click', (e) => {
+            const btn = e.target.closest('.provider-btn');
+            if (btn) {
+                document.querySelectorAll('.provider-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedProvider = btn.dataset.provider;
+                updateApiKeySection();
+            }
+        });
+
+        // Update API Key section based on provider
+        function updateApiKeySection() {
+            const info = PROVIDER_INFO[selectedProvider];
+            
+            if (info.needsKey) {
+                apiKeySection.style.display = 'block';
+                apiKeyHint.innerHTML = `Get your ${info.name} API key at <a href="${info.keyUrl}" target="_blank">${info.keyUrl}</a>`;
+            } else {
+                apiKeySection.style.display = 'none';
+            }
+            
+            // Also update vision option visibility
+            updateVisionOption();
+        }
+
+        // Update Vision option visibility based on provider
+        function updateVisionOption() {
+            if (extractionMode === 'pdf' && VISION_PROVIDERS.includes(selectedProvider)) {
+                visionOption.style.display = 'block';
+                chemextractOption.style.display = 'block';
+            } else {
+                visionOption.style.display = 'none';
+                chemextractOption.style.display = 'none';
+                if (enableVision) enableVision.checked = false;
+                if (enableChemExtract) enableChemExtract.checked = false;
+            }
+        }
+
+        // Toggle API Key visibility
+        toggleVisibility.addEventListener('click', () => {
+            const type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            apiKeyInput.type = type;
+        });
+
+        // Model Selection
+        modelSelect.addEventListener('change', (e) => {
+            selectedModel = e.target.value;
+        });
+
+        // File Upload - Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.pdf')) {
+                handleFileUpload(file);
+            } else {
+                showStatus('Please upload a PDF file', 'error');
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        async function handleFileUpload(file) {
+            // Store the file for potential vision extraction
+            uploadedPdfFile = file;
+            
+            showStatus('Processing PDF...', 'info');
+            
+            // Update drop zone to show file name (preserve the file input element)
+            const dropText = dropZone.querySelector('p');
+            if (dropText) {
+                dropText.innerHTML = `<span class="file-name">${file.name}</span>`;
+            }
+
+            // Show vision and ChemExtract options when a PDF is uploaded
+            // (updateVisionOption will handle visibility based on provider)
+            if (VISION_PROVIDERS.includes(selectedProvider)) {
+                visionOption.style.display = 'block';
+                chemextractOption.style.display = 'block';
+            } else {
+                // Still show the options but they will be styled to indicate provider requirement
+                visionOption.style.display = 'block';
+                chemextractOption.style.display = 'block';
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/extract/pdf`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    pdfText = data.text;
+                    textInput.value = data.text;
+                    
+                    // Show PDF preview
+                    pdfPreviewTitle.textContent = `${file.name} (${data.metadata.pages} pages, ${data.text_length} characters)`;
+                    pdfPreviewText.textContent = data.text.substring(0, 5000) + (data.text.length > 5000 ? '\n\n... (truncated, showing first 5000 characters)' : '');
+                    pdfPreview.style.display = 'block';
+                    pdfPreviewContent.style.display = 'block';
+                    pdfPreviewExpanded = true;
+                    togglePdfPreview.textContent = 'Collapse';
+                    
+                    showStatus(`PDF processed: ${data.metadata.pages} pages extracted. Check "Extract from Images" for vision analysis.`, 'success');
+                } else {
+                    showStatus(data.error || 'Failed to process PDF', 'error');
+                    pdfPreview.style.display = 'none';
+                }
+            } catch (error) {
+                showStatus('Error uploading PDF: ' + error.message, 'error');
+                pdfPreview.style.display = 'none';
+            }
+        }
+        
+        // Toggle PDF preview collapse/expand
+        togglePdfPreview.addEventListener('click', () => {
+            pdfPreviewExpanded = !pdfPreviewExpanded;
+            pdfPreviewContent.style.display = pdfPreviewExpanded ? 'block' : 'none';
+            togglePdfPreview.textContent = pdfPreviewExpanded ? 'Collapse' : 'Expand';
+        });
+
+        // Extract Data
+        extractBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            const info = PROVIDER_INFO[selectedProvider];
+            const useVision = enableVision && enableVision.checked;
+            const useChemExtract = enableChemExtract && enableChemExtract.checked;
+            
+            // Validate
+            if (info.needsKey && !apiKey) {
+                showStatus('Please enter your API key', 'error');
+                return;
+            }
+            
+            // Validate based on extraction mode
+            if (extractionMode === 'text') {
+                if (!text) {
+                    showStatus('Please enter some text to extract from', 'error');
+                    return;
+                }
+            } else if (extractionMode === 'pdf') {
+                if (!uploadedPdfFile) {
+                    showStatus('Please upload a PDF file', 'error');
+                    return;
+                }
+                // If vision or ChemExtract is enabled, check for vision-capable provider
+                if ((useVision || useChemExtract) && !VISION_PROVIDERS.includes(selectedProvider)) {
+                    showStatus('Vision/ChemExtract AI requires DeepSeek, OpenAI, Gemini, or Anthropic. Please select one of these providers.', 'error');
+                    return;
+                }
+            }
+
+            extractBtn.disabled = true;
+            extractBtn.innerHTML = '<span class="loading-spinner"></span> Extracting...';
+            
+            try {
+                let data;
+                
+                if (extractionMode === 'pdf' && useChemExtract && uploadedPdfFile) {
+                    // ChemExtract AI (comprehensive multimodal)
+                    showStatus('Running ChemExtract AI extraction (text + images + tables)...', 'info');
+                    data = await extractWithChemExtract(uploadedPdfFile, apiKey);
+                } else if (extractionMode === 'pdf' && useVision && uploadedPdfFile) {
+                    // Vision-based extraction from PDF
+                    showStatus('Converting PDF to images and analyzing with Vision AI...', 'info');
+                    data = await extractWithVision(uploadedPdfFile, apiKey);
+                } else if (extractionMode === 'pdf' && uploadedPdfFile) {
+                    // Text-based extraction from PDF
+                    showStatus('Extracting text from PDF and analyzing...', 'info');
+                    data = await extractFromPdf(uploadedPdfFile, apiKey);
+                } else {
+                    // Text-based extraction from pasted text
+                    showStatus('Extracting chemical data from text...', 'info');
+                    data = await extractFromText(text, apiKey);
+                }
+
+                if (data.success) {
+                    extractedData = data.data;
+                    console.log('Extraction successful, data:', data.data);
+                    displayResults(data.data);
+                    
+                    // Show warning if no data was found
+                    if (data.warning) {
+                        showStatus(data.warning, 'warning');
+                    } else {
+                        showStatus(`✓ Extraction complete using ${info.name}! Scroll down to see results.`, 'success');
+                    }
+                } else {
+                    showStatus(data.error || 'Extraction failed', 'error');
+                }
+            } catch (error) {
+                showStatus('Error during extraction: ' + error.message, 'error');
+            } finally {
+                extractBtn.disabled = false;
+                extractBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    Extract Data
+                `;
+            }
+        });
+
+        // Text-based extraction from pasted text
+        async function extractFromText(text, apiKey) {
+            const info = PROVIDER_INFO[selectedProvider];
+            
+            const requestBody = {
+                text: text,
+                provider: selectedProvider,
+                model: selectedModel || undefined
+            };
+
+            if (info.needsKey) {
+                requestBody.api_key = apiKey;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/extract`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            return await response.json();
+        }
+
+        // Text-based extraction from PDF (extract text first, then send to LLM)
+        async function extractFromPdf(pdfFile, apiKey) {
+            const info = PROVIDER_INFO[selectedProvider];
+            
+            const formData = new FormData();
+            formData.append('file', pdfFile);
+            
+            // First extract text from PDF
+            showStatus('Extracting text from PDF...', 'info');
+            
+            const pdfResponse = await fetch(`${API_BASE_URL}/api/extract/pdf`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const pdfData = await pdfResponse.json();
+            
+            if (!pdfData.success) {
+                // PDF text extraction failed
+                return {
+                    success: false,
+                    error: pdfData.error || 'Failed to extract text from PDF'
+                };
+            }
+            
+            // Check if we got meaningful text
+            if (!pdfData.text || pdfData.text.trim().length < 50) {
+                return {
+                    success: false,
+                    error: 'The PDF contains very little or no extractable text. This may be a scanned document. Try enabling "Extract from Images (Vision AI)" option for better results.'
+                };
+            }
+            
+            showStatus(`Extracted ${pdfData.text_length || pdfData.text.length} characters. Analyzing with ${info.name}...`, 'info');
+            
+            // Then extract chemical data from the text
+            const result = await extractFromText(pdfData.text, apiKey);
+            
+            // Add PDF metadata to result
+            if (result.success && result.data) {
+                result.data._pdfMetadata = pdfData.metadata;
+            }
+            
+            return result;
+        }
+
+        // Vision-based extraction
+        async function extractWithVision(pdfFile, apiKey) {
+            const formData = new FormData();
+            formData.append('file', pdfFile);
+            formData.append('provider', selectedProvider);
+            formData.append('api_key', apiKey);
+            if (selectedModel) {
+                formData.append('model', selectedModel);
+            }
+            formData.append('max_pages', '5');  // Limit to 5 pages
+
+            const response = await fetch(`${API_BASE_URL}/api/extract/pdf/vision`, {
+                method: 'POST',
+                body: formData
+            });
+
+            return await response.json();
+        }
+
+        // ChemExtract AI (comprehensive multimodal)
+        async function extractWithChemExtract(pdfFile, apiKey) {
+            const formData = new FormData();
+            formData.append('file', pdfFile);
+            formData.append('provider', selectedProvider);
+            formData.append('api_key', apiKey);
+            if (selectedModel) {
+                formData.append('model', selectedModel);
+            }
+            formData.append('max_pages', '10');  // Allow more pages for comprehensive extraction
+            formData.append('extract_figures', 'true');
+            formData.append('extract_text', 'true');
+
+            const response = await fetch(`${API_BASE_URL}/api/extract/pdf/chemextract`, {
+                method: 'POST',
+                body: formData
+            });
+
+            return await response.json();
+        }
+
+        // Clear
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            pdfText = '';
+            extractedData = null;
+            uploadedPdfFile = null;  // Reset uploaded file
+            
+            // Hide vision and ChemExtract options
+            visionOption.style.display = 'none';
+            chemextractOption.style.display = 'none';
+            if (enableVision) enableVision.checked = false;
+            if (enableChemExtract) enableChemExtract.checked = false;
+            
+            // Hide PDF preview
+            pdfPreview.style.display = 'none';
+            pdfPreviewText.textContent = '';
+            
+            resultsContent.innerHTML = `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <p>Select a mode and enter your API key to extract chemical data</p>
+                </div>
+            `;
+            
+            // Remove visual indicator
+            const resultsSection = document.querySelector('.results-section');
+            resultsSection.classList.remove('has-data');
+            
+            // Reset drop zone display - restore original text with centered SVG
+            const dropSvg = dropZone.querySelector('svg');
+            const dropText = dropZone.querySelector('p');
+            
+            // Remove any inline display style that might break centering
+            if (dropSvg) {
+                dropSvg.style.removeProperty('display');
+            }
+            
+            // Restore original text
+            if (dropText) {
+                dropText.innerHTML = 'Drag & drop PDF file here or <span class="file-name">click to browse</span>';
+            }
+            
+            // Clear the file input value so a new file can be selected
+            fileInput.value = '';
+            
+            statusMessage.style.display = 'none';
+        });
+
+        // Helper function to get SMILES from object (case-insensitive)
+        function getSmiles(obj) {
+            if (!obj || typeof obj !== 'object') return '';
+            // Check common variations of the SMILES property name
+            return obj.smiles || obj.SMILES || obj.Smiles || obj.smile || obj.SMILE || '';
+        }
+
+        // Helper function to get role from object (case-insensitive)
+        function getRole(obj) {
+            if (!obj || typeof obj !== 'object') return '';
+            return obj.role || obj.type || obj.classification || obj.category || '';
+        }
+
+        // Helper function to create role badge HTML
+        function getRoleBadge(role) {
+            if (!role) return '';
+            const roleColors = {
+                'reactant': '#3b82f6',
+                'product': '#10b981',
+                'catalyst': '#f59e0b',
+                'ligand': '#8b5cf6',
+                'solvent': '#06b6d4',
+                'reagent': '#ec4899',
+                'substrate': '#6366f1',
+                'byproduct': '#ef4444',
+                'additive': '#84cc16'
+            };
+            const color = roleColors[role.toLowerCase()] || '#64748b';
+            return `<span style="background: ${color}; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: 500; margin-left: 4px; text-transform: capitalize;">${role}</span>`;
+        }
+
+        // Render ChemExtract AI format results (reactions, compounds, tables, figures)
+        function renderChemExtractResults(data) {
+            let html = '';
+            
+            // Reactions
+            if (data.reactions && data.reactions.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 2v4"/>
+                                <path d="M12 18v4"/>
+                            </svg>
+                            Reactions Found (${data.reactions.length})
+                        </h4>
+                `;
+                
+                data.reactions.forEach((reaction, idx) => {
+                    html += `
+                        <div class="result-detail" style="margin-bottom: 12px; border-left: 3px solid #8b5cf6; padding-left: 12px;">
+                            <div class="result-detail-label">Reaction ${idx + 1}</div>
+                            ${reaction.reaction_type ? `<div style="font-weight: 600; color: #1e293b; margin: 4px 0;">Type: ${reaction.reaction_type}</div>` : ''}
+                    `;
+                    
+                    // Reactants with SMILES and role
+                    if (reaction.reactants && reaction.reactants.length > 0) {
+                        html += `<div style="margin: 4px 0;"><span style="color: #64748b;">Reactants:</span>`;
+                        reaction.reactants.forEach((r, i) => {
+                            if (typeof r === 'object' && r !== null) {
+                                const name = r.name || r.compound || r.formula || JSON.stringify(r);
+                                const smiles = getSmiles(r);
+                                const role = getRole(r);
+                                html += `<div style="margin-left: 12px; margin-top: 2px;">• ${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; color: #7c3aed;">${smiles}</code>` : ''}</div>`;
+                            } else {
+                                html += (i === 0 ? ' ' : ', ') + r;
+                            }
+                        });
+                        html += `</div>`;
+                    }
+                    
+                    // Products with SMILES and role
+                    if (reaction.products && reaction.products.length > 0) {
+                        html += `<div style="margin: 4px 0;"><span style="color: #64748b;">Products:</span>`;
+                        reaction.products.forEach((p, i) => {
+                            if (typeof p === 'object' && p !== null) {
+                                const name = p.name || p.compound || p.formula || JSON.stringify(p);
+                                const smiles = getSmiles(p);
+                                const role = getRole(p);
+                                html += `<div style="margin-left: 12px; margin-top: 2px;">• ${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; color: #7c3aed;">${smiles}</code>` : ''}</div>`;
+                            } else {
+                                html += (i === 0 ? ' ' : ', ') + p;
+                            }
+                        });
+                        html += `</div>`;
+                    }
+                    
+                    html += `
+                            ${reaction.catalyst ? `<div><span style="color: #64748b;">Catalyst:</span> ${reaction.catalyst}</div>` : ''}
+                            ${reaction.conditions ? `<div><span style="color: #64748b;">Conditions:</span> ${typeof reaction.conditions === 'object' ? JSON.stringify(reaction.conditions) : reaction.conditions}</div>` : ''}
+                            ${reaction.yield ? `<div><span style="color: #64748b;">Yield:</span> ${reaction.yield}</div>` : ''}
+                            ${reaction.description ? `<div style="margin-top: 4px; font-size: 0.9rem; color: #475569;">${reaction.description}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Compounds
+            if (data.compounds && data.compounds.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4"/>
+                                <path d="M12 8h.01"/>
+                            </svg>
+                            Compounds Found (${data.compounds.length})
+                        </h4>
+                `;
+                
+                data.compounds.forEach((compound, idx) => {
+                    let name = '';
+                    let smiles = '';
+                    let formula = '';
+                    let mw = '';
+                    let role = '';
+                    
+                    if (typeof compound === 'object' && compound !== null) {
+                        name = compound.name || compound.compound || compound.formula || '';
+                        smiles = getSmiles(compound);
+                        formula = compound.formula || '';
+                        mw = compound.mw || compound.molecular_weight || '';
+                        // Get role/classification (case-insensitive)
+                        role = getRole(compound);
+                    } else {
+                        name = String(compound);
+                    }
+                    
+                    html += `
+                        <div class="result-detail" style="margin-bottom: 8px;">
+                            <div class="result-detail-label">Compound ${idx + 1}</div>
+                            <div class="result-detail-value" style="font-weight: 600;">
+                                ${name || 'Unknown'}${getRoleBadge(role)}
+                            </div>
+                            ${smiles ? `<div style="margin-top: 4px;"><span style="color: #64748b; font-size: 0.8rem;">SMILES:</span> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: #7c3aed;">${smiles}</code></div>` : ''}
+                            ${formula && formula !== name ? `<div style="margin-top: 2px;"><span style="color: #64748b; font-size: 0.8rem;">Formula:</span> ${formula}</div>` : ''}
+                            ${mw ? `<div style="margin-top: 2px;"><span style="color: #64748b; font-size: 0.8rem;">MW:</span> ${mw}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Tables
+            if (data.tables && data.tables.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="3" y1="9" x2="21" y2="9"/>
+                                <line x1="9" y1="21" x2="9" y2="9"/>
+                            </svg>
+                            Tables Extracted (${data.tables.length})
+                        </h4>
+                `;
+                
+                data.tables.forEach((table, idx) => {
+                    html += `
+                        <div class="result-detail">
+                            <div class="result-detail-label">Table ${idx + 1}</div>
+                            <div class="result-detail-value">${table.description || table.title || 'Chemical data table'}</div>
+                            ${table.headers ? `<div style="font-size: 0.85rem; color: #64748b;">Columns: ${Array.isArray(table.headers) ? table.headers.join(', ') : table.headers}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Figures
+            if (data.figures && data.figures.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            Figures Analyzed (${data.figures.length})
+                        </h4>
+                `;
+                
+                data.figures.forEach((figure, idx) => {
+                    html += `
+                        <div class="result-detail">
+                            <div class="result-detail-label">Figure ${idx + 1}</div>
+                            <div class="result-detail-value">${figure.description || figure.caption || 'Chemical structure or scheme'}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Text content preview
+            if (data.text_content) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            Extracted Text Preview
+                        </h4>
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">
+                            ${data.text_content.substring(0, 1000)}${data.text_content.length > 1000 ? '...' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+
+        // Display Results
+        function displayResults(data) {
+            console.log('displayResults called with:', data);
+            let html = '';
+            
+            // Check if this is ChemExtract AI format (has reactions/compounds) or text format (has reactants/products)
+            const isChemExtractFormat = data.reactions || data.compounds || data.tables || data.figures;
+            
+            // Check if there's any actual data (handle both formats)
+            let hasData = false;
+            
+            if (isChemExtractFormat) {
+                // ChemExtract AI format
+                hasData = (
+                    (data.reactions && data.reactions.length > 0) ||
+                    (data.compounds && data.compounds.length > 0) ||
+                    (data.tables && data.tables.length > 0) ||
+                    (data.figures && data.figures.length > 0) ||
+                    (data.summary && Object.keys(data.summary).length > 0)
+                );
+            } else {
+                // Text extraction format
+                hasData = (
+                    (data.reactants && data.reactants.length > 0) ||
+                    (data.products && data.products.length > 0) ||
+                    (data.catalysts && data.catalysts.length > 0) ||
+                    (data.ligands && data.ligands.length > 0) ||
+                    (data.solvents && data.solvents.length > 0) ||
+                    (data.yields && data.yields.length > 0) ||
+                    (data.conditions && Object.keys(data.conditions).length > 0) ||
+                    data.reactionType ||
+                    data.selectivity ||
+                    (data.mechanisms && data.mechanisms.length > 0)
+                );
+            }
+
+            // Add banner at top
+            if (hasData) {
+                const extractionType = isChemExtractFormat ? 'ChemExtract AI' : 'Text';
+                html += `
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
+                        ✓ Extraction Complete! (${extractionType}) Results are displayed below.
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
+                        ⚠ No chemical reaction data found. Try using "Extract from Images (Vision AI)" for scanned PDFs.
+                    </div>
+                `;
+            }
+            
+            // Handle ChemExtract AI format (reactions, compounds, tables, figures)
+            if (isChemExtractFormat) {
+                html += renderChemExtractResults(data);
+            } else {
+                // Text extraction format (reactants, products, etc.)
+            
+            // Reactants
+            if (data.reactants && data.reactants.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Reactants
+                        </h4>
+                        <div class="result-items">
+                            ${data.reactants.map(r => {
+                                if (typeof r === 'object' && r !== null) {
+                                    const name = r.name || r.compound || r.formula || JSON.stringify(r);
+                                    const smiles = getSmiles(r);
+                                    const role = getRole(r);
+                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
+                                }
+                                return `<span class="result-tag">${r}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Products
+            if (data.products && data.products.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            Products
+                        </h4>
+                        <div class="result-items">
+                            ${data.products.map(p => {
+                                if (typeof p === 'object' && p !== null) {
+                                    const name = p.name || p.compound || p.formula || JSON.stringify(p);
+                                    const smiles = getSmiles(p);
+                                    const role = getRole(p);
+                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
+                                }
+                                return `<span class="result-tag">${p}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Catalysts
+            if (data.catalysts && data.catalysts.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            </svg>
+                            Catalysts
+                        </h4>
+                        <div class="result-items">
+                            ${data.catalysts.map(c => {
+                                if (typeof c === 'object' && c !== null) {
+                                    const name = c.name || c.compound || c.formula || JSON.stringify(c);
+                                    const smiles = getSmiles(c);
+                                    const role = getRole(c);
+                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
+                                }
+                                return `<span class="result-tag">${c}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Ligands
+            if (data.ligands && data.ligands.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 2v7.31"/>
+                                <path d="M14 9.3V1.99"/>
+                                <path d="M8.5 2h7"/>
+                            </svg>
+                            Ligands
+                        </h4>
+                        <div class="result-items">
+                            ${data.ligands.map(l => {
+                                if (typeof l === 'object' && l !== null) {
+                                    const name = l.name || l.compound || l.formula || JSON.stringify(l);
+                                    const smiles = getSmiles(l);
+                                    const role = getRole(l);
+                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
+                                }
+                                return `<span class="result-tag">${l}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Solvents
+            if (data.solvents && data.solvents.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+                            </svg>
+                            Solvents
+                        </h4>
+                        <div class="result-items">
+                            ${data.solvents.map(s => {
+                                if (typeof s === 'object' && s !== null) {
+                                    const name = s.name || s.compound || s.formula || JSON.stringify(s);
+                                    const smiles = getSmiles(s);
+                                    const role = getRole(s);
+                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
+                                }
+                                return `<span class="result-tag">${s}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Conditions
+            if (data.conditions && Object.keys(data.conditions).length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+                            </svg>
+                            Reaction Conditions
+                        </h4>
+                        ${data.conditions.temperature ? `<div class="result-detail"><div class="result-detail-label">Temperature</div><div class="result-detail-value">${data.conditions.temperature}</div></div>` : ''}
+                        ${data.conditions.time ? `<div class="result-detail"><div class="result-detail-label">Time</div><div class="result-detail-value">${data.conditions.time}</div></div>` : ''}
+                        ${data.conditions.pressure ? `<div class="result-detail"><div class="result-detail-label">Pressure</div><div class="result-detail-value">${data.conditions.pressure}</div></div>` : ''}
+                        ${data.conditions.atmosphere ? `<div class="result-detail"><div class="result-detail-label">Atmosphere</div><div class="result-detail-value">${data.conditions.atmosphere}</div></div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Yields
+            if (data.yields && data.yields.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                            Yields
+                        </h4>
+                        ${data.yields.map(y => `
+                            <div class="result-detail">
+                                <div class="result-detail-label">${y.product || 'Product'}</div>
+                                <div class="result-detail-value">${y.yield || 'N/A'}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Selectivity
+            if (data.selectivity) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                            Selectivity
+                        </h4>
+                        <div class="result-detail">
+                            <div class="result-detail-value">${data.selectivity}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Reaction Type
+            if (data.reactionType) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg>
+                            Reaction Type
+                        </h4>
+                        <div class="result-items">
+                            <span class="result-tag">${data.reactionType}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Mechanisms
+            if (data.mechanisms && data.mechanisms.length > 0) {
+                html += `
+                    <div class="result-category">
+                        <h4>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4"/>
+                                <path d="M12 18v4"/>
+                                <path d="M4.93 4.93l2.83 2.83"/>
+                                <path d="M16.24 16.24l2.83 2.83"/>
+                                <path d="M2 12h4"/>
+                                <path d="M18 12h4"/>
+                            </svg>
+                            Mechanisms
+                        </h4>
+                        <div class="result-items">
+                            ${data.mechanisms.map(m => `<span class="result-tag">${m}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            } // End of else block for text extraction format
+
+            if (!html) {
+                html = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4"/>
+                            <path d="M12 8h.01"/>
+                        </svg>
+                        <p>No chemical data could be extracted from the text</p>
+                    </div>
+                `;
+            }
+
+            resultsContent.innerHTML = html;
+
+            // Add visual indicator that results are ready
+            const resultsSection = document.querySelector('.results-section');
+            resultsSection.classList.add('has-data');
+
+            // Force scroll to results - scroll the content-area, not the window
+            setTimeout(() => {
+                const contentArea = document.querySelector('.content-area');
+                if (contentArea) {
+                    contentArea.scrollTo({
+                        top: resultsSection.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                    console.log('Scrolled content-area to:', resultsSection.offsetTop);
+                }
+                // Also try scrollIntoView as backup
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Status Messages
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+        }
+
+        // View Raw JSON
+        viewJsonBtn.addEventListener('click', () => {
+            if (!extractedData) {
+                showStatus('No data to view', 'error');
+                return;
+            }
+            
+            // Create modal to display JSON
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow: auto;
+                width: 90%;
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0; color: var(--tmc-primary);">Raw JSON Output</h3>
+                    <button id="closeModal" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+                </div>
+                <pre style="background: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5;">${JSON.stringify(extractedData, null, 2)}</pre>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal handlers
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            modalContent.querySelector('#closeModal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        });
+
+        // Export JSON
+        exportJsonBtn.addEventListener('click', () => {
+            if (!extractedData) {
+                showStatus('No data to export', 'error');
+                return;
+            }
+            
+            const blob = new Blob([JSON.stringify(extractedData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'extraction_result.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Initialize
+        updateApiKeySection();
+        updateInputSections();  // Set initial input section visibility
+    </script>
 </body>
 </html>
