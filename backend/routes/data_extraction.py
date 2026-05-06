@@ -117,7 +117,7 @@ def extract_from_text():
         "model": "deepseek-chat"  // optional
     }
     """
-    from chemextract_extractor import call_text_llm, SYSTEM_PROMPT_COMPREHENSIVE
+    from modules.chemextract_extractor import call_text_llm, SYSTEM_PROMPT_COMPREHENSIVE
     
     try:
         data = request.get_json()
@@ -183,7 +183,7 @@ async def extract_from_text_async():
         "model": "deepseek-chat"  // optional
     }
     """
-    from chemextract_extractor import call_text_llm_async
+    from modules.chemextract_extractor import call_text_llm_async
     
     try:
         data = request.get_json()
@@ -233,7 +233,7 @@ def extract_text_from_pdf():
     This endpoint only extracts text, does not analyze with LLM.
     Use /api/extract/pdf/vision for full extraction.
     """
-    from chemextract_extractor import extract_text_from_pdf
+    from modules.chemextract_extractor import extract_text_from_pdf
     
     tmp_path = None
     try:
@@ -284,7 +284,7 @@ def extract_pdf_with_vision():
     - model: Model to use (optional)
     - max_pages: Maximum pages to process (default: 5)
     """
-    from chemextract_extractor import (
+    from modules.chemextract_extractor import (
         ChemExtractAI, 
         extract_text_from_pdf,
         pdf_to_images,
@@ -365,7 +365,7 @@ async def extract_pdf_with_vision_async():
     
     Processes all pages concurrently for faster extraction.
     """
-    from chemextract_extractor import (
+    from modules.chemextract_extractor import (
         ChemExtractAI,
         extract_text_from_pdf,
         pdf_to_images,
@@ -458,7 +458,7 @@ def extract_pdf_chemextract():
     - extract_images: Enable vision analysis (default: true)
     - extract_text: Enable text analysis (default: true)
     """
-    from chemextract_extractor import extract_chemical_data_from_pdf
+    from modules.chemextract_extractor import extract_chemical_data_from_pdf
     
     tmp_path = None
     try:
@@ -520,7 +520,7 @@ async def extract_pdf_chemextract_async():
     
     Processes pages concurrently for faster extraction.
     """
-    from chemextract_extractor import extract_chemical_data_from_pdf_async
+    from modules.chemextract_extractor import extract_chemical_data_from_pdf_async
     
     tmp_path = None
     try:

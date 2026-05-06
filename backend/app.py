@@ -120,10 +120,12 @@ def api_status():
     return jsonify({
         'success': True,
         'service': 'GenAI Research Platform',
-        'version': '2.0.0',
+        'version': '2.1.0',
         'features': {
             'async_support': True,
-            'http_llm_client': True
+            'http_llm_client': True,
+            'rag_integration': True,
+            'database_integration': True
         },
         'endpoints': {
             'network': '/api/network',
@@ -132,7 +134,9 @@ def api_status():
             'gnn': '/api/gnn/*',
             'pca': '/api/pca/*',
             'llm': '/api/llm/*',
-            'knowledge_graph': '/api/knowledge-graph'
+            'knowledge_graph': '/api/knowledge-graph',
+            'nicobot_chat': '/api/nicobot/chat',
+            'database': '/api/database/*'
         }
     })
 
@@ -184,18 +188,34 @@ app.register_blueprint(llm_bp)
 app.register_blueprint(viz_bp)
 app.register_blueprint(data_extraction_bp)
 
-logger.info("Registered API blueprints: network, chemistry, llm, viz, data_extraction")
+# Register database blueprint if available
+try:
+    from routes.database import database_bp
+    app.register_blueprint(database_bp)
+    logger.info("Registered API blueprints: network, chemistry, llm, viz, data_extraction, database")
+except ImportError:
+    logger.warning("Database blueprint not available. Database API endpoints disabled.")
+    logger.info("Registered API blueprints: network, chemistry, llm, viz, data_extraction")
 
 # Use HTTP client for LLM requests instead of direct imports
 from llm_client import get_llm_response, generate_knowledge_graph
 from utils import sanitize_input
 from errors import ValidationError, LLMError
 
+# Import RAG service for database integration
+try:
+    from modules.nicobot_rag import get_rag, enhance_prompt_with_context
+    RAG_AVAILABLE = True
+except ImportError:
+    RAG_AVAILABLE = False
+    logger.warning("NiCOBot RAG service not available. Running without database integration.")
+
 @app.route('/api/nicobot/chat', methods=['POST'])
 @limiter.limit("20 per minute")
 def nicobot_chat():
     """
-    NiCOBot chat endpoint using HTTP-based LLM client.
+    NiCOBot chat endpoint using HTTP-based LLM client with RAG integration.
+    Integrates database context for enhanced responses about compounds and papers.
     """
     try:
         data = request.get_json()
@@ -207,14 +227,15 @@ def nicobot_chat():
         provider = data.get('provider')
         api_key = data.get('api_key')
         model = data.get('model')
+        use_rag = data.get('use_rag', True)  # Enable RAG by default
 
         message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
         if not message:
             raise ValidationError("Message cannot be empty", field="message")
 
-        logger.info(f"[NiCOBot] Provider: {provider}, Has API Key: {bool(api_key)}")
+        logger.info(f"[NiCOBot] Provider: {provider}, Has API Key: {bool(api_key)}, RAG: {use_rag}")
 
-        system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
+        base_system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
 Provide accurate, helpful responses about:
 - Nickel catalysis mechanisms and applications
 - C-O bond activation strategies
@@ -224,7 +245,32 @@ Provide accurate, helpful responses about:
 
 Keep responses concise but informative. Use proper chemical nomenclature."""
 
-        # Use HTTP client instead of direct import
+        # Enhance prompt with database context if RAG is available
+        database_context = None
+        if RAG_AVAILABLE and use_rag:
+            try:
+                rag = get_rag()
+                context = rag.retrieve_context(message)
+                if context.formatted_context:
+                    database_context = context.formatted_context
+                    system_prompt = f"""{base_system_prompt}
+
+## Database Context
+The following information has been retrieved from the NiCOBot chemical database. Use this to enhance your response:
+
+{context.formatted_context}
+
+When answering, reference specific compounds, papers, or data from the database when relevant. If the user asks about a specific compound or reaction, provide the SMILES notation and any relevant publication references."""
+                    logger.info(f"[NiCOBot] RAG context retrieved: {len(context.compounds)} compounds, {len(context.papers)} papers")
+                else:
+                    system_prompt = base_system_prompt
+            except Exception as e:
+                logger.warning(f"[NiCOBot] RAG error: {e}. Falling back to base prompt.")
+                system_prompt = base_system_prompt
+        else:
+            system_prompt = base_system_prompt
+
+        # Use HTTP client for LLM response
         response = get_llm_response(
             system_prompt,
             message,
@@ -234,11 +280,14 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
         )
 
         if response:
-            return jsonify({
+            result = {
                 'success': True,
                 'response': response,
                 'provider': provider or 'default'
-            })
+            }
+            if database_context:
+                result['database_enhanced'] = True
+            return jsonify(result)
         else:
             return jsonify({
                 'success': False,
@@ -262,7 +311,7 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
 @limiter.limit("20 per minute")
 async def nicobot_chat_async():
     """
-    Async NiCOBot chat endpoint using HTTP-based LLM client.
+    Async NiCOBot chat endpoint using HTTP-based LLM client with RAG integration.
     """
     from llm_client import get_llm_response_async
 
@@ -276,14 +325,15 @@ async def nicobot_chat_async():
         provider = data.get('provider')
         api_key = data.get('api_key')
         model = data.get('model')
+        use_rag = data.get('use_rag', True)
 
         message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
         if not message:
             raise ValidationError("Message cannot be empty", field="message")
 
-        logger.info(f"[NiCOBot Async] Provider: {provider}, Has API Key: {bool(api_key)}")
+        logger.info(f"[NiCOBot Async] Provider: {provider}, Has API Key: {bool(api_key)}, RAG: {use_rag}")
 
-        system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
+        base_system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
 Provide accurate, helpful responses about:
 - Nickel catalysis mechanisms and applications
 - C-O bond activation strategies
@@ -292,6 +342,31 @@ Provide accurate, helpful responses about:
 - Comparison of Ni vs Pd catalysis
 
 Keep responses concise but informative. Use proper chemical nomenclature."""
+
+        # Enhance prompt with database context if RAG is available
+        database_context = None
+        if RAG_AVAILABLE and use_rag:
+            try:
+                rag = get_rag()
+                context = rag.retrieve_context(message)
+                if context.formatted_context:
+                    database_context = context.formatted_context
+                    system_prompt = f"""{base_system_prompt}
+
+## Database Context
+The following information has been retrieved from the NiCOBot chemical database. Use this to enhance your response:
+
+{context.formatted_context}
+
+When answering, reference specific compounds, papers, or data from the database when relevant."""
+                    logger.info(f"[NiCOBot Async] RAG context retrieved")
+                else:
+                    system_prompt = base_system_prompt
+            except Exception as e:
+                logger.warning(f"[NiCOBot Async] RAG error: {e}")
+                system_prompt = base_system_prompt
+        else:
+            system_prompt = base_system_prompt
 
         # Use async HTTP client
         response = await get_llm_response_async(
@@ -303,12 +378,15 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
         )
 
         if response:
-            return jsonify({
+            result = {
                 'success': True,
                 'response': response,
                 'provider': provider or 'default',
                 'async': True
-            })
+            }
+            if database_context:
+                result['database_enhanced'] = True
+            return jsonify(result)
         else:
             return jsonify({
                 'success': False,
