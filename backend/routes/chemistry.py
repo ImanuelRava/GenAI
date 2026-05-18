@@ -1,8 +1,3 @@
-"""
-Chemistry Routes Blueprint
-Handles molecular visualization and reaction endpoints
-"""
-
 import io
 import base64
 import logging
@@ -93,6 +88,31 @@ REACTION_SCHEMES = {
         "smarts": "Brc1ccccc1.C[Si](C)(C)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
         "label": "Hiyama Coupling",
         "conditions": "Pd catalyst, Fluoride source"
+    },
+    "catalytic_cycle": {
+        "smarts": "Brc1ccccc1.B(c1ccccc1)(O)O>[Pd]>c1ccc(-c2ccccc2)cc1",
+        "label": "Cross-Coupling Catalytic Cycle",
+        "conditions": "Pd(0) → Pd(II) → Pd(0)"
+    },
+    "beta_hydride": {
+        "smarts": "CCCPdBr>>C=CPdHBr",
+        "label": "Beta-Hydride Elimination",
+        "conditions": "Undesired side reaction"
+    },
+    "grignard": {
+        "smarts": "C=O.[Mg]BrCc1ccccc1>>CC(O)c1ccccc1",
+        "label": "Grignard Addition",
+        "conditions": "Addition to carbonyl"
+    },
+    "nickel": {
+        "smarts": "Clc1ccccc1.B(c1ccccc1)(O)O>[Ni]>c1ccc(-c2ccccc2)cc1",
+        "label": "Ni-Catalyzed Coupling",
+        "conditions": "Ni catalyst, C-Cl activation"
+    },
+    "triflate": {
+        "smarts": "C=COS(=O)(=O)C(F)(F)F.B(c1ccccc1)(O)O>>C=Cc1ccccc1",
+        "label": "Vinyl Triflate Coupling",
+        "conditions": "Pd catalyst, Excellent leaving group"
     }
 }
 

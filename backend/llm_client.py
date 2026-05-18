@@ -1,8 +1,3 @@
-"""
-LLM Client Module for GenAI Research Platform
-Provides HTTP-based client for LLM API calls instead of direct module imports.
-"""
-
 import os
 import json
 import logging
@@ -20,35 +15,26 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class LLMConfig:
-    """Configuration for LLM API client."""
     base_url: str = "http://localhost:5000"
     timeout: int = 60
     max_retries: int = 3
 
     def __post_init__(self):
-        # Allow override from environment
         self.base_url = os.environ.get('LLM_SERVICE_URL', self.base_url)
         self.timeout = int(os.environ.get('LLM_TIMEOUT', self.timeout))
 
 
 class LLMClientError(Exception):
-    """Custom exception for LLM client errors."""
     pass
 
 
 class LLMClient:
-    """
-    HTTP-based client for LLM API calls.
-    Replaces direct module imports with HTTP requests to the LLM service.
-    """
-
     def __init__(self, config: Optional[LLMConfig] = None):
         self.config = config or LLMConfig()
         self._session: Optional[requests.Session] = None
         self._async_session: Optional[aiohttp.ClientSession] = None
 
     def _get_session(self) -> requests.Session:
-        """Get or create a synchronous requests session."""
         if self._session is None:
             self._session = requests.Session()
             self._session.headers.update({
@@ -58,7 +44,6 @@ class LLMClient:
         return self._session
 
     async def _get_async_session(self) -> aiohttp.ClientSession:
-        """Get or create an async aiohttp session."""
         if self._async_session is None or self._async_session.closed:
             self._async_session = aiohttp.ClientSession(
                 headers={
@@ -79,21 +64,6 @@ class LLMClient:
         temperature: float = 0.7,
         max_tokens: int = 2000
     ) -> Optional[str]:
-        """
-        Synchronous chat completion via HTTP request.
-
-        Args:
-            system_prompt: System prompt for the LLM
-            user_message: User message to send
-            provider: LLM provider to use
-            api_key: Optional API key override
-            model: Optional model override
-            temperature: Sampling temperature
-            max_tokens: Maximum tokens to generate
-
-        Returns:
-            LLM response text or None on failure
-        """
         system_prompt = sanitize_input(system_prompt, max_length=4000)
         user_message = sanitize_input(user_message, max_length=2000)
 
@@ -147,21 +117,6 @@ class LLMClient:
         temperature: float = 0.7,
         max_tokens: int = 2000
     ) -> Optional[str]:
-        """
-        Async chat completion via HTTP request.
-
-        Args:
-            system_prompt: System prompt for the LLM
-            user_message: User message to send
-            provider: LLM provider to use
-            api_key: Optional API key override
-            model: Optional model override
-            temperature: Sampling temperature
-            max_tokens: Maximum tokens to generate
-
-        Returns:
-            LLM response text or None on failure
-        """
         system_prompt = sanitize_input(system_prompt, max_length=4000)
         user_message = sanitize_input(user_message, max_length=2000)
 
@@ -206,17 +161,6 @@ class LLMClient:
         provider: str = None,
         api_key: str = None
     ) -> Optional[Dict[str, Any]]:
-        """
-        Generate knowledge graph via HTTP request.
-
-        Args:
-            topic: Topic to generate knowledge graph for
-            provider: LLM provider to use
-            api_key: Optional API key override
-
-        Returns:
-            Knowledge graph dict or None on failure
-        """
         topic = sanitize_input(topic, max_length=500)
 
         url = f"{self.config.base_url}/api/knowledge-graph"
@@ -251,9 +195,6 @@ class LLMClient:
         provider: str = None,
         api_key: str = None
     ) -> Optional[Dict[str, Any]]:
-        """
-        Async knowledge graph generation via HTTP request.
-        """
         topic = sanitize_input(topic, max_length=500)
 
         url = f"{self.config.base_url}/api/knowledge-graph"
@@ -278,24 +219,20 @@ class LLMClient:
             return None
 
     def close(self):
-        """Close the synchronous session."""
         if self._session:
             self._session.close()
             self._session = None
 
     async def close_async(self):
-        """Close the async session."""
         if self._async_session and not self._async_session.closed:
             await self._async_session.close()
             self._async_session = None
 
 
-# Global client instance
 _client: Optional[LLMClient] = None
 
 
 def get_llm_client() -> LLMClient:
-    """Get or create the global LLM client instance."""
     global _client
     if _client is None:
         _client = LLMClient()
@@ -310,10 +247,6 @@ def get_llm_response(
     model: str = None,
     **kwargs
 ) -> Optional[str]:
-    """
-    Convenience function for LLM chat via HTTP request.
-    Drop-in replacement for llm_providers.get_llm_response.
-    """
     client = get_llm_client()
     return client.chat(
         system_prompt=system_prompt,
@@ -334,9 +267,6 @@ async def get_llm_response_async(
     model: str = None,
     **kwargs
 ) -> Optional[str]:
-    """
-    Async convenience function for LLM chat via HTTP request.
-    """
     client = get_llm_client()
     return await client.chat_async(
         system_prompt=system_prompt,
@@ -354,10 +284,6 @@ def generate_knowledge_graph(
     provider: str = None,
     api_key: str = None
 ) -> Optional[Dict[str, Any]]:
-    """
-    Convenience function for knowledge graph generation via HTTP request.
-    Drop-in replacement for llm_providers.generate_knowledge_graph.
-    """
     client = get_llm_client()
     return client.generate_knowledge_graph(
         topic=topic,
@@ -371,9 +297,6 @@ async def generate_knowledge_graph_async(
     provider: str = None,
     api_key: str = None
 ) -> Optional[Dict[str, Any]]:
-    """
-    Async convenience function for knowledge graph generation.
-    """
     client = get_llm_client()
     return await client.generate_knowledge_graph_async(
         topic=topic,

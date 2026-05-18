@@ -24,9 +24,8 @@ import aiohttp
 
 logger = logging.getLogger(__name__)
 
-# Try to import PDF libraries
 try:
-    import fitz  # PyMuPDF
+    import fitz
     HAS_PYMUPDF = True
 except ImportError:
     HAS_PYMUPDF = False
@@ -45,9 +44,6 @@ except ImportError:
     HAS_PDFPLUMBER = False
 
 
-# ============================================================
-# CHEMISTRY-SPECIFIC PROMPTS
-# ============================================================
 
 SYSTEM_PROMPT_CHEMICAL_ENTITIES = """You are an expert chemist specializing in extracting chemical entities from scientific literature. 
 
@@ -251,9 +247,6 @@ Return structured JSON:
 }"""
 
 
-# ============================================================
-# PDF CONVERSION UTILITIES
-# ============================================================
 
 def pdf_to_images(file_path: str, dpi: int = 150, max_pages: int = 10) -> List[Tuple[int, str]]:
     """
@@ -263,9 +256,9 @@ def pdf_to_images(file_path: str, dpi: int = 150, max_pages: int = 10) -> List[T
     """
     if not HAS_PYMUPDF:
         raise ImportError("PyMuPDF is required for PDF to image conversion. Install with: pip install PyMuPDF")
-    
+
     images = []
-    
+
     try:
         doc = fitz.open(file_path)
         for page_num in range(min(len(doc), max_pages)):
@@ -275,7 +268,7 @@ def pdf_to_images(file_path: str, dpi: int = 150, max_pages: int = 10) -> List[T
             img_data = pix.tobytes("png")
             base64_image = base64.b64encode(img_data).decode('utf-8')
             images.append((page_num + 1, base64_image))
-        
+
         logger.info(f"[ChemExtract] Converted {len(images)} pages using PyMuPDF")
         return images
     except Exception as e:
@@ -291,57 +284,54 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
     """
     text = ""
     metadata = {"pages": 0, "method": None}
-    
+
     if HAS_PYPDF:
         try:
             reader = pypdf.PdfReader(file_path)
             metadata["pages"] = len(reader.pages)
             metadata["method"] = "pypdf"
-            
+
             for page in reader.pages:
                 page_text = page.extract_text()
                 if page_text:
                     text += page_text + "\n\n"
-            
+
             if text.strip():
                 return text, metadata
         except Exception as e:
             logger.warning(f"[ChemExtract] pypdf failed: {e}")
-    
+
     if HAS_PDFPLUMBER:
         try:
             with pdfplumber.open(file_path) as pdf:
                 metadata["pages"] = len(pdf.pages)
                 metadata["method"] = "pdfplumber"
-                
+
                 for page in pdf.pages:
                     page_text = page.extract_text()
                     if page_text:
                         text += page_text + "\n\n"
-            
+
             return text, metadata
         except Exception as e:
             logger.error(f"[ChemExtract] pdfplumber failed: {e}")
-    
+
     if HAS_PYMUPDF:
         try:
             doc = fitz.open(file_path)
             metadata["pages"] = len(doc)
             metadata["method"] = "pymupdf"
-            
+
             for page in doc:
                 text += page.get_text() + "\n\n"
-            
+
             return text, metadata
         except Exception as e:
             logger.error(f"[ChemExtract] PyMuPDF text extraction failed: {e}")
-    
+
     raise ImportError("No PDF text extraction library available. Install pypdf, pdfplumber, or PyMuPDF.")
 
 
-# ============================================================
-# HTTP-BASED LLM VISION INTEGRATION
-# ============================================================
 
 def call_vision_llm(
     base64_image: str,
@@ -352,7 +342,7 @@ def call_vision_llm(
     user_message: str
 ) -> Optional[Dict]:
     """Call a vision-capable LLM via HTTP to extract data from an image."""
-    
+
     try:
         if provider == 'deepseek':
             return _call_deepseek_vision(base64_image, model, api_key, system_prompt, user_message)
@@ -379,7 +369,7 @@ async def call_vision_llm_async(
     user_message: str
 ) -> Optional[Dict]:
     """Async call to a vision-capable LLM via HTTP."""
-    
+
     try:
         if provider == 'deepseek':
             return await _call_deepseek_vision_async(base64_image, model, api_key, system_prompt, user_message)
@@ -401,18 +391,17 @@ def _parse_json_response(content: str) -> Optional[Dict]:
     """Parse JSON from LLM response."""
     if not content:
         return None
-    
+
     try:
         json_match = re.search(r'\{[\s\S]*\}', content)
         if json_match:
             return json.loads(json_match.group(0))
     except json.JSONDecodeError as e:
         logger.warning(f"[ChemExtract] JSON parse error: {e}")
-    
+
     return None
 
 
-# ==================== SYNC VISION API CALLS ====================
 
 def _call_deepseek_vision(base64_image: str, model: str, api_key: str, system_prompt: str, user_message: str) -> Optional[Dict]:
     """Call DeepSeek Vision API via HTTP."""
@@ -421,7 +410,7 @@ def _call_deepseek_vision(base64_image: str, model: str, api_key: str, system_pr
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -437,7 +426,7 @@ def _call_deepseek_vision(base64_image: str, model: str, api_key: str, system_pr
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -457,7 +446,7 @@ def _call_openai_vision(base64_image: str, model: str, api_key: str, system_prom
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -473,7 +462,7 @@ def _call_openai_vision(base64_image: str, model: str, api_key: str, system_prom
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -489,7 +478,7 @@ def _call_openai_vision(base64_image: str, model: str, api_key: str, system_prom
 def _call_gemini_vision(base64_image: str, model: str, api_key: str, system_prompt: str, user_message: str) -> Optional[Dict]:
     """Call Google Gemini Vision API via HTTP."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    
+
     payload = {
         "contents": [
             {
@@ -504,7 +493,7 @@ def _call_gemini_vision(base64_image: str, model: str, api_key: str, system_prom
             "maxOutputTokens": 4000
         }
     }
-    
+
     try:
         response = requests.post(url, json=payload, timeout=120)
         if response.status_code == 200:
@@ -525,7 +514,7 @@ def _call_anthropic_vision(base64_image: str, model: str, api_key: str, system_p
         "Content-Type": "application/json",
         "anthropic-version": "2023-06-01"
     }
-    
+
     payload = {
         "model": model,
         "max_tokens": 4000,
@@ -540,7 +529,7 @@ def _call_anthropic_vision(base64_image: str, model: str, api_key: str, system_p
             }
         ]
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -553,7 +542,6 @@ def _call_anthropic_vision(base64_image: str, model: str, api_key: str, system_p
         return None
 
 
-# ==================== ASYNC VISION API CALLS ====================
 
 async def _call_deepseek_vision_async(base64_image: str, model: str, api_key: str, system_prompt: str, user_message: str) -> Optional[Dict]:
     """Call DeepSeek Vision API via HTTP (async)."""
@@ -562,7 +550,7 @@ async def _call_deepseek_vision_async(base64_image: str, model: str, api_key: st
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -578,7 +566,7 @@ async def _call_deepseek_vision_async(base64_image: str, model: str, api_key: st
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -600,7 +588,7 @@ async def _call_openai_vision_async(base64_image: str, model: str, api_key: str,
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -616,7 +604,7 @@ async def _call_openai_vision_async(base64_image: str, model: str, api_key: str,
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -634,7 +622,7 @@ async def _call_openai_vision_async(base64_image: str, model: str, api_key: str,
 async def _call_gemini_vision_async(base64_image: str, model: str, api_key: str, system_prompt: str, user_message: str) -> Optional[Dict]:
     """Call Google Gemini Vision API via HTTP (async)."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    
+
     payload = {
         "contents": [
             {
@@ -649,7 +637,7 @@ async def _call_gemini_vision_async(base64_image: str, model: str, api_key: str,
             "maxOutputTokens": 4000
         }
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -672,7 +660,7 @@ async def _call_anthropic_vision_async(base64_image: str, model: str, api_key: s
         "Content-Type": "application/json",
         "anthropic-version": "2023-06-01"
     }
-    
+
     payload = {
         "model": model,
         "max_tokens": 4000,
@@ -687,7 +675,7 @@ async def _call_anthropic_vision_async(base64_image: str, model: str, api_key: s
             }
         ]
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -702,7 +690,6 @@ async def _call_anthropic_vision_async(base64_image: str, model: str, api_key: s
         return None
 
 
-# ==================== HTTP-BASED TEXT ANALYSIS ====================
 
 def call_text_llm(
     text: str,
@@ -757,7 +744,7 @@ def _call_deepseek_text(text: str, model: str, api_key: str) -> Optional[Dict]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -767,7 +754,7 @@ def _call_deepseek_text(text: str, model: str, api_key: str) -> Optional[Dict]:
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -786,7 +773,7 @@ async def _call_deepseek_text_async(text: str, model: str, api_key: str) -> Opti
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -796,7 +783,7 @@ async def _call_deepseek_text_async(text: str, model: str, api_key: str) -> Opti
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -817,7 +804,7 @@ def _call_openai_text(text: str, model: str, api_key: str) -> Optional[Dict]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -827,7 +814,7 @@ def _call_openai_text(text: str, model: str, api_key: str) -> Optional[Dict]:
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -846,7 +833,7 @@ async def _call_openai_text_async(text: str, model: str, api_key: str) -> Option
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -856,7 +843,7 @@ async def _call_openai_text_async(text: str, model: str, api_key: str) -> Option
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -873,7 +860,7 @@ async def _call_openai_text_async(text: str, model: str, api_key: str) -> Option
 def _call_gemini_text(text: str, model: str, api_key: str) -> Optional[Dict]:
     """Call Gemini for text analysis via HTTP."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    
+
     payload = {
         "contents": [
             {
@@ -887,7 +874,7 @@ def _call_gemini_text(text: str, model: str, api_key: str) -> Optional[Dict]:
             "maxOutputTokens": 4000
         }
     }
-    
+
     try:
         response = requests.post(url, json=payload, timeout=120)
         if response.status_code == 200:
@@ -902,7 +889,7 @@ def _call_gemini_text(text: str, model: str, api_key: str) -> Optional[Dict]:
 async def _call_gemini_text_async(text: str, model: str, api_key: str) -> Optional[Dict]:
     """Call Gemini for text analysis via HTTP (async)."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    
+
     payload = {
         "contents": [
             {
@@ -916,7 +903,7 @@ async def _call_gemini_text_async(text: str, model: str, api_key: str) -> Option
             "maxOutputTokens": 4000
         }
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -938,7 +925,7 @@ def _call_anthropic_text(text: str, model: str, api_key: str) -> Optional[Dict]:
         "Content-Type": "application/json",
         "anthropic-version": "2023-06-01"
     }
-    
+
     payload = {
         "model": model,
         "max_tokens": 4000,
@@ -947,7 +934,7 @@ def _call_anthropic_text(text: str, model: str, api_key: str) -> Optional[Dict]:
             {"role": "user", "content": f"Extract all chemical information from this text:\n\n{text[:8000]}"}
         ]
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -967,7 +954,7 @@ async def _call_anthropic_text_async(text: str, model: str, api_key: str) -> Opt
         "Content-Type": "application/json",
         "anthropic-version": "2023-06-01"
     }
-    
+
     payload = {
         "model": model,
         "max_tokens": 4000,
@@ -976,7 +963,7 @@ async def _call_anthropic_text_async(text: str, model: str, api_key: str) -> Opt
             {"role": "user", "content": f"Extract all chemical information from this text:\n\n{text[:8000]}"}
         ]
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -997,7 +984,7 @@ def _call_generic_text(text: str, provider: str, model: str, api_key: str) -> Op
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -1007,7 +994,7 @@ def _call_generic_text(text: str, provider: str, model: str, api_key: str) -> Op
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=120)
         if response.status_code == 200:
@@ -1026,7 +1013,7 @@ async def _call_generic_text_async(text: str, provider: str, model: str, api_key
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": model,
         "messages": [
@@ -1036,7 +1023,7 @@ async def _call_generic_text_async(text: str, provider: str, model: str, api_key
         "max_tokens": 4000,
         "temperature": 0.1
     }
-    
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as response:
@@ -1050,9 +1037,6 @@ async def _call_generic_text_async(text: str, provider: str, model: str, api_key
         return None
 
 
-# ============================================================
-# MAIN EXTRACTOR CLASS
-# ============================================================
 
 class ChemExtractAI:
     """
@@ -1064,7 +1048,7 @@ class ChemExtractAI:
     - Table extraction for optimization data
     - SMILES and molecular formula recognition
     """
-    
+
     def __init__(self, llm_provider: str = 'deepseek', api_key: str = None, model: str = None):
         """
         Initialize the extractor.
@@ -1077,19 +1061,19 @@ class ChemExtractAI:
         self.llm_provider = llm_provider
         self.api_key = api_key
         self.model = model
-        
+
         self.vision_providers = ['deepseek', 'openai', 'gemini', 'anthropic']
-        
+
         self.default_models = {
             'deepseek': 'deepseek-chat',
             'openai': 'gpt-4o',
             'gemini': 'gemini-2.0-flash',
             'anthropic': 'claude-3-5-sonnet-20241022'
         }
-        
+
         if not self.model:
             self.model = self.default_models.get(llm_provider)
-    
+
     def extract_from_pdf(
         self,
         pdf_path: str,
@@ -1120,8 +1104,7 @@ class ChemExtractAI:
                 "images_extracted": False
             }
         }
-        
-        # Step 1: Text extraction (primary)
+
         text_data = None
         if extract_text:
             try:
@@ -1129,7 +1112,7 @@ class ChemExtractAI:
                 result["text_content"] = text
                 result["metadata"]["pages"] = text_meta.get("pages", 0)
                 result["metadata"]["text_method"] = text_meta.get("method")
-                
+
                 if text.strip():
                     logger.info(f"[ChemExtract] Analyzing text ({len(text)} chars)...")
                     text_data = call_text_llm(text, self.llm_provider, self.model, self.api_key)
@@ -1137,54 +1120,47 @@ class ChemExtractAI:
                         result["metadata"]["text_extracted"] = True
                         result["reactions"] = text_data.get("reactions", [])
                         result["compounds"] = text_data.get("compounds", [])
-                        # Also get other fields
                         if "experimental_procedures" in text_data:
                             result["experimental_procedures"] = text_data["experimental_procedures"]
                         if "characterization_data" in text_data:
                             result["characterization_data"] = text_data["characterization_data"]
             except Exception as e:
                 logger.error(f"[ChemExtract] Text extraction failed: {e}")
-        
-        # Step 2: Image extraction (supplementary - only if text extraction worked or explicitly requested)
+
         if extract_images and self.llm_provider in self.vision_providers:
             try:
                 page_images = pdf_to_images(pdf_path, dpi=150, max_pages=max_pages)
                 result["metadata"]["pages_processed"] = len(page_images)
-                
+
                 logger.info(f"[ChemExtract] Analyzing {len(page_images)} pages with vision...")
-                
+
                 for page_num, base64_img in page_images:
-                    # Single comprehensive extraction per page
                     vision_data = self._extract_from_image(
-                        base64_img, 
+                        base64_img,
                         extraction_type="comprehensive",
                         page_number=page_num
                     )
-                    
+
                     if vision_data:
                         result["metadata"]["images_extracted"] = True
-                        
-                        # Merge vision results with existing results
+
                         self._merge_vision_results(result, vision_data, page_num)
-                        
+
             except Exception as e:
                 logger.error(f"[ChemExtract] Image extraction failed: {e}")
-        
-        # Step 3: Deduplicate and clean up
+
         result["compounds"] = self._deduplicate_compounds(result.get("compounds", []))
         result["reactions"] = self._deduplicate_reactions(result.get("reactions", []))
-        
+
         return result
-    
+
     def _merge_vision_results(self, result: Dict, vision_data: Dict, page_num: int):
         """
         Intelligently merge vision extraction results with existing text results.
         Vision data supplements text data but doesn't override it.
         """
-        # Extract reaction schemes and convert to standard format
         reaction_schemes = vision_data.get("reaction_schemes", [])
         for scheme in reaction_schemes:
-            # Convert vision format to standard reaction format
             reaction = {
                 "id": f"vision_page{page_num}_{len(result['reactions'])+1}",
                 "source": "vision",
@@ -1200,8 +1176,7 @@ class ChemExtractAI:
                 "notes": scheme.get("notes", "")
             }
             result["reactions"].append(reaction)
-        
-        # Extract tables
+
         if vision_data.get("table_data"):
             result["tables"].append({
                 "page": page_num,
@@ -1209,11 +1184,9 @@ class ChemExtractAI:
                 "data": vision_data.get("table_data", []),
                 "columns": vision_data.get("table_columns", [])
             })
-        
-        # Add compounds from vision that aren't already in text results
+
         existing_names = {c.get("name", "").lower() for c in result.get("compounds", []) if c.get("name")}
-        
-        # Extract compounds from vision reaction data
+
         for scheme in reaction_schemes:
             for reactant in scheme.get("reactants", []):
                 name = reactant.get("name", "") if isinstance(reactant, dict) else str(reactant)
@@ -1225,7 +1198,7 @@ class ChemExtractAI:
                         "source": "vision"
                     })
                     existing_names.add(name.lower())
-            
+
             for product in scheme.get("products", []):
                 name = product.get("name", "") if isinstance(product, dict) else str(product)
                 if name and name.lower() not in existing_names:
@@ -1236,15 +1209,14 @@ class ChemExtractAI:
                         "source": "vision"
                     })
                     existing_names.add(name.lower())
-        
-        # Store figure info
+
         result["figures"].append({
             "page": page_num,
             "type": "vision_analysis",
             "description": vision_data.get("description", ""),
             "notes": vision_data.get("notes", "")
         })
-    
+
     def _deduplicate_compounds(self, compounds: List) -> List:
         """Remove duplicate compounds based on name or SMILES."""
         seen = set()
@@ -1255,23 +1227,21 @@ class ChemExtractAI:
                 seen.add(key)
                 unique.append(compound)
         return unique
-    
+
     def _deduplicate_reactions(self, reactions: List) -> List:
         """Remove duplicate reactions based on reactants/products similarity."""
-        # Simple dedup - remove exact duplicates
         seen = set()
         unique = []
         for reaction in reactions:
-            # Create a fingerprint from key fields
             reactants_str = str(sorted([str(r) for r in reaction.get("reactants", [])]))
             products_str = str(sorted([str(p) for p in reaction.get("products", [])]))
             fingerprint = f"{reactants_str}|{products_str}"
-            
+
             if fingerprint not in seen:
                 seen.add(fingerprint)
                 unique.append(reaction)
         return unique
-    
+
     async def extract_from_pdf_async(
         self,
         pdf_path: str,
@@ -1304,14 +1274,13 @@ class ChemExtractAI:
                 "images_extracted": False
             }
         }
-        
-        # Step 1: Text extraction (primary)
+
         if extract_text:
             try:
                 text, text_meta = extract_text_from_pdf(pdf_path)
                 result["text_content"] = text
                 result["metadata"]["pages"] = text_meta.get("pages", 0)
-                
+
                 if text.strip():
                     logger.info(f"[ChemExtract Async] Analyzing text ({len(text)} chars)...")
                     text_data = await call_text_llm_async(text, self.llm_provider, self.model, self.api_key)
@@ -1325,52 +1294,47 @@ class ChemExtractAI:
                             result["characterization_data"] = text_data["characterization_data"]
             except Exception as e:
                 logger.error(f"[ChemExtract] Async text extraction failed: {e}")
-        
-        # Step 2: Image extraction (supplementary) - process concurrently
+
         if extract_images and self.llm_provider in self.vision_providers:
             try:
                 page_images = pdf_to_images(pdf_path, dpi=150, max_pages=max_pages)
                 result["metadata"]["pages_processed"] = len(page_images)
-                
+
                 logger.info(f"[ChemExtract Async] Analyzing {len(page_images)} pages with vision...")
-                
-                # Process all pages concurrently with comprehensive extraction
+
                 async def process_page(page_num: int, base64_img: str):
                     vision_data = await self._extract_from_image_async(
-                        base64_img, 
+                        base64_img,
                         extraction_type="comprehensive",
                         page_number=page_num
                     )
                     return (page_num, vision_data)
-                
+
                 tasks = [process_page(page_num, base64_img) for page_num, base64_img in page_images]
                 all_results = await asyncio.gather(*tasks)
-                
-                # Merge all vision results
+
                 for page_num, vision_data in all_results:
                     if vision_data:
                         result["metadata"]["images_extracted"] = True
                         self._merge_vision_results(result, vision_data, page_num)
-                        
+
             except Exception as e:
                 logger.error(f"[ChemExtract] Async image extraction failed: {e}")
-        
-        # Step 3: Deduplicate and clean up
+
         result["compounds"] = self._deduplicate_compounds(result.get("compounds", []))
         result["reactions"] = self._deduplicate_reactions(result.get("reactions", []))
-        
+
         return result
-    
+
     def _extract_from_image(
-        self, 
-        base64_image: str, 
+        self,
+        base64_image: str,
         extraction_type: str = "reactions",
         page_number: int = 1
     ) -> Optional[Dict]:
         """Extract data from an image using vision LLM (sync)."""
-        
+
         if extraction_type == "comprehensive":
-            # Combined extraction - reactions + tables in one call
             system_prompt = SYSTEM_PROMPT_VISION
             user_message = f"""Analyze page {page_number} of this scientific document and extract ALL chemical information:
 1. Reaction schemes and molecular structures
@@ -1387,7 +1351,7 @@ Return a comprehensive JSON with all extracted data."""
         else:
             system_prompt = SYSTEM_PROMPT_VISION
             user_message = f"Extract all chemical information from page {page_number}."
-        
+
         return call_vision_llm(
             base64_image,
             self.llm_provider,
@@ -1396,17 +1360,16 @@ Return a comprehensive JSON with all extracted data."""
             system_prompt,
             user_message
         )
-    
+
     async def _extract_from_image_async(
-        self, 
-        base64_image: str, 
+        self,
+        base64_image: str,
         extraction_type: str = "reactions",
         page_number: int = 1
     ) -> Optional[Dict]:
         """Extract data from an image using vision LLM (async)."""
-        
+
         if extraction_type == "comprehensive":
-            # Combined extraction - reactions + tables in one call
             system_prompt = SYSTEM_PROMPT_VISION
             user_message = f"""Analyze page {page_number} of this scientific document and extract ALL chemical information:
 1. Reaction schemes and molecular structures
@@ -1423,7 +1386,7 @@ Return a comprehensive JSON with all extracted data."""
         else:
             system_prompt = SYSTEM_PROMPT_VISION
             user_message = f"Extract all chemical information from page {page_number}."
-        
+
         return await call_vision_llm_async(
             base64_image,
             self.llm_provider,
@@ -1434,9 +1397,6 @@ Return a comprehensive JSON with all extracted data."""
         )
 
 
-# ============================================================
-# CONVENIENCE FUNCTIONS
-# ============================================================
 
 def extract_chemical_data_from_pdf(
     pdf_path: str,
@@ -1455,7 +1415,7 @@ def extract_chemical_data_from_pdf(
         api_key=api_key,
         model=model
     )
-    
+
     return extractor.extract_from_pdf(
         pdf_path,
         extract_images=extract_images,
@@ -1481,7 +1441,7 @@ async def extract_chemical_data_from_pdf_async(
         api_key=api_key,
         model=model
     )
-    
+
     return await extractor.extract_from_pdf_async(
         pdf_path,
         extract_images=extract_images,
@@ -1490,41 +1450,38 @@ async def extract_chemical_data_from_pdf_async(
     )
 
 
-# ============================================================
-# CLI ENTRY POINT
-# ============================================================
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) < 2:
         print("ChemExtract AI - Chemical Data Extraction Tool")
         print("Usage: python chemextract_extractor.py <pdf_path> [provider] [api_key]")
         print("\nProviders: deepseek, openai, gemini, anthropic")
         sys.exit(1)
-    
+
     pdf_path = sys.argv[1]
     provider = sys.argv[2] if len(sys.argv) > 2 else 'deepseek'
     api_key = sys.argv[3] if len(sys.argv) > 3 else os.environ.get(f'{provider.upper()}_API_KEY')
-    
+
     if not api_key:
         print(f"Error: No API key provided. Set {provider.upper()}_API_KEY environment variable or pass as argument.")
         sys.exit(1)
-    
+
     print(f"Extracting from: {pdf_path}")
     print(f"Provider: {provider}")
-    
+
     result = extract_chemical_data_from_pdf(
         pdf_path,
         llm_provider=provider,
         api_key=api_key
     )
-    
+
     print("\n=== Extraction Results ===")
     print(f"Reactions found: {len(result.get('reactions', []))}")
     print(f"Compounds found: {len(result.get('compounds', []))}")
     print(f"Tables found: {len(result.get('tables', []))}")
     print(f"\nFull results saved to extraction_result.json")
-    
+
     with open("extraction_result.json", "w") as f:
         json.dump(result, f, indent=2, default=str)

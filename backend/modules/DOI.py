@@ -11,7 +11,7 @@ HEADERS = {'User-Agent': USER_AGENT}
 
 def extract_doi_from_pdf(pdf_path) -> str:
     doi_pattern = r'10\.\d{4,9}/[-._;()/:A-Z0-9]+'
-    
+
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
             text = page.extract_text()
@@ -27,7 +27,7 @@ def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
     try:
         resp = requests.get(url, timeout=15, headers=HEADERS)
         resp.raise_for_status()
-        
+
         msg = resp.json()['message']
         date_info = msg.get('published-print') or msg.get('published-online') or msg.get('published', {})
         year = date_info.get('date-parts', [[None]])[0][0]
@@ -59,38 +59,38 @@ def get_referenced_dois(references: List) -> List[str]:
 def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, Any]]:
     base_url = "https://api.openalex.org"
     search_url = f"{base_url}/works/doi:{doi}"
-    
+
     try:
         resp = requests.get(search_url, timeout=15, headers=HEADERS)
         if resp.status_code != 200:
             return []
-        
+
         work_data = resp.json()
         work_id = work_data.get('id')
-        
+
         if not work_id:
             return []
-        
+
         all_results = []
         page = 1
         per_page = 200
-        
+
         while True:
             citations_url = (
                 f"{base_url}/works?filter=cites:{work_id}&per_page={per_page}&page={page}"
                 f"&select=id,doi,display_name,publication_year,cited_by_count,authorships,referenced_works"
             )
-            
+
             resp = requests.get(citations_url, timeout=20, headers=HEADERS)
             if resp.status_code != 200:
                 break
-            
+
             data = resp.json()
             items = data.get('results', [])
-            
+
             if not items:
                 break
-            
+
             for item in items:
                 authors = item.get('authorships', [])
                 author_name = "Unknown"
@@ -111,7 +111,7 @@ def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, An
                 break
             page += 1
         return all_results
-            
+
     except Exception as e:
         logger.error(f"API Error: {e}")
         return []

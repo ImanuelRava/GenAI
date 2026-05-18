@@ -1,8 +1,3 @@
-"""
-GenAI Research Platform - Main Flask Application
-An AI-powered chemistry research platform for transition metal catalysis.
-"""
-
 import os
 import sys
 import time
@@ -188,7 +183,6 @@ app.register_blueprint(llm_bp)
 app.register_blueprint(viz_bp)
 app.register_blueprint(data_extraction_bp)
 
-# Register database blueprint if available
 try:
     from routes.database import database_bp
     app.register_blueprint(database_bp)
@@ -197,12 +191,10 @@ except ImportError:
     logger.warning("Database blueprint not available. Database API endpoints disabled.")
     logger.info("Registered API blueprints: network, chemistry, llm, viz, data_extraction")
 
-# Use HTTP client for LLM requests instead of direct imports
 from llm_client import get_llm_response, generate_knowledge_graph
 from utils import sanitize_input
 from errors import ValidationError, LLMError
 
-# Import RAG service for database integration
 try:
     from modules.nicobot_rag import get_rag, enhance_prompt_with_context
     RAG_AVAILABLE = True
@@ -227,7 +219,7 @@ def nicobot_chat():
         provider = data.get('provider')
         api_key = data.get('api_key')
         model = data.get('model')
-        use_rag = data.get('use_rag', True)  # Enable RAG by default
+        use_rag = data.get('use_rag', True)
 
         message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
         if not message:
@@ -245,7 +237,6 @@ Provide accurate, helpful responses about:
 
 Keep responses concise but informative. Use proper chemical nomenclature."""
 
-        # Enhance prompt with database context if RAG is available
         database_context = None
         if RAG_AVAILABLE and use_rag:
             try:
@@ -270,7 +261,6 @@ When answering, reference specific compounds, papers, or data from the database 
         else:
             system_prompt = base_system_prompt
 
-        # Use HTTP client for LLM response
         response = get_llm_response(
             system_prompt,
             message,
@@ -343,7 +333,6 @@ Provide accurate, helpful responses about:
 
 Keep responses concise but informative. Use proper chemical nomenclature."""
 
-        # Enhance prompt with database context if RAG is available
         database_context = None
         if RAG_AVAILABLE and use_rag:
             try:
@@ -368,7 +357,6 @@ When answering, reference specific compounds, papers, or data from the database 
         else:
             system_prompt = base_system_prompt
 
-        # Use async HTTP client
         response = await get_llm_response_async(
             system_prompt,
             message,
@@ -436,7 +424,6 @@ Provide accurate, helpful responses about:
 - Nickel and first-row transition metal catalysis
 Keep responses concise but informative."""
 
-        # Use HTTP client instead of direct import
         response = get_llm_response(system_prompt, message, provider=provider, api_key=api_key, model=model)
 
         if response:
@@ -454,9 +441,6 @@ Keep responses concise but informative."""
 @app.route('/api/redox/chat/async', methods=['POST'])
 @limiter.limit("20 per minute")
 async def redox_chat_async():
-    """
-    Async Redox-Active Ligands chat endpoint using HTTP-based LLM client.
-    """
     from llm_client import get_llm_response_async
 
     try:
@@ -483,7 +467,6 @@ Provide accurate, helpful responses about:
 - Nickel and first-row transition metal catalysis
 Keep responses concise but informative."""
 
-        # Use async HTTP client
         response = await get_llm_response_async(system_prompt, message, provider=provider, api_key=api_key, model=model)
 
         if response:
@@ -518,7 +501,6 @@ def api_knowledge_graph():
 
         if use_llm:
             logger.info(f"[KG API] Attempting LLM generation for: {topic}")
-            # Use HTTP client instead of direct import
             graph_data = generate_knowledge_graph(topic, provider=provider, api_key=api_key)
             if graph_data:
                 llm_used = True
@@ -562,7 +544,6 @@ async def api_knowledge_graph_async():
 
         if use_llm:
             logger.info(f"[KG API Async] Attempting LLM generation for: {topic}")
-            # Use async HTTP client
             graph_data = await generate_knowledge_graph_async(topic, provider=provider, api_key=api_key)
             if graph_data:
                 llm_used = True
@@ -607,7 +588,6 @@ Keep the explanation accessible to graduate-level chemistry students."""
 
         user_message = f"Explain {node_label} in the context of transition metal catalysis. Context: {context}"
 
-        # Use HTTP client instead of direct import
         llm_response = get_llm_response(system_prompt, user_message, provider=provider, api_key=api_key)
 
         if llm_response:
@@ -672,7 +652,6 @@ Keep the explanation accessible to graduate-level chemistry students."""
 
         user_message = f"Explain {node_label} in the context of transition metal catalysis. Context: {context}"
 
-        # Use async HTTP client
         llm_response = await get_llm_response_async(system_prompt, user_message, provider=provider, api_key=api_key)
 
         if llm_response:

@@ -1,6 +1,6 @@
 """
 NiCOBot Database Service
-Provides access to chemical reaction data, compounds, and citation networks.
+Provides access to chemical reaction data and compounds.
 Integrates with LLM for context-aware responses.
 """
 
@@ -21,7 +21,7 @@ class CompoundInfo:
     name: str
     leaving_group: str = ""
     compound_type: str = ""
-    category: str = ""  # 'electrophile' or 'nucleophile'
+    category: str = ""
 
 
 @dataclass
@@ -52,21 +52,17 @@ class NiCOBotDatabase:
 
     def __init__(self, data_dir: str = None):
         if data_dir is None:
-            # Data is in backend/nicobot_data/, but this module is in backend/modules/
             data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nicobot_data')
         self.data_dir = Path(data_dir)
 
-        # Data stores
         self.electrophiles: Dict[str, CompoundInfo] = {}
         self.nucleophiles: Dict[str, CompoundInfo] = {}
         self.papers: Dict[str, PaperInfo] = {}
-        self.citation_network: Dict[str, List[str]] = {}
         self.reactions: Dict[str, ReactionInfo] = {}
 
-        # Lookup indices for fast searching
-        self._name_index: Dict[str, List[str]] = {}  # lowercase name -> compound keys
-        self._smiles_index: Dict[str, str] = {}  # smiles -> compound key
-        self._keyword_index: Dict[str, List[str]] = {}  # keyword -> paper DOIs
+        self._name_index: Dict[str, List[str]] = {}
+        self._smiles_index: Dict[str, str] = {}
+        self._keyword_index: Dict[str, List[str]] = {}
 
         self._loaded = False
 
@@ -79,7 +75,6 @@ class NiCOBotDatabase:
             self._load_electrophiles()
             self._load_nucleophiles()
             self._load_papers()
-            self._load_citation_network()
             self._load_reactions()
             self._build_indices()
             self._loaded = True
@@ -92,25 +87,21 @@ class NiCOBotDatabase:
 
     def _load_electrophiles(self):
         """Load electrophile data."""
-        # Load leaving groups
         lvg_path = self.data_dir / 'E_LVG.json'
         if lvg_path.exists():
             with open(lvg_path) as f:
                 lvg_data = json.load(f)
 
-        # Load major types
         major_path = self.data_dir / 'E_Major.json'
         if major_path.exists():
             with open(major_path) as f:
                 major_data = json.load(f)
 
-        # Load types
         type_path = self.data_dir / 'E_Type.json'
         if type_path.exists():
             with open(type_path) as f:
                 type_data = json.load(f)
 
-        # Load compounds with SMILES
         smiles_path = self.data_dir / 'E_LVG_name_smiles.json'
         if smiles_path.exists():
             with open(smiles_path) as f:
@@ -121,7 +112,6 @@ class NiCOBotDatabase:
                     name = info[0]
                     leaving_group_smiles = info[1] if len(info) > 1 else ""
 
-                    # Infer leaving group type from name
                     lg_type = self._infer_leaving_group(name)
 
                     self.electrophiles[smiles] = CompoundInfo(
@@ -133,25 +123,21 @@ class NiCOBotDatabase:
 
     def _load_nucleophiles(self):
         """Load nucleophile data."""
-        # Load leaving groups
         lvg_path = self.data_dir / 'Nu_LVG.json'
         if lvg_path.exists():
             with open(lvg_path) as f:
                 lvg_data = json.load(f)
 
-        # Load major types
         major_path = self.data_dir / 'Nu_Major.json'
         if major_path.exists():
             with open(major_path) as f:
                 major_data = json.load(f)
 
-        # Load types
         type_path = self.data_dir / 'Nu_Type.json'
         if type_path.exists():
             with open(type_path) as f:
                 type_data = json.load(f)
 
-        # Load compounds with SMILES
         smiles_path = self.data_dir / 'Nu_LVG_name_smiles.json'
         if smiles_path.exists():
             with open(smiles_path) as f:
@@ -162,7 +148,6 @@ class NiCOBotDatabase:
                     name = info[0]
                     leaving_group_smiles = info[1] if len(info) > 1 else ""
 
-                    # Infer nucleophile type
                     nucl_type = self._infer_nucleophile_type(name)
 
                     self.nucleophiles[smiles] = CompoundInfo(
@@ -192,7 +177,6 @@ class NiCOBotDatabase:
                     references=references
                 )
 
-        # Also load citation network nodes for additional info
         nodes_path = self.data_dir / 'citation-network-nodes.csv'
         if nodes_path.exists():
             try:
@@ -207,24 +191,6 @@ class NiCOBotDatabase:
                             self.papers[doi].strength = row.get('Strength', '')
             except Exception as e:
                 logger.warning(f"Could not load citation nodes: {e}")
-
-    def _load_citation_network(self):
-        """Load citation network edges."""
-        edges_path = self.data_dir / 'citation-network-edges.csv'
-        if edges_path.exists():
-            try:
-                import csv
-                with open(edges_path) as f:
-                    reader = csv.reader(f)
-                    next(reader)  # Skip header
-                    for row in reader:
-                        if len(row) >= 2:
-                            source, target = row[0], row[1]
-                            if source not in self.citation_network:
-                                self.citation_network[source] = []
-                            self.citation_network[source].append(target)
-            except Exception as e:
-                logger.warning(f"Could not load citation edges: {e}")
 
     def _load_reactions(self):
         """Load reaction type information."""
@@ -241,7 +207,6 @@ class NiCOBotDatabase:
 
     def _build_indices(self):
         """Build search indices for fast lookup."""
-        # Index compounds by name
         for key, compound in self.electrophiles.items():
             name_lower = compound.name.lower()
             if name_lower not in self._name_index:
@@ -256,12 +221,10 @@ class NiCOBotDatabase:
             self._name_index[name_lower].append(f"n:{key}")
             self._smiles_index[key] = f"n:{key}"
 
-        # Index papers by keywords
         for doi, paper in self.papers.items():
-            # Index by title words
             title_words = re.findall(r'\w+', paper.title.lower())
             for word in title_words:
-                if len(word) > 3:  # Skip short words
+                if len(word) > 3:
                     if word not in self._keyword_index:
                         self._keyword_index[word] = []
                     self._keyword_index[word].append(doi)
@@ -309,7 +272,6 @@ class NiCOBotDatabase:
         query_lower = query.lower()
         results = []
 
-        # Direct name match
         for name, keys in self._name_index.items():
             if query_lower in name:
                 for key in keys:
@@ -343,7 +305,6 @@ class NiCOBotDatabase:
                 for doi in self._keyword_index[word]:
                     doi_scores[doi] = doi_scores.get(doi, 0) + 1
 
-        # Sort by relevance
         sorted_dois = sorted(doi_scores.items(), key=lambda x: x[1], reverse=True)[:limit]
 
         results = []
@@ -372,17 +333,6 @@ class NiCOBotDatabase:
     def get_paper_by_doi(self, doi: str) -> Optional[PaperInfo]:
         """Get paper information by DOI."""
         return self.papers.get(doi)
-
-    def get_related_papers(self, doi: str, limit: int = 5) -> List[PaperInfo]:
-        """Get papers related through citations."""
-        related = []
-        paper = self.papers.get(doi)
-        if paper:
-            for ref_doi in paper.references[:limit]:
-                ref_paper = self.papers.get(ref_doi)
-                if ref_paper:
-                    related.append(ref_paper)
-        return related
 
     def get_leaving_groups(self) -> Dict[str, List[str]]:
         """Get all available leaving groups for electrophiles and nucleophiles."""
@@ -414,8 +364,7 @@ class NiCOBotDatabase:
             'electrophiles': len(self.electrophiles),
             'nucleophiles': len(self.nucleophiles),
             'papers': len(self.papers),
-            'reactions': len(self.reactions),
-            'citation_edges': sum(len(v) for v in self.citation_network.values())
+            'reactions': len(self.reactions)
         }
 
     def search_for_context(self, query: str, max_results: int = 5) -> str:
@@ -425,14 +374,12 @@ class NiCOBotDatabase:
         """
         context_parts = []
 
-        # Search compounds
         compounds = self.search_compounds(query, limit=max_results)
         if compounds:
             context_parts.append("### Relevant Compounds:")
             for c in compounds:
                 context_parts.append(f"- {c['name']} ({c['category']}): SMILES={c['smiles']}, Leaving Group={c['leaving_group']}")
 
-        # Search papers
         papers = self.search_papers(query, limit=max_results)
         if papers:
             context_parts.append("\n### Relevant Publications:")
@@ -441,7 +388,6 @@ class NiCOBotDatabase:
                 if p['reaction_type']:
                     context_parts.append(f"  Reaction Type: {p['reaction_type']}")
 
-        # Check for specific reaction mentions
         query_lower = query.lower()
         for rxn in self.reactions.values():
             if rxn.name.lower() in query_lower:
@@ -478,7 +424,6 @@ class NiCOBotDatabase:
 """
 
 
-# Global database instance
 _database: Optional[NiCOBotDatabase] = None
 
 

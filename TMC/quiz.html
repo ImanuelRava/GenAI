@@ -285,15 +285,19 @@
                 // Load reaction diagrams from RDKit backend
                 const rxnResponse = await fetch('/api/reactions');
                 if (rxnResponse.ok) {
-                    rxnData = await rxnResponse.json();
+                    const rxnJson = await rxnResponse.json();
+                    rxnData = rxnJson.data || {};  // Extract the 'data' property
                     console.log('Loaded reaction diagrams:', Object.keys(rxnData));
+                    console.log('RDKit available:', rxnJson.rdkit_available);
                 }
 
                 // Load molecule data for 3D visualization
                 const molResponse = await fetch('/api/molecules');
                 if (molResponse.ok) {
-                    molData = await molResponse.json();
+                    const molJson = await molResponse.json();
+                    molData = molJson.data || {};  // Extract the 'data' property
                     console.log('Loaded molecule data:', Object.keys(molData));
+                    console.log('RDKit available:', molJson.rdkit_available);
                 }
 
                 // Shuffle and select questions

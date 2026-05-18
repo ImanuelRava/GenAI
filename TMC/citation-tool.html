@@ -12,6 +12,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/shared.css">
     <style>
+        /* Define primary and accent colors for this page */
+        :root {
+            --primary: #8b5cf6;
+            --accent: #3b82f6;
+        }
         /* Content Panel - Add padding to prevent touching outer container */
         .content-panel {
             padding: 24px;
@@ -434,10 +439,21 @@
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            /* Solid color as primary - always visible */
+            color: var(--primary);
+            /* Ensure visibility */
+            display: block;
+            min-height: 1.5rem;
+        }
+        
+        /* Gradient text effect only for browsers that fully support it */
+        @supports (-webkit-background-clip: text) and (background-clip: text) {
+            .stat-value {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
         }
         
         .stat-label-small {
@@ -1287,10 +1303,16 @@
             const jitterY = PLOT_HEIGHT * 0.05;
 
             const cyElements = {
-                nodes: nodes.map(node => {
+                nodes: nodes.map((node, index) => {
                     const nodeId = getNodeProp(node, 'id') || getNodeProp(node, 'doi') || `node-${Math.random()}`;
                     const year = parseInt(getNodeProp(node, 'year')) || minYear;
                     const cites = parseInt(getNodeProp(node, 'citations')) || 0;
+                    
+                    // Debug: log raw node data for first 3 nodes
+                    if (index < 3) {
+                        console.log(`Node ${index} raw data:`, node);
+                        console.log(`Node ${index} extracted - id:`, nodeId, 'title:', getNodeProp(node, 'title'), 'year:', year, 'cites:', cites, 'author:', getNodeProp(node, 'author'));
+                    }
                     
                     // Calculate scatter plot position (year on X, citations on Y)
                     let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
@@ -1300,7 +1322,7 @@
                     const xPos = getStableJitter(String(nodeId), rawX, jitterX);
                     const yPos = getStableJitter(String(nodeId), rawY, jitterY);
                     
-                    // Build node data object
+                    // Build node data object with all properties
                     const nodeData = {
                         id: String(nodeId),
                         title: getNodeProp(node, 'title') || 'Unknown',
@@ -1308,7 +1330,8 @@
                         citations: cites,
                         author: getNodeProp(node, 'author') || getNodeProp(node, 'authors') || 'Unknown',
                         doi: getNodeProp(node, 'doi') || '',
-                        is_main: String(getNodeProp(node, 'is_main') || false)
+                        is_main: String(getNodeProp(node, 'is_main') || false),
+                        local_citations: 0  // Will be calculated later
                     };
                     
                     return { 
@@ -1327,6 +1350,7 @@
             };
             
             console.log("Created cyElements with positions. Sample node:", cyElements.nodes[0]);
+            console.log("Sample node data:", cyElements.nodes[0] ? cyElements.nodes[0].data : 'no data');
 
             try {
                 window.cy = cytoscape({
@@ -1424,6 +1448,14 @@
                     userPanningEnabled: true,
                     wheelSensitivity: 0.3
                 });
+
+                // Calculate local citations for all nodes after graph is created
+                console.log('Calculating local citations for all nodes...');
+                window.cy.nodes().forEach(node => {
+                    const localCites = node.indegree ? node.indegree() : 0;
+                    node.data('local_citations', localCites);
+                });
+                console.log('Local citations calculated');
 
                 // Event handlers
                 window.cy.on('tap', 'node', function(evt) { 
@@ -1748,13 +1780,29 @@
 
         // --- NODE FOCUS ---
         function focusOnNode(nodeId) {
-            if (!window.cy) return;
+            console.log('focusOnNode called with nodeId:', nodeId);
+            
+            if (!window.cy) {
+                console.error('Cytoscape not initialized');
+                return;
+            }
+            
             const node = window.cy.getElementById(nodeId);
-            if (!node || node.length === 0) return;
+            console.log('Found node:', node);
+            console.log('Node length:', node ? node.length : 'null');
+            
+            if (!node || node.length === 0) {
+                console.error('Node not found for id:', nodeId);
+                return;
+            }
+            
+            // Log the node data
+            const nodeData = node.data();
+            console.log('Node data:', nodeData);
             
             resetNodeStyles();
             highlightConnected(node);
-            showNodeDetails(node.data());
+            showNodeDetails(nodeData);
             
             // Animate to node
             window.cy.animate({
@@ -1779,21 +1827,80 @@
 
         // --- INFO PANEL ---
         function showNodeDetails(data) {
-            document.getElementById('detail-title').innerText = data.title || "No Title";
-            document.getElementById('detail-cites').innerText = data.citations || 0;
-            document.getElementById('detail-year').innerText = data.year || "N/A";
-            document.getElementById('detail-author').innerText = data.author || "Unknown";
-            document.getElementById('detail-local').innerText = data.local_citations || window.cy.getElementById(data.id).indegree() || 0;
+            console.log('showNodeDetails called with data:', data);
+            console.log('Data type:', typeof data);
+            console.log('Data keys:', data ? Object.keys(data) : 'no data');
+            
+            // Ensure we have valid data
+            if (!data) {
+                console.error('No data provided to showNodeDetails');
+                alert('No node data available');
+                return;
+            }
+            
+            // Helper function to safely get string value
+            function safeString(val, defaultVal) {
+                if (val === null || val === undefined) return defaultVal;
+                return String(val);
+            }
+            
+            // Helper function to safely get number value
+            function safeNumber(val, defaultVal) {
+                const num = parseInt(val);
+                return isNaN(num) ? defaultVal : num;
+            }
+            
+            // Update title
+            const titleEl = document.getElementById('detail-title');
+            titleEl.innerText = safeString(data.title, "No Title");
+            titleEl.style.color = 'var(--text-main)';
+            
+            // Update author
+            const authorEl = document.getElementById('detail-author');
+            authorEl.innerText = safeString(data.author, "Unknown");
+            authorEl.style.color = 'var(--text-main)';
+            
+            // Handle citations
+            const citations = safeNumber(data.citations, 0);
+            const citesElement = document.getElementById('detail-cites');
+            citesElement.innerText = citations;
+            citesElement.style.color = 'var(--primary)';
+            
+            // Handle year
+            const year = safeNumber(data.year, 0);
+            const yearElement = document.getElementById('detail-year');
+            yearElement.innerText = year > 0 ? year : "N/A";
+            yearElement.style.color = 'var(--primary)';
+            
+            // Handle local citations
+            let localCitations = safeNumber(data.local_citations, 0);
+            if (localCitations === 0 && window.cy && data.id) {
+                try {
+                    const node = window.cy.getElementById(data.id);
+                    if (node && node.length > 0) {
+                        localCitations = node.indegree ? node.indegree() : 0;
+                    }
+                } catch (e) {
+                    console.warn('Could not calculate local citations:', e);
+                }
+            }
+            const localElement = document.getElementById('detail-local');
+            localElement.innerText = localCitations;
+            localElement.style.color = 'var(--primary)';
+            
+            console.log('Displaying - Title:', data.title, 'Author:', data.author, 'Citations:', citations, 'Year:', year, 'Local:', localCitations);
             
             const doiText = document.getElementById('detail-doi');
             const doiLink = document.getElementById('detail-link');
             
-            if (data.id && !data.id.startsWith('ref_')) {
-                doiText.innerText = data.id;
+            const doiValue = data.id || data.doi || "N/A";
+            doiText.innerText = doiValue;
+            doiText.style.color = 'var(--text-main)';
+            
+            if (data.id && !String(data.id).startsWith('ref_')) {
                 doiLink.href = `https://doi.org/${data.id}`;
                 doiLink.style.display = 'block';
             } else {
-                doiText.innerText = data.id || "N/A";
                 doiLink.style.display = 'none';
             }
             
@@ -1843,6 +1950,22 @@
         function closeInfoPanel() { 
             document.getElementById('infoPanel').classList.remove('open');
             resetHighlight();
+        }
+        
+        // Test function - call from browser console: testInfoPanel()
+        function testInfoPanel() {
+            console.log('Testing info panel with sample data...');
+            const testData = {
+                id: '10.1234/test.doi.5678',
+                title: 'Test Paper Title - This is a sample paper for testing',
+                author: 'Smith, J.',
+                year: 2023,
+                citations: 150,
+                local_citations: 5,
+                doi: '10.1234/test.doi.5678'
+            };
+            showNodeDetails(testData);
+            console.log('Info panel should now be visible with test data.');
         }
     </script>
 </body>

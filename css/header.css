@@ -1,11 +1,5 @@
-/* ===========================================
-   SHARED HEADER STYLES - GenAI Research
-   =========================================== */
-
-/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* CSS Variables */
 :root {
     --ai-primary: #3b82f6;
     --ai-light: #dbeafe;
@@ -36,7 +30,6 @@
     --radius-xl: 28px;
 }
 
-/* Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -56,12 +49,8 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
     min-height: 100vh;
-    padding-top: 72px; /* Account for fixed header */
+    padding-top: 72px;
 }
-
-/* ===========================================
-   HEADER STYLES
-   =========================================== */
 
 header {
     background: rgba(255, 255, 255, 0.95);
@@ -152,7 +141,6 @@ nav a:hover {
     background: var(--bg-main);
 }
 
-/* Active states for different sections */
 nav a.active {
     color: var(--ai-primary);
     background: var(--ai-light);
@@ -178,10 +166,6 @@ nav a.active-virus {
     background: var(--virus-light);
 }
 
-/* ===========================================
-   RESPONSIVE HEADER
-   =========================================== */
-
 @media (max-width: 768px) {
     .header-inner {
         flex-direction: column;
@@ -202,6 +186,6 @@ nav a.active-virus {
     }
 
     body {
-        padding-top: 120px; /* Taller header on mobile */
+        padding-top: 120px;
     }
 }

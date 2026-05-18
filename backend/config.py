@@ -1,8 +1,3 @@
-"""
-Configuration Module for GenAI Research Platform
-Centralizes all application settings and environment variables
-"""
-
 import os
 from dataclasses import dataclass, field
 from typing import List, Set, Optional

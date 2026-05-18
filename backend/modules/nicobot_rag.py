@@ -30,7 +30,6 @@ class NiCOBotRAG:
     Retrieves relevant context from database and enhances LLM prompts.
     """
 
-    # Keywords that indicate specific query types
     COMPOUND_KEYWORDS = [
         'smiles', 'structure', 'compound', 'molecule', 'leaving group',
         'electrophile', 'nucleophile', 'boronic', 'triflate', 'tosylate',
@@ -83,27 +82,22 @@ class NiCOBotRAG:
             'mechanism': 0.0
         }
 
-        # Check compound keywords
         for kw in self.COMPOUND_KEYWORDS:
             if kw in query_lower:
                 scores['compounds'] += 1.0
 
-        # Check paper keywords
         for kw in self.PAPER_KEYWORDS:
             if kw in query_lower:
                 scores['papers'] += 1.0
 
-        # Check reaction keywords
         for kw in self.REACTION_KEYWORDS:
             if kw in query_lower:
                 scores['reactions'] += 1.0
 
-        # Check mechanism keywords
         for kw in self.MECHANISM_KEYWORDS:
             if kw in query_lower:
                 scores['mechanism'] += 1.0
 
-        # Normalize scores
         max_score = max(sum(scores.values()), 1.0)
         for k in scores:
             scores[k] = scores[k] / max_score
@@ -116,7 +110,6 @@ class NiCOBotRAG:
         """
         self._ensure_db()
 
-        # Analyze query
         scores = self.analyze_query(query)
 
         compounds = []
@@ -124,40 +117,32 @@ class NiCOBotRAG:
         reactions = []
         general_info = ""
 
-        # Always search compounds - extract potential compound names
         query_words = re.findall(r'\w+', query.lower())
 
-        # Search for compounds mentioned in the query
         for word in query_words:
-            if len(word) > 3:  # Skip short words
+            if len(word) > 3:
                 found = self.db.search_compounds(word, limit=2)
                 for c in found:
                     if c not in compounds:
                         compounds.append(c)
 
-        # Also search with the full query
         found = self.db.search_compounds(query, limit=max_results)
         for c in found:
             if c not in compounds:
                 compounds.append(c)
 
-        # Limit results
         compounds = compounds[:max_results]
 
-        # Always search papers for relevant publications
         papers = self.db.search_papers(query, limit=max_results)
 
-        # Check for reaction mentions
         query_lower = query.lower()
         for rxn in self.db.reactions.values():
             if rxn.name.lower() in query_lower:
                 reactions.append(rxn.name)
 
-        # Add general cross-coupling info for mechanism/reaction questions
         if scores['mechanism'] > 0.1 or scores['reactions'] > 0.1:
             general_info = self.db.get_cross_coupling_info()
 
-        # Format context
         formatted = self._format_context(compounds, papers, reactions, general_info)
 
         return RAGContext(
@@ -295,15 +280,13 @@ When answering, reference specific compounds, papers, or data from the database 
         response += f"- **{stats['electrophiles']}** electrophile compounds\n"
         response += f"- **{stats['nucleophiles']}** nucleophile compounds\n"
         response += f"- **{stats['papers']}** research papers\n"
-        response += f"- **{stats['reactions']}** reaction types\n"
-        response += f"- **{stats['citation_edges']}** citation relationships\n\n"
+        response += f"- **{stats['reactions']}** reaction types\n\n"
         response += "I can search this database to provide specific compound information, "
         response += "publication references, and reaction data in my responses."
 
         return response
 
 
-# Global RAG instance
 _rag_instance: Optional[NiCOBotRAG] = None
 
 

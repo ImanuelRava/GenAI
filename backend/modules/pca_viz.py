@@ -4,26 +4,26 @@ from typing import Dict, List, Any, Tuple
 
 def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
     np.random.seed(42)
-    
+
     if data_type == 'clusters':
         n_per_cluster = n_samples // 2
-        
+
         cluster1_x = np.random.randn(n_per_cluster) * 1.5 - 3
         cluster1_y = np.random.randn(n_per_cluster) * 1.5 + 2
-        
+
         cluster2_x = np.random.randn(n_per_cluster) * 1.5 + 3
         cluster2_y = np.random.randn(n_per_cluster) * 1.5 - 2
-        
+
         X = np.concatenate([cluster1_x, cluster2_x])
         Y = np.concatenate([cluster1_y, cluster2_y])
         labels = [0] * n_per_cluster + [1] * n_per_cluster
-        
+
     elif data_type == 'linear':
         t = np.linspace(-4, 4, n_samples)
         X = t + np.random.randn(n_samples) * 0.5
         Y = t * 0.7 + np.random.randn(n_samples) * 0.8
         labels = [0] * n_samples
-        
+
     else:
         X = np.random.randn(n_samples) * 2
         Y = np.random.randn(n_samples) * 2
@@ -36,20 +36,17 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
     cov_xx = np.mean(X_centered ** 2)
     cov_yy = np.mean(Y_centered ** 2)
     cov_xy = np.mean(X_centered * Y_centered)
-    
-    # Compute eigenvalues and eigenvectors
-    # For 2x2 symmetric matrix: λ² - (a+d)λ + (ad-bc) = 0
+
     trace = cov_xx + cov_yy
     det = cov_xx * cov_yy - cov_xy ** 2
-    
+
     discriminant = trace ** 2 / 4 - det
     if discriminant < 0:
         discriminant = 0
-    
+
     lambda1 = trace / 2 + np.sqrt(discriminant)
     lambda2 = trace / 2 - np.sqrt(discriminant)
-    
-    # Compute eigenvector for PC1
+
     if abs(cov_xy) > 1e-10:
         pc1_x = lambda1 - cov_yy
         pc1_y = cov_xy
@@ -58,30 +55,25 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
             pc1_x, pc1_y = 1, 0
         else:
             pc1_x, pc1_y = 0, 1
-    
-    # Normalize PC1
+
     norm = np.sqrt(pc1_x ** 2 + pc1_y ** 2)
     pc1_x, pc1_y = pc1_x / norm, pc1_y / norm
-    
-    # PC2 is perpendicular to PC1
+
     pc2_x, pc2_y = -pc1_y, pc1_x
-    
-    # Compute variance explained
+
     total_variance = lambda1 + lambda2
     variance_pc1 = lambda1 / total_variance * 100
     variance_pc2 = lambda2 / total_variance * 100
-    
-    # Project data onto PC1
+
     projected_x = (X_centered * pc1_x + Y_centered * pc1_y) * pc1_x + mean_x
     projected_y = (X_centered * pc1_x + Y_centered * pc1_y) * pc1_y + mean_y
-    
-    # Scale for visualization (canvas coordinates)
+
     scale = 50
     center_x, center_y = 300, 200
-    
+
     data_points = []
     projected_points = []
-    
+
     for i in range(len(X)):
         data_points.append({
             'x': center_x + X[i] * scale,
@@ -92,7 +84,7 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
             'x': center_x + (projected_x[i] - mean_x) * scale + mean_x * scale,
             'y': center_y - (projected_y[i] - mean_y) * scale - mean_y * scale
         })
-    
+
     return {
         'data_points': data_points,
         'projected_points': projected_points,
@@ -114,13 +106,13 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
 
 def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
     np.random.seed(42)
-    
+
     if data_type == 'structured':
         base_eigenvalues = np.array([5.0, 3.0, 1.5, 0.8, 0.5, 0.3, 0.2, 0.15, 0.1, 0.05])
-        
+
     elif data_type == 'moderate':
         base_eigenvalues = np.array([3.0, 2.5, 2.0, 1.5, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3])
-        
+
     else:
         base_eigenvalues = np.array([1.3, 1.2, 1.1, 1.05, 1.0, 0.95, 0.9, 0.85, 0.8, 0.75])
 
@@ -131,13 +123,13 @@ def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
             base_eigenvalues,
             np.linspace(0.05, 0.02, num_features - 10)
         ])
-    
+
     eigenvalues = eigenvalues * num_features / np.sum(eigenvalues)
-    
+
     total_variance = np.sum(eigenvalues)
     variance_explained = eigenvalues / total_variance * 100
     cumulative_variance = np.cumsum(variance_explained)
-    
+
     components = []
     for i in range(num_features):
         components.append({
@@ -146,7 +138,7 @@ def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
             'variance_explained': round(variance_explained[i], 1),
             'cumulative_variance': round(cumulative_variance[i], 1)
         })
-    
+
     return {
         'components': components,
         'num_features': num_features,
@@ -156,7 +148,7 @@ def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
 
 def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
     np.random.seed(42)
-    
+
     if dataset == 'drug':
         molecules = [
             {'name': 'Aspirin', 'class': 'NSAID', 'mw': 180, 'logp': 1.2, 'tpsa': 63},
@@ -176,7 +168,7 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             {'name': 'Amoxicillin', 'class': 'Antibiotic', 'mw': 365, 'logp': 0.0, 'tpsa': 132},
             {'name': 'Penicillin G', 'class': 'Antibiotic', 'mw': 334, 'logp': 1.5, 'tpsa': 97},
         ]
-        
+
         class_colors = {
             'NSAID': '#3b82f6',
             'Analgesic': '#10b981',
@@ -186,7 +178,7 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             'Antidiabetic': '#06b6d4',
             'Antibiotic': '#ec4899'
         }
-        
+
     elif dataset == 'solvents':
         molecules = [
             {'name': 'Water', 'class': 'Protic', 'mw': 18, 'logp': -0.8, 'tpsa': 25},
@@ -205,7 +197,7 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             {'name': 'Hexane', 'class': 'Alkane', 'mw': 86, 'logp': 3.6, 'tpsa': 0},
             {'name': 'Cyclohexane', 'class': 'Alkane', 'mw': 84, 'logp': 3.0, 'tpsa': 0},
         ]
-        
+
         class_colors = {
             'Protic': '#3b82f6',
             'Aprotic': '#10b981',
@@ -213,7 +205,7 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             'Aromatic': '#7c3aed',
             'Alkane': '#ef4444'
         }
-        
+
     else:
         molecules = [
             {'name': 'H', 'class': 'Nonmetal', 'mw': 1, 'logp': 0, 'tpsa': 0},
@@ -235,47 +227,39 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             {'name': 'Pt', 'class': 'Transition', 'mw': 195, 'logp': 0, 'tpsa': 0},
             {'name': 'Au', 'class': 'Transition', 'mw': 197, 'logp': 0, 'tpsa': 0},
         ]
-        
+
         class_colors = {
             'Nonmetal': '#3b82f6',
             'Halogen': '#10b981',
             'Metal': '#f59e0b',
             'Transition': '#7c3aed'
         }
-    
-    # Extract features for PCA
+
     features = np.array([[m['mw'], m['logp'], m['tpsa']] for m in molecules])
-    
-    # Standardize features
+
     mean = np.mean(features, axis=0)
     std = np.std(features, axis=0)
-    std[std == 0] = 1  # Avoid division by zero
+    std[std == 0] = 1
     features_std = (features - mean) / std
-    
-    # Compute covariance matrix
+
     cov_matrix = np.cov(features_std.T)
-    
-    # Compute eigenvalues and eigenvectors
+
     eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
-    
-    # Sort by eigenvalue (descending)
+
     idx = np.argsort(eigenvalues)[::-1]
     eigenvalues = eigenvalues[idx]
     eigenvectors = eigenvectors[:, idx]
-    
-    # Project data onto first two principal components
+
     projected = features_std @ eigenvectors[:, :2]
-    
-    # Scale for visualization
+
     scale = 40
     center_x, center_y = 300, 200
-    
-    # Normalize to [-1, 1] range then scale
+
     projected_norm = (projected - projected.mean(axis=0)) / (projected.max(axis=0) - projected.min(axis=0) + 0.1)
-    
+
     points = []
     classes_found = set()
-    
+
     for i, mol in enumerate(molecules):
         points.append({
             'name': mol['name'],
@@ -285,18 +269,16 @@ def get_chemistry_pca_data(dataset: str) -> Dict[str, Any]:
             'color': class_colors.get(mol['class'], '#6b7280')
         })
         classes_found.add(mol['class'])
-    
-    # Calculate variance explained
+
     total_variance = np.sum(eigenvalues)
     variance_pc1 = eigenvalues[0] / total_variance * 100
     variance_pc2 = eigenvalues[1] / total_variance * 100
-    
-    # Build legend
+
     legend = []
     for cls, color in class_colors.items():
         if cls in classes_found:
             legend.append({'class': cls, 'color': color})
-    
+
     return {
         'name': dataset.title() + ' Dataset',
         'points': points,

@@ -1,8 +1,3 @@
-"""
-Database Routes Blueprint
-Provides API endpoints for direct database queries.
-"""
-
 import logging
 from typing import Dict, Any
 
@@ -15,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 database_bp = Blueprint('database', __name__, url_prefix='/api/database')
 
-# Import database services
 try:
     from modules.nicobot_database import get_database, NiCOBotDatabase
     from modules.nicobot_rag import get_rag, NiCOBotRAG
@@ -70,7 +64,7 @@ def search_compounds():
 
     query = request.args.get('q', '')
     limit = min(int(request.args.get('limit', 10)), 50)
-    category = request.args.get('category')  # 'electrophile' or 'nucleophile'
+    category = request.args.get('category')
 
     if not query:
         raise APIError("Query parameter 'q' is required", 400)
@@ -79,7 +73,6 @@ def search_compounds():
         db = get_database()
         results = db.search_compounds(query, limit=limit)
 
-        # Filter by category if specified
         if category:
             results = [r for r in results if r.get('category') == category]
 

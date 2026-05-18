@@ -1,9 +1,3 @@
-"""
-LLM Providers Module for GenAI Research Platform
-Supports multiple LLM providers with unified interface.
-Includes both synchronous and asynchronous support.
-"""
-
 import os
 import json
 import logging
@@ -21,8 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class BaseLLMProvider(ABC):
-    """Base class for LLM providers with sync and async support."""
-
     def __init__(self, api_key: str = None, base_url: str = None, model: str = None):
         self.api_key = api_key
         self.base_url = base_url
@@ -36,7 +28,6 @@ class BaseLLMProvider(ABC):
         temperature: float = 0.7,
         max_tokens: int = 2000
     ) -> Optional[str]:
-        """Synchronous chat completion."""
         pass
 
     @abstractmethod
@@ -47,7 +38,6 @@ class BaseLLMProvider(ABC):
         temperature: float = 0.7,
         max_tokens: int = 2000
     ) -> Optional[str]:
-        """Asynchronous chat completion."""
         pass
 
     def _make_request(
@@ -56,7 +46,6 @@ class BaseLLMProvider(ABC):
         payload: Dict[str, Any],
         timeout: int = 60
     ) -> Optional[str]:
-        """Synchronous HTTP request helper."""
         try:
             response = requests.post(
                 f"{self.base_url}/chat/completions",
@@ -86,7 +75,6 @@ class BaseLLMProvider(ABC):
         payload: Dict[str, Any],
         timeout: int = 60
     ) -> Optional[str]:
-        """Asynchronous HTTP request helper."""
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
@@ -115,8 +103,6 @@ class BaseLLMProvider(ABC):
 
 
 class DeepSeekProvider(BaseLLMProvider):
-    """DeepSeek LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('DEEPSEEK_API_KEY')
         self.base_url = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1')
@@ -172,8 +158,6 @@ class DeepSeekProvider(BaseLLMProvider):
 
 
 class OpenAIProvider(BaseLLMProvider):
-    """OpenAI LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('OPENAI_API_KEY')
         self.base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
@@ -229,8 +213,6 @@ class OpenAIProvider(BaseLLMProvider):
 
 
 class AnthropicProvider(BaseLLMProvider):
-    """Anthropic Claude LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('ANTHROPIC_API_KEY')
         self.base_url = 'https://api.anthropic.com/v1'
@@ -316,8 +298,6 @@ class AnthropicProvider(BaseLLMProvider):
 
 
 class OllamaProvider(BaseLLMProvider):
-    """Ollama local LLM provider with sync and async support."""
-
     def __init__(self, base_url: str = None, model: str = None):
         self.base_url = base_url or os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
         self.model = model or os.environ.get('OLLAMA_MODEL', 'llama3')
@@ -396,8 +376,6 @@ class OllamaProvider(BaseLLMProvider):
 
 
 class GroqProvider(BaseLLMProvider):
-    """Groq LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('GROQ_API_KEY')
         self.base_url = 'https://api.groq.com/openai/v1'
@@ -453,8 +431,6 @@ class GroqProvider(BaseLLMProvider):
 
 
 class HuggingFaceProvider(BaseLLMProvider):
-    """Hugging Face Inference API provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('HF_API_KEY') or os.environ.get('HUGGINGFACE_API_KEY')
         self.model = model or os.environ.get('HF_MODEL', 'meta-llama/Llama-3.2-3B-Instruct')
@@ -548,8 +524,6 @@ class HuggingFaceProvider(BaseLLMProvider):
 
 
 class GeminiProvider(BaseLLMProvider):
-    """Google Gemini LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
         self.model = model or os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
@@ -632,8 +606,6 @@ class GeminiProvider(BaseLLMProvider):
 
 
 class OpenRouterProvider(BaseLLMProvider):
-    """OpenRouter LLM provider with sync and async support."""
-
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.environ.get('OPENROUTER_API_KEY')
         self.base_url = 'https://openrouter.ai/api/v1'
@@ -693,8 +665,6 @@ class OpenRouterProvider(BaseLLMProvider):
 
 
 class LLMProviderFactory:
-    """Factory for creating LLM provider instances."""
-
     HK_FRIENDLY_PROVIDERS: List[str] = ['ollama', 'openrouter', 'huggingface', 'deepseek']
     ALL_PROVIDERS: List[str] = [
         'ollama', 'openrouter', 'huggingface', 'deepseek',
@@ -703,7 +673,6 @@ class LLMProviderFactory:
 
     @staticmethod
     def create(provider: str = 'ollama', **kwargs) -> BaseLLMProvider:
-        """Create an LLM provider instance."""
         providers = {
             'ollama': OllamaProvider,
             'openrouter': OpenRouterProvider,
@@ -725,7 +694,6 @@ class LLMProviderFactory:
 
     @staticmethod
     def get_default_provider() -> str:
-        """Get the default provider based on available environment variables."""
         if os.environ.get('GROQ_API_KEY'):
             return 'groq'
         elif os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY'):
@@ -753,10 +721,6 @@ def get_llm_response(
     model: str = None,
     **kwargs
 ) -> Optional[str]:
-    """
-    Synchronous LLM chat completion.
-    Drop-in function for backward compatibility.
-    """
     system_prompt = sanitize_input(system_prompt, max_length=4000)
     user_message = sanitize_input(user_message, max_length=2000)
 
@@ -792,9 +756,6 @@ async def get_llm_response_async(
     model: str = None,
     **kwargs
 ) -> Optional[str]:
-    """
-    Asynchronous LLM chat completion.
-    """
     system_prompt = sanitize_input(system_prompt, max_length=4000)
     user_message = sanitize_input(user_message, max_length=2000)
 
@@ -827,10 +788,6 @@ def generate_knowledge_graph(
     provider: str = None,
     api_key: str = None
 ) -> Optional[Dict[str, Any]]:
-    """
-    Generate a knowledge graph for a given topic.
-    Synchronous version.
-    """
     topic = sanitize_input(topic, max_length=500)
 
     system_prompt = """You are an expert in transition metal catalysis and chemistry education.
@@ -874,10 +831,6 @@ async def generate_knowledge_graph_async(
     provider: str = None,
     api_key: str = None
 ) -> Optional[Dict[str, Any]]:
-    """
-    Generate a knowledge graph for a given topic.
-    Asynchronous version.
-    """
     topic = sanitize_input(topic, max_length=500)
 
     system_prompt = """You are an expert in transition metal catalysis and chemistry education.
@@ -969,7 +922,6 @@ if __name__ == "__main__":
     else:
         print("No response received. Check your API key configuration.")
 
-    # Test async
     async def test_async():
         response = await get_llm_response_async(
             "You are a helpful chemistry assistant.",
