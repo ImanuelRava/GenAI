@@ -131,13 +131,6 @@
             margin-top: 10px;
             overflow-x: auto;
         }
-        .arrow-down {
-            text-align: center;
-            padding: 0;
-            margin: -10px 0;
-            color: #3B82F6;
-            font-size: 28px;
-        }
         .data-flow {
             display: flex;
             align-items: center;
@@ -240,8 +233,6 @@ message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
                 </div>
             </div>
 
-            <div class="arrow-down">↓</div>
-
             <!-- Phase 2: RAG -->
             <div class="phase">
                 <div class="phase-header">
@@ -337,8 +328,6 @@ enhanced_prompt = f"{base_prompt}\n## Database Context\n{context.formatted_conte
                 </div>
             </div>
 
-            <div class="arrow-down">↓</div>
-
             <!-- Phase 3: LLM -->
             <div class="phase">
                 <div class="phase-header">
@@ -389,8 +378,6 @@ response = requests.post(
                     </div>
                 </div>
             </div>
-
-            <div class="arrow-down">↓</div>
 
             <!-- Phase 4: Response -->
             <div class="phase">
