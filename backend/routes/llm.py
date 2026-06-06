@@ -4,16 +4,11 @@ Handles LLM integration endpoints
 """
 
 import os
-import json
 import logging
-from typing import Optional, Dict, Any
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
-from errors import APIError, ValidationError, LLMError
-from utils import sanitize_input, validate_api_key
-from config import config, LLM_PROVIDER_CONFIG
-from cache import cache_llm_response
+from config import LLM_PROVIDER_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -104,56 +99,6 @@ def api_llm_status():
         'ollama_available': ollama_available,
         'note': 'Backend API key verification is disabled by default to avoid unnecessary API calls.'
     })
-
-@llm_bp.route('/chat', methods=['POST'])
-def chat():
-    data = request.get_json()
-
-    if not data:
-        raise ValidationError("No JSON data provided")
-
-    message = data.get('message', '')
-    provider = data.get('provider')
-    api_key = data.get('api_key')
-    model = data.get('model')
-
-    message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
-    if not message:
-        raise ValidationError("Message cannot be empty", field="message")
-
-    from llm_providers import get_llm_response
-
-    system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
-Provide accurate, helpful responses about:
-- Nickel catalysis mechanisms and applications
-- C-O bond activation strategies
-- Cross-coupling reactions (Suzuki, Heck, Kumada, etc.)
-- Ligand design for transition metal catalysis
-- Comparison of Ni vs Pd catalysis
-
-Keep responses concise but informative. Use proper chemical nomenclature."""
-
-    try:
-        response = get_llm_response(
-            system_prompt,
-            message,
-            provider=provider,
-            api_key=api_key,
-            model=model
-        )
-
-        if response:
-            return jsonify({
-                'success': True,
-                'response': response,
-                'provider': provider or 'default'
-            })
-        else:
-            raise LLMError("No response received from LLM")
-
-    except Exception as e:
-        logger.error(f"LLM chat error: {e}", exc_info=True)
-        raise LLMError(f"Error communicating with LLM: {str(e)}")
 
 @llm_bp.route('/providers')
 def get_providers():

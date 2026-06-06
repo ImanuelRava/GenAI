@@ -3,7 +3,6 @@ NiCOBot RAG (Retrieval Augmented Generation) Service
 Integrates database context with LLM for enhanced responses.
 """
 
-import os
 import logging
 import re
 from typing import Optional, Dict, Any, List

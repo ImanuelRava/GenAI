@@ -1,8 +1,6 @@
 import os
-import json
 import logging
-import asyncio
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
 import requests
@@ -22,10 +20,6 @@ class LLMConfig:
     def __post_init__(self):
         self.base_url = os.environ.get('LLM_SERVICE_URL', self.base_url)
         self.timeout = int(os.environ.get('LLM_TIMEOUT', self.timeout))
-
-
-class LLMClientError(Exception):
-    pass
 
 
 class LLMClient:

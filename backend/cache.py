@@ -118,42 +118,4 @@ def cached(ttl: int = 3600, key_prefix: str = ''):
     return decorator
 
 
-def cache_paper_details(ttl: int = 86400):
-    return cached(ttl=ttl, key_prefix='paper')
 
-
-def cache_llm_response(ttl: int = 3600):
-    return cached(ttl=ttl, key_prefix='llm')
-
-
-def cache_molecule_data(ttl: int = 86400):
-    return cached(ttl=ttl, key_prefix='molecule')
-
-
-def invalidate_cache(key_prefix: str = None):
-    if key_prefix is None:
-        _cache.clear()
-        logger.info("Cleared all cache entries")
-    else:
-        keys_to_delete = [
-            k for k in _cache._cache.keys() 
-            if k.startswith(key_prefix)
-        ]
-        for key in keys_to_delete:
-            _cache.delete(key)
-        logger.info(f"Invalidated {len(keys_to_delete)} cache entries with prefix '{key_prefix}'")
-
-
-@lru_cache(maxsize=100)
-def cached_parse_doi(doi: str) -> Optional[Dict[str, str]]:
-    if not doi:
-        return None
-    doi = doi.strip().lower()
-    if doi.startswith('https://doi.org/'):
-        doi = doi.replace('https://doi.org/', '')
-    elif doi.startswith('http://doi.org/'):
-        doi = doi.replace('http://doi.org/', '')
-    elif doi.startswith('doi:'):
-        doi = doi.replace('doi:', '')
-    
-    return {'doi': doi, 'normalized': doi}

@@ -6,12 +6,11 @@ Handles citation network analysis endpoints
 import os
 import uuid
 import logging
-from typing import Dict, Any
 
-from flask import Blueprint, request, jsonify, current_app
-from werkzeug.utils import secure_filename
 
-from errors import APIError, ValidationError, NotFoundError
+from flask import Blueprint, request, jsonify
+
+from errors import APIError, ValidationError
 from utils import sanitize_filename
 from config import config
 

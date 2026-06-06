@@ -3,736 +3,1056 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Extraction | TMC - GenAI Research</title>
+    <title>Data Extraction | TMC — GenAI Research</title>
+    <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Content Panel - Add padding to prevent touching outer container */
-        .content-panel {
-            padding: 24px;
-        }
-        .content-header {
-            margin: -24px -24px 24px -24px;
-            padding: 32px 24px;
-        }
-        .content-panel > h2,
-        .content-panel > h3 {
-            padding: 0;
-            margin-top: 24px;
-            margin-bottom: 16px;
-        }
-        .content-panel > p,
-        .content-panel > ul,
-        .content-panel > ol {
-            padding: 0;
-        }
-        .content-panel > ul,
-        .content-panel > ol {
-            padding-left: 24px;
-        }
-        .content-panel > .highlight-box,
-        .content-panel > .info-box,
-        .content-panel > .warning-box,
-        .content-panel > .module-cards,
-        .content-panel > .steps-container,
-        .content-panel > .reaction-scheme,
-        .content-panel > .diagram-container,
-        .content-panel > .cards-grid,
-        .content-panel > .data-table,
-        .content-panel > .formula-box,
-        .content-panel > .network-diagram,
-        .content-panel > .stats-grid,
-        .content-panel > .btn-group {
-            margin-left: 0;
-            margin-right: 0;
-        }
-        .btn-group {
-            padding: 24px 0 0 0;
+        /* ================================================
+           CSS VARIABLES & RESET
+           ================================================ */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-darker: #6d28d9;
+            --primary-light: #ede9fe;
+            --primary-lighter: #f5f3ff;
+            --primary-glow: rgba(139, 92, 246, 0.25);
+            --success: #10b981;
+            --success-dark: #059669;
+            --success-light: #d1fae5;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --bg-sidebar: #0f172a;
+            --bg-sidebar-hover: #1e293b;
+            --bg-sidebar-active: rgba(139, 92, 246, 0.15);
+            --bg-card: #ffffff;
+            --bg-input: #f8fafc;
+            --bg-code: #f1f5f9;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --text-sidebar: #cbd5e1;
+            --text-sidebar-muted: #64748b;
+            --text-sidebar-active: #a78bfa;
+            --border-color: #e2e8f0;
+            --border-sidebar: #1e293b;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --sidebar-width: 260px;
+            --header-height: 72px;
+            --transition: 0.25s ease;
         }
 
-        /* Page-specific styles */
-        html { height: auto; min-height: 100vh; }
-        body { min-height: 100vh; }
-        
-        /* Clean Sidebar Styles */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { height: auto; min-height: 100vh; scroll-behavior: smooth; }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ================================================
+           MAIN LAYOUT
+           ================================================ */
+        .app-layout {
+            display: flex;
+            flex: 1;
+            padding-top: var(--header-height);
+        }
+
+        /* ================================================
+           DARK SIDEBAR
+           ================================================ */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 100;
+            border-right: 1px solid var(--border-sidebar);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-sidebar); border-radius: 4px; }
+
         .sidebar-section {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-top: 0;
-            border-top: none;
+            padding: 20px 18px;
+            border-bottom: 1px solid var(--border-sidebar);
         }
-        .sidebar-section:first-child {
-            padding-top: 20px;
-        }
-        .sidebar-section:last-child {
-            border-bottom: none;
-        }
-        
+        .sidebar-section:last-child { border-bottom: none; }
+
         .sidebar-section-title {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--tmc-primary);
-            margin-bottom: 12px;
+            letter-spacing: 0.8px;
+            color: var(--text-sidebar-active);
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        .sidebar-section-title svg {
-            width: 14px;
-            height: 14px;
-        }
-        
+        .sidebar-section-title svg { width: 14px; height: 14px; flex-shrink: 0; }
+
         .sidebar-text {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin: 0;
+            font-size: 0.82rem;
+            color: var(--text-sidebar);
+            line-height: 1.65;
         }
-        
-        .info-box {
-            background: var(--tmc-light);
-            border-radius: 8px;
+
+        /* Info box in sidebar */
+        .sidebar-info-box {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: var(--radius);
             padding: 12px;
             margin-top: 12px;
         }
-        
-        .info-box h4 {
-            font-size: 0.85rem;
+        .sidebar-info-box h4 {
+            font-size: 0.78rem;
             font-weight: 600;
-            color: var(--tmc-primary);
+            color: var(--text-sidebar-active);
             margin-bottom: 4px;
         }
-        
-        .info-box p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 0;
+        .sidebar-info-box p {
+            font-size: 0.75rem;
+            color: var(--text-sidebar-muted);
             line-height: 1.5;
+            margin: 0;
         }
-        
-        /* Step Flow - Compact */
-        .step-flow {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
+
+        /* Step flow */
+        .step-flow { display: flex; flex-direction: column; gap: 6px; }
         .step-flow-item {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px 12px;
-            background: var(--bg-gray);
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            background: var(--bg-sidebar-hover);
+            border-radius: var(--radius);
+            transition: background var(--transition);
         }
-        
-        .step-flow-item:hover {
-            background: var(--tmc-light);
-        }
-        
+        .step-flow-item:hover { background: rgba(139, 92, 246, 0.12); }
         .step-flow-number {
-            width: 24px;
-            height: 24px;
-            background: var(--tmc-primary);
+            width: 22px; height: 22px;
+            background: var(--primary);
             color: white;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
         }
-        
-        .step-flow-text {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-        
-        .step-flow-arrow {
-            display: flex;
-            justify-content: center;
-            padding: 2px 0;
-        }
-        
-        .step-flow-arrow svg {
-            width: 16px;
-            height: 16px;
-            color: var(--text-light);
-        }
-        
-        /* Data List - Clean */
-        .data-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
+        .step-flow-text { font-size: 0.82rem; font-weight: 500; color: var(--text-sidebar); }
+        .step-flow-arrow { display: flex; justify-content: center; padding: 1px 0; }
+        .step-flow-arrow svg { width: 14px; height: 14px; color: var(--text-sidebar-muted); }
+
+        /* Data list */
+        .data-list { display: flex; flex-direction: column; gap: 6px; }
         .data-list-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            background: var(--bg-gray);
-            border-radius: 6px;
-            border-left: 3px solid var(--tmc-primary);
-            transition: all 0.2s ease;
-        }
-        
-        .data-list-item:hover {
-            background: var(--tmc-light);
-        }
-        
-        .data-list-item svg {
-            width: 16px;
-            height: 16px;
-            color: var(--tmc-primary);
-            flex-shrink: 0;
-        }
-        
-        .data-list-content h4 {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
-        }
-        
-        .data-list-content p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin: 2px 0 0 0;
-        }
-
-        /* Extraction Tool Styles */
-        .extraction-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            min-height: 100%;
-            padding-bottom: 40px;
-        }
-
-        .input-section {
-            background: var(--bg-gray);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .input-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .provider-selector {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .provider-btn {
-            padding: 10px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .provider-btn:hover {
-            border-color: var(--tmc-primary);
-        }
-
-        .provider-btn.active {
-            background: var(--tmc-primary);
-            border-color: var(--tmc-primary);
-            color: white;
-        }
-
-        .provider-btn .provider-desc {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            display: block;
-        }
-
-        .provider-btn.active .provider-desc {
-            color: rgba(255,255,255,0.8);
-        }
-
-        /* Mode Selector Styles */
-        .mode-selector {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 16px 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .mode-btn:hover {
-            border-color: var(--tmc-primary);
-            background: var(--tmc-light);
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border-color: var(--tmc-primary);
-            color: white;
-        }
-
-        .mode-btn svg {
-            margin-bottom: 4px;
-        }
-
-        .mode-btn span {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .mode-btn small {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .mode-btn.active small {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .input-section-mode {
-            margin-bottom: 16px;
-        }
-
-        .api-key-section {
-            margin-bottom: 16px;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .api-key-section label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-main);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .api-key-section label .required {
-            color: #ef4444;
-        }
-
-        .api-key-input-wrapper {
-            display: flex;
-            gap: 8px;
-        }
-
-        .api-key-input-wrapper input {
-            flex: 1;
+            display: flex; align-items: flex-start; gap: 10px;
             padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-family: monospace;
+            background: var(--bg-sidebar-hover);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+            transition: all var(--transition);
         }
+        .data-list-item:hover { background: rgba(139, 92, 246, 0.12); }
+        .data-list-item svg { width: 15px; height: 15px; color: var(--text-sidebar-active); flex-shrink: 0; margin-top: 1px; }
+        .data-list-content h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-sidebar); margin: 0; }
+        .data-list-content p { font-size: 0.7rem; color: var(--text-sidebar-muted); margin: 2px 0 0 0; }
 
-        .api-key-input-wrapper input:focus {
-            outline: none;
-            border-color: var(--tmc-primary);
-        }
-
-        .toggle-visibility {
-            padding: 8px 12px;
-            background: var(--bg-gray);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .toggle-visibility:hover {
-            background: var(--tmc-light);
-        }
-
-        .api-key-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .api-key-hint a {
-            color: var(--tmc-primary);
-        }
-
-        .model-select-area {
-            margin-bottom: 16px;
-        }
-
-        .model-select-area label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .model-select-area select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: white;
-        }
-
-        .model-select-area select:focus {
-            outline: none;
-            border-color: var(--tmc-primary);
-        }
-
-        .file-upload-area {
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            margin-bottom: 16px;
-        }
-
-        .file-upload-area:hover {
-            border-color: var(--tmc-primary);
-            background: var(--tmc-light);
-        }
-
-        .file-upload-area.dragover {
-            border-color: var(--tmc-primary);
-            background: var(--tmc-light);
-        }
-
-        .file-upload-area svg {
-            width: 48px;
-            height: 48px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .file-upload-area p {
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .file-upload-area .file-name {
-            color: var(--tmc-primary);
-            font-weight: 600;
-        }
-
-        .text-input-area {
-            margin-bottom: 16px;
-        }
-
-        .text-input-area textarea {
-            width: 100%;
-            min-height: 120px;
+        /* Pipeline comparison */
+        .pipeline-compare { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .pipeline-card {
+            background: var(--bg-sidebar-hover);
+            border-radius: var(--radius);
             padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            resize: vertical;
-            font-family: inherit;
+            border: 1px solid var(--border-sidebar);
+            transition: all var(--transition);
         }
-
-        .text-input-area textarea:focus {
-            outline: none;
-            border-color: var(--tmc-primary);
+        .pipeline-card:hover { border-color: rgba(139, 92, 246, 0.3); }
+        .pipeline-card h4 {
+            font-size: 0.8rem; font-weight: 600; color: var(--text-sidebar);
+            margin-bottom: 4px; display: flex; align-items: center; gap: 6px;
         }
-
-        .action-buttons {
-            display: flex;
-            gap: 12px;
+        .pipeline-card p { font-size: 0.72rem; color: var(--text-sidebar-muted); line-height: 1.5; margin: 0; }
+        .pipeline-badge {
+            font-size: 0.6rem; font-weight: 700; padding: 2px 7px;
+            border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.3px;
         }
+        .pipeline-badge.fast { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .pipeline-badge.advanced { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
 
-        .btn-primary {
+        /* ================================================
+           MAIN CONTENT
+           ================================================ */
+        .main-content {
             flex: 1;
-            padding: 12px 24px;
-            background: var(--tmc-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            margin-left: var(--sidebar-width);
+            min-height: calc(100vh - var(--header-height));
+            padding: 32px;
+        }
+
+        /* Page header */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 12px;
         }
-
-        .btn-primary:hover {
-            background: #7c3aed;
-            transform: translateY(-1px);
+        .page-header h1 .header-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px var(--primary-glow);
         }
+        .page-header h1 .header-icon svg { width: 22px; height: 22px; color: white; }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-        .btn-primary:disabled {
-            background: var(--text-muted);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            padding: 12px 24px;
-            background: white;
-            color: var(--text-main);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--tmc-primary);
-            color: var(--tmc-primary);
-        }
-
-        /* Results Section - VERY VISIBLE */
-        .results-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-            border-radius: 16px;
-            border: 4px solid #8b5cf6;
+        /* ================================================
+           CARD BASE
+           ================================================ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            min-height: 400px;
-            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+            transition: box-shadow var(--transition);
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .card-header h2 {
+            font-size: 1.05rem; font-weight: 700; color: var(--text-main);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-header h2 svg { width: 18px; height: 18px; color: var(--primary); }
+
+        .card-body { padding: 24px; }
+
+        .section-gap { margin-bottom: 24px; }
+
+        /* ================================================
+           PROVIDER PILLS
+           ================================================ */
+        .provider-pills {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .provider-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-full);
+            background: var(--bg-white);
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            position: relative;
+        }
+        .provider-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-lighter);
+        }
+        .provider-pill.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+        .provider-pill .vision-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: 50%;
+        }
+        .provider-pill.active .vision-badge { background: rgba(255,255,255,0.25); }
+        .provider-pill .vision-badge svg { width: 11px; height: 11px; }
+        .provider-pill .pill-desc {
+            font-size: 0.7rem; font-weight: 400; opacity: 0.7;
+        }
+        .provider-pill.active .pill-desc { opacity: 0.85; }
+
+        /* ================================================
+           API KEY INPUT
+           ================================================ */
+        .api-key-card {
+            margin-top: 16px;
+            padding: 16px 20px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition);
+        }
+        .api-key-card label {
+            font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+        }
+        .api-key-card label .required { color: var(--danger); }
+        .api-key-card label svg { width: 15px; height: 15px; color: var(--text-muted); }
+        .api-key-row { display: flex; gap: 8px; }
+        .api-key-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.88rem;
+            font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+            background: var(--bg-white);
+            transition: all var(--transition);
+        }
+        .api-key-row input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        .toggle-vis-btn {
+            padding: 10px 14px;
+            background: var(--bg-white);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition);
+            color: var(--text-muted);
+        }
+        .toggle-vis-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lighter); }
+        .toggle-vis-btn svg { width: 18px; height: 18px; }
+        .api-key-hint {
+            font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;
+        }
+        .api-key-hint a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .api-key-hint a:hover { text-decoration: underline; }
+
+        /* Model select */
+        .model-row { margin-top: 16px; }
+        .model-row label {
+            display: block; font-size: 0.82rem; color: var(--text-muted);
+            margin-bottom: 6px; font-weight: 500;
+        }
+        .model-row select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.88rem;
+            background: var(--bg-white);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .model-row select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+        /* ================================================
+           EXTRACTION MODE CARDS (2)
+           ================================================ */
+        .mode-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
             margin-top: 20px;
         }
-
-        .results-section.has-data {
-            border-color: #10b981;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            animation: pulse-border 2s ease-in-out;
+        .mode-card {
+            position: relative;
+            padding: 22px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-white);
+            cursor: pointer;
+            transition: all var(--transition);
+            overflow: hidden;
         }
-
-        @keyframes pulse-border {
-            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.5); }
+        .mode-card:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-lighter);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
-
-        .results-header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: none;
-        }
-
-        .results-header h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
+        .mode-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            margin: 0;
-            display: flex;
+            box-shadow: 0 6px 24px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+        .mode-card .mode-icon {
+            width: 40px; height: 40px;
+            border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+            transition: all var(--transition);
+        }
+        .mode-card .mode-icon svg { width: 22px; height: 22px; }
+        .mode-card:not(.active) .mode-icon {
+            background: var(--primary-light);
+        }
+        .mode-card:not(.active) .mode-icon svg { color: var(--primary); }
+        .mode-card.active .mode-icon { background: rgba(255,255,255,0.2); }
+        .mode-card.active .mode-icon svg { color: white; }
+        .mode-card h3 {
+            font-size: 1rem; font-weight: 700; margin-bottom: 4px;
+        }
+        .mode-card .mode-desc {
+            font-size: 0.78rem; line-height: 1.5; margin-top: 2px;
+        }
+        .mode-card:not(.active) .mode-desc { color: var(--text-muted); }
+        .mode-card.active .mode-desc { color: rgba(255,255,255,0.85); }
+        .mode-card .mode-sub {
+            font-size: 0.72rem; line-height: 1.4; margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(100,116,139,0.15);
+        }
+        .mode-card:not(.active) .mode-sub { color: var(--text-light); }
+        .mode-card.active .mode-sub { color: rgba(255,255,255,0.6); border-top-color: rgba(255,255,255,0.2); }
+        .mode-card .new-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            font-size: 0.6rem; font-weight: 800;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+        /* ================================================
+           INPUT PANELS
+           ================================================ */
+        .input-panel { display: none; margin-top: 16px; animation: fadeSlideIn 0.3s ease; }
+        .input-panel.active { display: block; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Text input */
+        .text-input-wrapper textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 0.9rem;
+            font-family: inherit;
+            line-height: 1.6;
+            resize: vertical;
+            background: var(--bg-input);
+            transition: all var(--transition);
+            color: var(--text-main);
+        }
+        .text-input-wrapper textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background: var(--bg-white);
+        }
+        .text-input-wrapper textarea::placeholder { color: var(--text-light); }
+
+        /* File upload */
+        .file-drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 36px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: var(--bg-input);
+        }
+        .file-drop-zone:hover, .file-drop-zone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-lighter);
+        }
+        .file-drop-zone.has-file {
+            border-style: solid;
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+        .file-drop-zone .drop-icon {
+            width: 48px; height: 48px;
+            margin: 0 auto 12px;
+            color: var(--text-light);
+            transition: color var(--transition);
+        }
+        .file-drop-zone:hover .drop-icon { color: var(--primary); }
+        .file-drop-zone.has-file .drop-icon { color: var(--success); }
+        .file-drop-zone .drop-text { font-size: 0.88rem; color: var(--text-muted); }
+        .file-drop-zone .drop-text strong { color: var(--primary); font-weight: 600; }
+
+        /* PDF Options */
+        .pdf-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .pdf-option-card {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-input);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .pdf-option-card:hover { border-color: var(--primary-light); background: var(--primary-lighter); }
+        .pdf-option-card input[type="checkbox"] {
+            width: 18px; height: 18px; margin-top: 1px; accent-color: var(--primary);
+            cursor: pointer; flex-shrink: 0;
+        }
+        .pdf-option-card .option-info h4 {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 2px;
+        }
+        .pdf-option-card .option-info p { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+
+        /* ReactionLens options */
+        .reactionlens-options {
+            display: flex; flex-direction: column; gap: 12px;
+            margin-top: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--bg-white) 100%);
+            border: 1.5px solid rgba(139, 92, 246, 0.2);
+            border-radius: var(--radius-lg);
+        }
+        .reactionlens-options h4 {
+            font-size: 0.85rem; font-weight: 700; color: var(--primary-dark);
+            margin-bottom: 14px;
+        }
+        .rl-toggle-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .rl-toggle-row label {
+            font-size: 0.82rem; font-weight: 500; color: var(--text-main);
+            cursor: pointer;
+        }
+        .toggle-switch {
+            position: relative; width: 42px; height: 22px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-switch .slider {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--border-color);
+            border-radius: 22px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .toggle-switch .slider::before {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            left: 2px; bottom: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: all var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .toggle-switch input:checked + .slider { background: var(--primary); }
+        .toggle-switch input:checked + .slider::before { transform: translateX(20px); }
+
+        /* Slider */
+        .rl-slider-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 10px 14px;
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .rl-slider-row label {
+            font-size: 0.82rem; font-weight: 500; color: var(--text-main);
+            white-space: nowrap; min-width: 80px;
+        }
+        .rl-slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        .rl-slider-row .slider-value {
+            font-size: 0.85rem; font-weight: 700; color: var(--primary);
+            min-width: 30px; text-align: center;
+        }
+
+        /* ReactionLens text input */
+        .rl-text-input {
+            margin-top: 14px;
+        }
+        .rl-text-input textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.88rem;
+            font-family: inherit;
+            resize: vertical;
+            background: var(--bg-input);
+            transition: all var(--transition);
+        }
+        .rl-text-input textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        /* ================================================
+           ACTION BUTTONS
+           ================================================ */
+        .action-bar {
+            display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;
+        }
+        .btn-extract {
+            flex: 1; min-width: 200px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem; font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+        .btn-extract:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+        .btn-extract:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-extract svg { width: 18px; height: 18px; }
+        .btn-clear {
+            padding: 14px 24px;
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.95rem; font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-clear:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+        .btn-clear svg { width: 16px; height: 16px; }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block; width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ================================================
+           STATUS MESSAGE
+           ================================================ */
+        .status-msg {
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: none;
             align-items: center;
             gap: 10px;
+            animation: fadeSlideIn 0.3s ease;
         }
+        .status-msg.visible { display: flex; }
+        .status-msg svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .status-msg.error { background: var(--danger-light); color: #b91c1c; border: 1px solid #fecaca; }
+        .status-msg.success { background: var(--success-light); color: #047857; border: 1px solid #bbf7d0; }
+        .status-msg.info { background: var(--info-light); color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .status-msg.warning { background: var(--warning-light); color: #b45309; border: 1px solid #fde68a; }
 
-        .results-header h3 svg {
-            stroke: white;
+        /* ================================================
+           RESULTS SECTION
+           ================================================ */
+        .results-card {
+            margin-top: 24px;
+            border: 2px solid var(--border-color);
+            transition: all 0.4s ease;
         }
-
-        .export-buttons {
-            display: flex;
-            gap: 8px;
+        .results-card.has-data {
+            border-color: var(--success);
+            box-shadow: 0 0 0 1px var(--success), 0 8px 30px rgba(16, 185, 129, 0.15);
         }
-
-        .view-json-btn {
-            padding: 10px 18px;
-            background: white;
-            color: #8b5cf6;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .results-card .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-bottom: none;
+            padding: 18px 24px;
         }
-
-        .view-json-btn:hover {
-            background: #f0fdf4;
-            color: #10b981;
-            transform: translateY(-1px);
+        .results-card.has-data .card-header {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
         }
+        .results-card .card-header h2 { color: white; }
+        .results-card .card-header h2 svg { color: rgba(255,255,255,0.85); }
+        .results-card .card-header .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .export-btn {
             padding: 8px 14px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            background: rgba(255,255,255,0.15);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius);
+            font-size: 0.8rem; font-weight: 600;
             color: white;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--transition);
+            display: inline-flex; align-items: center; gap: 6px;
         }
+        .export-btn:hover { background: white; color: var(--primary); border-color: white; }
+        .results-card.has-data .export-btn:hover { color: var(--success-dark); }
+        .export-btn svg { width: 14px; height: 14px; }
 
-        .export-btn:hover {
-            background: white;
-            color: #8b5cf6;
+        /* Result tabs */
+        .result-tabs {
+            display: flex; gap: 2px; padding: 8px 24px 0;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
         }
-
-        .results-content {
-            padding: 20px;
-            max-height: 450px;
-            overflow-y: auto;
-        }
-
-        .result-category {
-            margin-bottom: 20px;
-        }
-
-        .result-category:last-child {
-            margin-bottom: 0;
-        }
-
-        .result-category h4 {
-            font-size: 0.85rem;
+        .result-tab {
+            padding: 10px 20px;
+            font-size: 0.82rem;
             font-weight: 600;
-            color: var(--tmc-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .result-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .result-tag {
-            padding: 6px 12px;
-            background: var(--tmc-light);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--text-main);
-        }
-
-        .result-detail {
-            padding: 12px;
-            background: var(--bg-gray);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .result-detail:last-child {
-            margin-bottom: 0;
-        }
-
-        .result-detail-label {
-            font-size: 0.75rem;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition);
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
         }
-
-        .result-detail-value {
-            font-size: 0.95rem;
-            color: var(--text-main);
-            font-weight: 500;
+        .result-tab:hover { color: var(--text-secondary); }
+        .result-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
+        .result-tab .tab-count {
+            font-size: 0.68rem;
+            background: var(--bg-code);
+            padding: 1px 7px;
+            border-radius: var(--radius-full);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .result-tab.active .tab-count { background: var(--primary-light); color: var(--primary); }
 
+        /* Tab content */
+        .tab-content { display: none; padding: 24px; animation: fadeSlideIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
         }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
+        .empty-state .empty-icon {
+            width: 64px; height: 64px;
+            margin: 0 auto 16px;
+            color: var(--text-light);
             opacity: 0.5;
         }
+        .empty-state p { font-size: 0.95rem; }
 
-        .empty-state p {
-            font-size: 1rem;
+        /* Overview summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition);
+        }
+        .summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+        .summary-card .summary-num {
+            font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .summary-label {
+            font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
+        /* Reaction cards */
+        .reaction-card {
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: 14px;
+            transition: all var(--transition);
+            border-left: 4px solid var(--primary);
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .reaction-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .reaction-card .rxn-entry {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.68rem; font-weight: 700; color: var(--primary);
+            background: var(--primary-light);
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+        .reaction-card .rxn-scheme {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            background: var(--bg-code);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .reaction-card .rxn-section { margin-bottom: 10px; }
+        .reaction-card .rxn-section-title {
+            font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .rxn-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .rxn-tag {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.78rem; font-weight: 500;
+        }
+        .rxn-tag.reactant { background: var(--info-light); color: #1d4ed8; }
+        .rxn-tag.product { background: var(--success-light); color: #047857; }
+        .rxn-tag.catalyst { background: #fef3c7; color: #b45309; }
+        .rxn-tag.ligand { background: var(--primary-light); color: var(--primary-dark); }
+        .rxn-tag.solvent { background: #e0f2fe; color: #0369a1; }
+        .rxn-tag.reagent { background: #fce7f3; color: #be185d; }
 
-        /* Status message */
-        .status-message {
+        .rxn-conditions {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+        }
+        .rxn-cond-badge {
+            padding: 4px 10px;
+            background: var(--bg-code);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--text-secondary);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .rxn-cond-badge svg { width: 12px; height: 12px; }
+
+        .yield-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.78rem; font-weight: 700;
+        }
+        .yield-badge.high { background: var(--success-light); color: #047857; }
+        .yield-badge.medium { background: var(--warning-light); color: #b45309; }
+        .yield-badge.low { background: var(--danger-light); color: #b91c1c; }
+
+        /* Compound grid */
+        .compound-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .compound-card {
+            padding: 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition);
+        }
+        .compound-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+        .compound-card .compound-name {
+            font-size: 0.9rem; font-weight: 600; color: var(--text-main);
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        }
+        .compound-card .compound-smiles {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.78rem; color: var(--primary-dark);
+            background: var(--primary-lighter);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            word-break: break-all;
+        }
+        .compound-card .compound-meta {
+            font-size: 0.72rem; color: var(--text-muted); margin-top: 6px;
+        }
+        .role-badge {
+            font-size: 0.6rem; font-weight: 700; padding: 2px 8px;
+            border-radius: var(--radius-full);
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .role-badge.reactant { background: var(--info-light); color: #1d4ed8; }
+        .role-badge.product { background: var(--success-light); color: #047857; }
+        .role-badge.catalyst { background: #fef3c7; color: #b45309; }
+        .role-badge.ligand { background: var(--primary-light); color: var(--primary-dark); }
+        .role-badge.solvent { background: #e0f2fe; color: #0369a1; }
+        .role-badge.reagent { background: #fce7f3; color: #be185d; }
+        .role-badge.byproduct { background: var(--danger-light); color: #b91c1c; }
+        .role-badge.substrate { background: #e0e7ff; color: #4338ca; }
+        .role-badge.additive { background: #ecfccb; color: #4d7c0f; }
+
+        /* Conditions table */
+        .conditions-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .conditions-table th {
+            background: var(--bg-input);
+            padding: 10px 16px;
+            font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-muted);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .conditions-table td {
             padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .conditions-table tr:last-child td { border-bottom: none; }
+        .conditions-table tr:hover td { background: var(--primary-lighter); }
+
+        /* JSON viewer */
+        .json-viewer {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            max-height: 500px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .json-viewer .json-key { color: #7dd3fc; }
+        .json-viewer .json-string { color: #86efac; }
+        .json-viewer .json-number { color: #fbbf24; }
+        .json-viewer .json-boolean { color: #c084fc; }
+        .json-viewer .json-null { color: #94a3b8; }
+
+        /* PDF Preview */
+        .pdf-preview {
+            margin-top: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: none;
+        }
+        .pdf-preview.visible { display: block; animation: fadeSlideIn 0.3s ease; }
+        .pdf-preview-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 10px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .pdf-preview-header span {
+            font-size: 0.82rem; font-weight: 600; color: white;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pdf-preview-header span svg { width: 16px; height: 16px; }
+        .pdf-preview-toggle {
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+        .pdf-preview-toggle:hover { background: rgba(255,255,255,0.35); }
+        .pdf-preview-body {
+            padding: 14px 16px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .pdf-preview-body pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin: 0;
         }
 
-        .status-message.error {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
+        /* ================================================
+           RESPONSIVE
+           ================================================ */
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mode-cards { grid-template-columns: 1fr; }
+            .provider-pills { gap: 6px; }
+            .provider-pill { padding: 8px 14px; font-size: 0.82rem; }
+            .action-bar { flex-direction: column; }
+            .btn-extract { min-width: auto; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .compound-grid { grid-template-columns: 1fr; }
         }
-
-        .status-message.success {
-            background: #f0fdf4;
-            color: #16a34a;
-            border: 1px solid #bbf7d0;
-        }
-
-        .status-message.info {
-            background: var(--tmc-light);
-            color: var(--tmc-primary);
-            border: 1px solid var(--tmc-primary);
-        }
-
-        .status-message.warning {
-            background: #fffbeb;
-            color: #d97706;
-            border: 1px solid #fcd34d;
-        }
-
     </style>
-    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body class="theme-purple">
 
@@ -757,34 +1077,29 @@
                     <span class="logo-subtitle">Innovate & Discover</span>
                 </div>
             </a>
-
             <nav>
                 <ul>
                     <li><a href="../index.html">Home</a></li>
-                    <li><a href="../AI/" >Artificial Intelligence</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
                     <li><a href="../TMC/" class="active-tmc">Transition Metal Catalysis</a></li>
-                    <li><a href="../redox-ligands/" >Redox-Active Ligands</a></li>
-                    <li><a href="../virus/" >Virology</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Main Layout -->
-    <div class="main-wrapper">
-        <!-- Sidebar -->
+    <!-- App Layout -->
+    <div class="app-layout">
+        <!-- Dark Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-section-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4"/>
-                        <path d="M12 8h.01"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                     About This Tool
                 </div>
-                <p class="sidebar-text">AI-powered extraction of chemical reaction data from scientific literature. Bring your own API key for the LLM provider of your choice.</p>
-                <div class="info-box">
+                <p class="sidebar-text">AI-powered extraction of chemical reaction data from scientific literature. Supports text, PDF, and advanced multimodal extraction.</p>
+                <div class="sidebar-info-box">
                     <h4>BYO API Key</h4>
                     <p>Your API key is sent directly to the LLM provider and is not stored on our servers.</p>
                 </div>
@@ -792,1503 +1107,967 @@
 
             <div class="sidebar-section">
                 <div class="sidebar-section-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     How It Works
                 </div>
                 <div class="step-flow">
                     <div class="step-flow-item">
                         <div class="step-flow-number">1</div>
-                        <span class="step-flow-text">Select Provider & Enter API Key</span>
+                        <span class="step-flow-text">Select Provider &amp; Enter API Key</span>
                     </div>
-                    <div class="step-flow-arrow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <polyline points="19 12 12 19 5 12"/>
-                        </svg>
-                    </div>
+                    <div class="step-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
                     <div class="step-flow-item">
                         <div class="step-flow-number">2</div>
-                        <span class="step-flow-text">Upload PDF or Text</span>
+                        <span class="step-flow-text">Choose Extraction Mode</span>
                     </div>
-                    <div class="step-flow-arrow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <polyline points="19 12 12 19 5 12"/>
-                        </svg>
-                    </div>
+                    <div class="step-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
                     <div class="step-flow-item">
                         <div class="step-flow-number">3</div>
-                        <span class="step-flow-text">AI Extraction</span>
+                        <span class="step-flow-text">AI Extracts Chemical Data</span>
                     </div>
-                    <div class="step-flow-arrow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <polyline points="19 12 12 19 5 12"/>
-                        </svg>
-                    </div>
+                    <div class="step-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
                     <div class="step-flow-item">
                         <div class="step-flow-number">4</div>
-                        <span class="step-flow-text">Export Results</span>
+                        <span class="step-flow-text">Review &amp; Export Results</span>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-section">
                 <div class="sidebar-section-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Extracted Data
                 </div>
                 <div class="data-list">
                     <div class="data-list-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 2v4"/>
-                            <path d="M12 18v4"/>
-                        </svg>
-                        <div class="data-list-content">
-                            <h4>Reactants & Products</h4>
-                            <p>Chemical structures and compounds</p>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4"/><path d="M12 18v4"/></svg>
+                        <div class="data-list-content"><h4>Reactants &amp; Products</h4><p>Molecular structures</p></div>
                     </div>
                     <div class="data-list-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
-                        </svg>
-                        <div class="data-list-content">
-                            <h4>Reaction Conditions</h4>
-                            <p>Temperature, time, solvents</p>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
+                        <div class="data-list-content"><h4>Reaction Conditions</h4><p>Temp, time, solvents</p></div>
                     </div>
                     <div class="data-list-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10 2v7.31"/>
-                            <path d="M14 9.3V1.99"/>
-                            <path d="M8.5 2h7"/>
-                            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"/>
-                        </svg>
-                        <div class="data-list-content">
-                            <h4>Catalysts & Ligands</h4>
-                            <p>Metal catalysts and ligand systems</p>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+                        <div class="data-list-content"><h4>Catalysts &amp; Ligands</h4><p>Metal systems</p></div>
                     </div>
                     <div class="data-list-item">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                        </svg>
-                        <div class="data-list-content">
-                            <h4>Yields & Selectivity</h4>
-                            <p>Reaction outcomes and metrics</p>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        <div class="data-list-content"><h4>Yields &amp; Selectivity</h4><p>Reaction outcomes</p></div>
+                    </div>
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        <div class="data-list-content"><h4>SMILES Notation</h4><p>Machine-readable</p></div>
+                    </div>
+                    <div class="data-list-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        <div class="data-list-content"><h4>R-Group Tables</h4><p>Substituent data</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Pipeline Comparison
+                </div>
+                <div class="pipeline-compare">
+                    <div class="pipeline-card">
+                        <h4>
+                            ChemExtract AI
+                            <span class="pipeline-badge fast">Fast</span>
+                        </h4>
+                        <p>Text + Vision extraction. Good for most papers with fast turnaround.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <h4>
+                            ReactionLens
+                            <span class="pipeline-badge advanced">Advanced</span>
+                        </h4>
+                        <p>Multimodal + Segmentation + Entity Resolution. Slower but more accurate.</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Content Area -->
-        <main class="content-area">
-            <div class="content-header">
-                <h2>Chemical Data Extraction Tool</h2>
-                <p>Extract structured chemical reaction data using AI-powered LLM analysis</p>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>
+                    <span class="header-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </span>
+                    Chemical Data Extraction
+                </h1>
+                <p>Extract structured chemical reaction data using AI-powered LLM analysis of text and PDFs</p>
             </div>
-            
-            <div class="extraction-container">
-                <!-- Input Section -->
-                <div class="input-section">
-                    <h3>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            <path d="M2 17l10 5 10-5"/>
-                            <path d="M2 12l10 5 10-5"/>
-                        </svg>
-                        Select LLM Provider
-                    </h3>
-                    <div class="provider-selector" id="providerSelector">
-                        <button class="provider-btn active" data-provider="deepseek">
+
+            <!-- Provider & API Key Card -->
+            <div class="card section-gap">
+                <div class="card-body">
+                    <h2 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        LLM Provider
+                    </h2>
+                    <div class="provider-pills" id="providerSelector">
+                        <button class="provider-pill active" data-provider="deepseek">
+                            <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             DeepSeek
-                            <span class="provider-desc">Cost-effective • Vision</span>
                         </button>
-                        <button class="provider-btn" data-provider="openai">
+                        <button class="provider-pill" data-provider="openai">
+                            <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             OpenAI
-                            <span class="provider-desc">GPT-4o • Vision</span>
                         </button>
-                        <button class="provider-btn" data-provider="gemini">
+                        <button class="provider-pill" data-provider="gemini">
+                            <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             Gemini
-                            <span class="provider-desc">Google AI • Vision</span>
                         </button>
-                        <button class="provider-btn" data-provider="groq">
-                            Groq
-                            <span class="provider-desc">Ultra fast</span>
-                        </button>
-                        <button class="provider-btn" data-provider="ollama">
-                            Ollama
-                            <span class="provider-desc">Local (No key)</span>
-                        </button>
-                        <button class="provider-btn" data-provider="anthropic">
+                        <button class="provider-pill" data-provider="groq">Groq</button>
+                        <button class="provider-pill" data-provider="ollama">Ollama</button>
+                        <button class="provider-pill" data-provider="anthropic">
+                            <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             Anthropic
-                            <span class="provider-desc">Claude • Vision</span>
                         </button>
                     </div>
 
-                    <!-- API Key Input -->
-                    <div class="api-key-section" id="apiKeySection">
+                    <!-- API Key -->
+                    <div class="api-key-card" id="apiKeySection">
                         <label>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                             API Key <span class="required">*</span>
                         </label>
-                        <div class="api-key-input-wrapper">
+                        <div class="api-key-row">
                             <input type="password" id="apiKeyInput" placeholder="Enter your API key...">
-                            <button class="toggle-visibility" id="toggleVisibility" title="Toggle visibility">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
+                            <button class="toggle-vis-btn" id="toggleVisibility" title="Toggle visibility">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
-                        <p class="api-key-hint" id="apiKeyHint">
-                            Get your DeepSeek API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a>
-                        </p>
+                        <p class="api-key-hint" id="apiKeyHint">Get your DeepSeek API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a></p>
                     </div>
 
-                    <div class="model-select-area">
-                        <label for="modelSelect">Model (optional - leave empty for default)</label>
+                    <!-- Model Select -->
+                    <div class="model-row">
+                        <label for="modelSelect">Model (optional — leave empty for default)</label>
                         <select id="modelSelect">
                             <option value="">Default Model</option>
-                            <!-- DeepSeek -->
                             <optgroup label="DeepSeek" data-provider="deepseek">
                                 <option value="deepseek-chat">DeepSeek Chat</option>
                                 <option value="deepseek-reasoner">DeepSeek Reasoner</option>
                             </optgroup>
-                            <!-- OpenAI -->
                             <optgroup label="OpenAI" data-provider="openai">
                                 <option value="gpt-4o">GPT-4o</option>
                                 <option value="gpt-4o-mini">GPT-4o Mini</option>
                                 <option value="gpt-4-turbo">GPT-4 Turbo</option>
                             </optgroup>
-                            <!-- Gemini -->
                             <optgroup label="Gemini" data-provider="gemini">
                                 <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
                                 <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                             </optgroup>
-                            <!-- Groq -->
                             <optgroup label="Groq" data-provider="groq">
                                 <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
                                 <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
                             </optgroup>
-                            <!-- Ollama -->
                             <optgroup label="Ollama" data-provider="ollama">
                                 <option value="llama3">Llama 3</option>
                                 <option value="mistral">Mistral</option>
                             </optgroup>
-                            <!-- Anthropic -->
                             <optgroup label="Anthropic" data-provider="anthropic">
                                 <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
                                 <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
                             </optgroup>
                         </select>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Extraction Mode Selector -->
-                    <h3>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="M21 21l-4.35-4.35"/>
-                        </svg>
+            <!-- Extraction Mode Card -->
+            <div class="card section-gap">
+                <div class="card-body">
+                    <h2 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                         Extraction Mode
-                    </h3>
-                    <div class="mode-selector" id="modeSelector">
-                        <button class="mode-btn" data-mode="text">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                            </svg>
-                            <span>From Text</span>
-                            <small>Paste or type text</small>
-                        </button>
-                        <button class="mode-btn active" data-mode="pdf">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            <span>From PDF</span>
-                            <small>Upload a PDF file</small>
-                        </button>
-                    </div>
-
-                    <!-- Text Input Section -->
-                    <div class="input-section-mode" id="textInputSection" style="display: none;">
-                        <h3>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                            </svg>
-                            Enter Text
-                        </h3>
-                        <div class="text-input-area">
-                            <textarea id="textInput" placeholder="Paste scientific text containing chemical reaction data here..."></textarea>
+                    </h2>
+                    <div class="mode-cards" id="modeSelector">
+                        <div class="mode-card active" data-mode="chemextract">
+                            <div class="mode-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                            <h3>ChemExtract</h3>
+                            <p class="mode-desc">Fast text + vision extraction pipeline</p>
+                            <p class="mode-sub">Extracts reactions, compounds, conditions from PDF text and images. Outputs SMILES reaction schemes (e.g. CC(=O)O.CCO>>CC(=O)OCC). Best for quick extraction from well-structured papers.</p>
+                        </div>
+                        <div class="mode-card" data-mode="reactionlens">
+                            <span class="new-badge">New</span>
+                            <div class="mode-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+                            <h3>ReactionLens</h3>
+                            <p class="mode-desc">Advanced multimodal mining pipeline</p>
+                            <p class="mode-sub">Classifies pages, segments figures, resolves entities via PubChem, and merges results across passes. Higher accuracy but slower. Best for complex papers with many reaction schemes.</p>
                         </div>
                     </div>
 
-                    <!-- PDF Input Section -->
-                    <div class="input-section-mode" id="pdfInputSection">
-                        <h3>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            Upload PDF Document
-                        </h3>
-                        <div class="file-upload-area" id="dropZone">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="17 8 12 3 7 8"/>
-                                <line x1="12" y1="3" x2="12" y2="15"/>
-                            </svg>
-                            <p>Drag & drop PDF file here or <span class="file-name">click to browse</span></p>
-                            <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+                    <!-- Shared PDF Upload Area (always visible) -->
+                    <div class="input-panel active" id="pdfInputPanel">
+                        <div class="file-drop-zone" id="dropZone">
+                            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <p class="drop-text">Drag &amp; drop PDF here or <strong>click to browse</strong></p>
+                            <input type="file" id="fileInput" accept=".pdf" style="display:none;">
                         </div>
-                        
-                        <!-- PDF Content Preview -->
-                        <div id="pdfPreview" style="display: none; margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-                            <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <polyline points="14 2 14 8 20 8"/>
-                                        <line x1="16" y1="13" x2="8" y2="13"/>
-                                        <line x1="16" y1="17" x2="8" y2="17"/>
-                                    </svg>
-                                    <span id="pdfPreviewTitle">PDF Content Preview</span>
-                                </span>
-                                <button id="togglePdfPreview" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                                    Collapse
-                                </button>
+                        <!-- PDF Preview -->
+                        <div class="pdf-preview" id="pdfPreview">
+                            <div class="pdf-preview-header">
+                                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> <span id="pdfPreviewTitle">PDF Preview</span></span>
+                                <button class="pdf-preview-toggle" id="togglePdfPreview">Collapse</button>
                             </div>
-                            <div id="pdfPreviewContent" style="padding: 16px; max-height: 300px; overflow-y: auto;">
-                                <pre id="pdfPreviewText" style="white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 0.85rem; color: #334155; margin: 0;"></pre>
+                            <div class="pdf-preview-body" id="pdfPreviewBody">
+                                <pre id="pdfPreviewText"></pre>
                             </div>
                         </div>
-                        
-                        <!-- Vision Extraction Option -->
-                        <div class="vision-option" id="visionOption" style="display: none; background: linear-gradient(135deg, #ede9fe 0%, #f8fafc 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 16px; margin-top: 16px;">
-                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
-                                <input type="checkbox" id="enableVision" style="width: 20px; height: 20px; margin-top: 2px; accent-color: #8b5cf6;">
-                                <div>
-                                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                            <circle cx="12" cy="12" r="3"/>
-                                        </svg>
-                                        Extract from Images (Vision AI)
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #64748b;">
-                                        Analyze chemical structures, reaction schemes, and tables in PDF images. 
-                                        <strong>Requires DeepSeek, OpenAI, Gemini, or Anthropic.</strong>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <!-- ChemExtract AI Option -->
-                        <div class="vision-option" id="chemextractOption" style="display: none; background: linear-gradient(135deg, #dbeafe 0%, #f8fafc 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin-top: 16px;">
-                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
-                                <input type="checkbox" id="enableChemExtract" style="width: 20px; height: 20px; margin-top: 2px; accent-color: #3b82f6;">
-                                <div>
-                                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
-                                            <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4"/>
-                                        </svg>
-                                        ChemExtract AI (Recommended)
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #64748b;">
-                                        Comprehensive multimodal extraction: combines text + image analysis, figure/table detection, and SMILES extraction.
-                                        <strong>Advanced AI-powered chemistry extraction. Best for scientific papers.</strong>
-                                    </div>
-                                </div>
-                            </label>
+                    </div>
+
+                    <!-- ReactionLens Advanced Options (shown only when ReactionLens mode selected) -->
+                    <div class="input-panel" id="reactionlensPanel">
+                        <div class="reactionlens-options">
+                            <h4>ReactionLens Pipeline Options</h4>
+                            <div class="rl-toggle-row">
+                                <label>Enable Filtering</label>
+                                <label class="toggle-switch"><input type="checkbox" id="rlFilter" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="rl-toggle-row">
+                                <label>Enable Segmentation</label>
+                                <label class="toggle-switch"><input type="checkbox" id="rlSegmentation" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="rl-toggle-row">
+                                <label>Enable Entity Resolution</label>
+                                <label class="toggle-switch"><input type="checkbox" id="rlEntityResolution" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="rl-slider-row">
+                                <label>Max Pages</label>
+                                <input type="range" id="rlMaxPages" min="1" max="50" value="15">
+                                <span class="slider-value" id="rlMaxPagesValue">15</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="statusMessage" class="status-message" style="display: none;"></div>
-
-                    <div class="action-buttons">
-                        <button class="btn-primary" id="extractBtn">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="M21 21l-4.35-4.35"/>
-                            </svg>
+                    <!-- Action Buttons -->
+                    <div class="action-bar">
+                        <button class="btn-extract" id="extractBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                             Extract Data
                         </button>
-                        <button class="btn-secondary" id="clearBtn">Clear</button>
+                        <button class="btn-clear" id="clearBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            Clear
+                        </button>
                     </div>
-                </div>
 
-                <!-- Results Section -->
-                <div class="results-section">
-                    <div class="results-header">
-                        <h3>
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                            </svg>
-                            Extraction Results
-                        </h3>
-                        <div class="export-buttons">
-                            <button class="view-json-btn" id="viewJsonBtn">View Raw JSON</button>
-                            <button class="export-btn" id="exportJsonBtn">Export JSON</button>
-                        </div>
-                    </div>
-                    <div class="results-content" id="resultsContent">
-                        <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            <p>Select a mode and enter your API key to extract chemical data</p>
-                        </div>
+                    <!-- Status Message -->
+                    <div class="status-msg" id="statusMessage"></div>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card results-card" id="resultsCard">
+                <div class="card-header">
+                    <h2>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Extraction Results
+                    </h2>
+                    <div class="header-actions" id="exportActions" style="display:none;">
+                        <button class="export-btn" id="exportJsonBtn" title="Export JSON">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            JSON
+                        </button>
+                        <button class="export-btn" id="exportSchemesBtn" title="Export SMILES Schemes">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                            Schemes
+                        </button>
+                        <button class="export-btn" id="copyClipboardBtn" title="Copy to Clipboard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            Copy
+                        </button>
+                        <button class="export-btn" id="downloadTxtBtn" title="Download as .txt">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            .txt
+                        </button>
                     </div>
                 </div>
+                <div class="result-tabs" id="resultTabs">
+                    <button class="result-tab active" data-tab="overview">Overview</button>
+                    <button class="result-tab" data-tab="reactions">Reactions <span class="tab-count" id="rxnCount">0</span></button>
+                    <button class="result-tab" data-tab="compounds">Compounds <span class="tab-count" id="cmpCount">0</span></button>
+                    <button class="result-tab" data-tab="conditions">Conditions</button>
+                    <button class="result-tab" data-tab="rawjson">Raw JSON</button>
+                </div>
+                <div class="tab-content active" id="tab-overview">
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <p>Select a mode, enter your API key, and click Extract to begin</p>
+                    </div>
+                </div>
+                <div class="tab-content" id="tab-reactions"></div>
+                <div class="tab-content" id="tab-compounds"></div>
+                <div class="tab-content" id="tab-conditions"></div>
+                <div class="tab-content" id="tab-rawjson"></div>
             </div>
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
-    </footer>
-
     <script>
-        // Configuration
-        const API_BASE_URL = 'http://localhost:5000';
+    // ==================================================================
+    // CONFIGURATION
+    // ==================================================================
+    const API_BASE_URL = 'http://localhost:5000';
 
-        // Provider API key URLs
-        const PROVIDER_INFO = {
-            deepseek: {
-                name: 'DeepSeek',
-                keyUrl: 'https://platform.deepseek.com/',
-                needsKey: true
-            },
-            openai: {
-                name: 'OpenAI',
-                keyUrl: 'https://platform.openai.com/api-keys',
-                needsKey: true
-            },
-            gemini: {
-                name: 'Gemini',
-                keyUrl: 'https://aistudio.google.com/app/apikey',
-                needsKey: true
-            },
-            groq: {
-                name: 'Groq',
-                keyUrl: 'https://console.groq.com/keys',
-                needsKey: true
-            },
-            ollama: {
-                name: 'Ollama',
-                keyUrl: null,
-                needsKey: false
-            },
-            anthropic: {
-                name: 'Anthropic',
-                keyUrl: 'https://console.anthropic.com/settings/keys',
-                needsKey: true
-            }
-        };
+    const PROVIDER_INFO = {
+        deepseek: { name: 'DeepSeek', keyUrl: 'https://platform.deepseek.com/', needsKey: true },
+        openai:   { name: 'OpenAI',   keyUrl: 'https://platform.openai.com/api-keys', needsKey: true },
+        gemini:   { name: 'Gemini',   keyUrl: 'https://aistudio.google.com/app/apikey', needsKey: true },
+        groq:     { name: 'Groq',     keyUrl: 'https://console.groq.com/keys', needsKey: true },
+        ollama:   { name: 'Ollama',   keyUrl: null, needsKey: false },
+        anthropic:{ name: 'Anthropic', keyUrl: 'https://console.anthropic.com/settings/keys', needsKey: true }
+    };
 
-        // State
-        let selectedProvider = 'deepseek';
-        let selectedModel = '';
-        let extractionMode = 'pdf';  // 'text' or 'pdf'
-        let extractedData = null;
-        let pdfText = '';
-        let uploadedPdfFile = null;  // Store the PDF file for vision extraction
+    const VISION_PROVIDERS = ['deepseek', 'openai', 'gemini', 'anthropic'];
 
-        // Vision-capable providers
-        const VISION_PROVIDERS = ['deepseek', 'openai', 'gemini', 'anthropic'];
+    // ==================================================================
+    // STATE
+    // ==================================================================
+    let selectedProvider = 'deepseek';
+    let selectedModel = '';
+    let extractionMode = 'chemextract';
+    let extractedData = null;
+    let pdfText = '';
+    let uploadedPdfFile = null;
 
-        // DOM Elements
-        const providerSelector = document.getElementById('providerSelector');
-        const modelSelect = document.getElementById('modelSelect');
-        const apiKeySection = document.getElementById('apiKeySection');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const apiKeyHint = document.getElementById('apiKeyHint');
-        const toggleVisibility = document.getElementById('toggleVisibility');
-        const modeSelector = document.getElementById('modeSelector');
-        const textInputSection = document.getElementById('textInputSection');
-        const pdfInputSection = document.getElementById('pdfInputSection');
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const textInput = document.getElementById('textInput');
-        const extractBtn = document.getElementById('extractBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const statusMessage = document.getElementById('statusMessage');
-        const resultsContent = document.getElementById('resultsContent');
-        const exportJsonBtn = document.getElementById('exportJsonBtn');
-        const viewJsonBtn = document.getElementById('viewJsonBtn');
-        const visionOption = document.getElementById('visionOption');
-        const enableVision = document.getElementById('enableVision');
-        const chemextractOption = document.getElementById('chemextractOption');
-        const enableChemExtract = document.getElementById('enableChemExtract');
-        
-        // PDF Preview elements
-        const pdfPreview = document.getElementById('pdfPreview');
-        const pdfPreviewTitle = document.getElementById('pdfPreviewTitle');
-        const pdfPreviewText = document.getElementById('pdfPreviewText');
-        const pdfPreviewContent = document.getElementById('pdfPreviewContent');
-        const togglePdfPreview = document.getElementById('togglePdfPreview');
-        let pdfPreviewExpanded = true;
+    // ==================================================================
+    // DOM ELEMENTS
+    // ==================================================================
+    const $ = id => document.getElementById(id);
+    const providerSelector = $('providerSelector');
+    const modelSelect = $('modelSelect');
+    const apiKeySection = $('apiKeySection');
+    const apiKeyInput = $('apiKeyInput');
+    const apiKeyHint = $('apiKeyHint');
+    const toggleVisibility = $('toggleVisibility');
+    const modeSelector = $('modeSelector');
+    const pdfInputPanel = $('pdfInputPanel');
+    const reactionlensPanel = $('reactionlensPanel');
+    const dropZone = $('dropZone');
+    const fileInput = $('fileInput');
+    const extractBtn = $('extractBtn');
+    const clearBtn = $('clearBtn');
+    const statusMessage = $('statusMessage');
+    const pdfPreview = $('pdfPreview');
+    const pdfPreviewTitle = $('pdfPreviewTitle');
+    const pdfPreviewText = $('pdfPreviewText');
+    const pdfPreviewBody = $('pdfPreviewBody');
+    const togglePdfPreview = $('togglePdfPreview');
+    const resultsCard = $('resultsCard');
+    const exportActions = $('exportActions');
+    const resultTabs = $('resultTabs');
+    const rlMaxPages = $('rlMaxPages');
+    const rlMaxPagesValue = $('rlMaxPagesValue');
+    let pdfPreviewExpanded = true;
 
-        // Mode Selection - Switch between Text and PDF
-        modeSelector.addEventListener('click', (e) => {
-            const btn = e.target.closest('.mode-btn');
-            if (btn) {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                extractionMode = btn.dataset.mode;
-                updateInputSections();
-            }
-        });
-
-        // Update input sections based on mode
-        function updateInputSections() {
-            if (extractionMode === 'text') {
-                textInputSection.style.display = 'block';
-                pdfInputSection.style.display = 'none';
-            } else {
-                textInputSection.style.display = 'none';
-                pdfInputSection.style.display = 'block';
-                // Show vision option if provider supports it
-                updateVisionOption();
-            }
-        }
-
-        // Provider Selection
-        providerSelector.addEventListener('click', (e) => {
-            const btn = e.target.closest('.provider-btn');
-            if (btn) {
-                document.querySelectorAll('.provider-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedProvider = btn.dataset.provider;
-                updateApiKeySection();
-            }
-        });
-
-        // Update API Key section based on provider
-        function updateApiKeySection() {
-            const info = PROVIDER_INFO[selectedProvider];
-            
-            if (info.needsKey) {
-                apiKeySection.style.display = 'block';
-                apiKeyHint.innerHTML = `Get your ${info.name} API key at <a href="${info.keyUrl}" target="_blank">${info.keyUrl}</a>`;
-            } else {
-                apiKeySection.style.display = 'none';
-            }
-            
-            // Also update vision option visibility
-            updateVisionOption();
-        }
-
-        // Update Vision option visibility based on provider
-        function updateVisionOption() {
-            if (extractionMode === 'pdf' && VISION_PROVIDERS.includes(selectedProvider)) {
-                visionOption.style.display = 'block';
-                chemextractOption.style.display = 'block';
-            } else {
-                visionOption.style.display = 'none';
-                chemextractOption.style.display = 'none';
-                if (enableVision) enableVision.checked = false;
-                if (enableChemExtract) enableChemExtract.checked = false;
-            }
-        }
-
-        // Toggle API Key visibility
-        toggleVisibility.addEventListener('click', () => {
-            const type = apiKeyInput.type === 'password' ? 'text' : 'password';
-            apiKeyInput.type = type;
-        });
-
-        // Model Selection
-        modelSelect.addEventListener('change', (e) => {
-            selectedModel = e.target.value;
-        });
-
-        // File Upload - Drag & Drop
-        dropZone.addEventListener('click', () => fileInput.click());
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.name.endsWith('.pdf')) {
-                handleFileUpload(file);
-            } else {
-                showStatus('Please upload a PDF file', 'error');
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                handleFileUpload(file);
-            }
-        });
-
-        async function handleFileUpload(file) {
-            // Store the file for potential vision extraction
-            uploadedPdfFile = file;
-            
-            showStatus('Processing PDF...', 'info');
-            
-            // Update drop zone to show file name (preserve the file input element)
-            const dropText = dropZone.querySelector('p');
-            if (dropText) {
-                dropText.innerHTML = `<span class="file-name">${file.name}</span>`;
-            }
-
-            // Show vision and ChemExtract options when a PDF is uploaded
-            // (updateVisionOption will handle visibility based on provider)
-            if (VISION_PROVIDERS.includes(selectedProvider)) {
-                visionOption.style.display = 'block';
-                chemextractOption.style.display = 'block';
-            } else {
-                // Still show the options but they will be styled to indicate provider requirement
-                visionOption.style.display = 'block';
-                chemextractOption.style.display = 'block';
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/extract/pdf`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    pdfText = data.text;
-                    textInput.value = data.text;
-                    
-                    // Show PDF preview
-                    pdfPreviewTitle.textContent = `${file.name} (${data.metadata.pages} pages, ${data.text_length} characters)`;
-                    pdfPreviewText.textContent = data.text.substring(0, 5000) + (data.text.length > 5000 ? '\n\n... (truncated, showing first 5000 characters)' : '');
-                    pdfPreview.style.display = 'block';
-                    pdfPreviewContent.style.display = 'block';
-                    pdfPreviewExpanded = true;
-                    togglePdfPreview.textContent = 'Collapse';
-                    
-                    showStatus(`PDF processed: ${data.metadata.pages} pages extracted. Check "Extract from Images" for vision analysis.`, 'success');
-                } else {
-                    showStatus(data.error || 'Failed to process PDF', 'error');
-                    pdfPreview.style.display = 'none';
-                }
-            } catch (error) {
-                showStatus('Error uploading PDF: ' + error.message, 'error');
-                pdfPreview.style.display = 'none';
-            }
-        }
-        
-        // Toggle PDF preview collapse/expand
-        togglePdfPreview.addEventListener('click', () => {
-            pdfPreviewExpanded = !pdfPreviewExpanded;
-            pdfPreviewContent.style.display = pdfPreviewExpanded ? 'block' : 'none';
-            togglePdfPreview.textContent = pdfPreviewExpanded ? 'Collapse' : 'Expand';
-        });
-
-        // Extract Data
-        extractBtn.addEventListener('click', async () => {
-            const text = textInput.value.trim();
-            const apiKey = apiKeyInput.value.trim();
-            const info = PROVIDER_INFO[selectedProvider];
-            const useVision = enableVision && enableVision.checked;
-            const useChemExtract = enableChemExtract && enableChemExtract.checked;
-            
-            // Validate
-            if (info.needsKey && !apiKey) {
-                showStatus('Please enter your API key', 'error');
-                return;
-            }
-            
-            // Validate based on extraction mode
-            if (extractionMode === 'text') {
-                if (!text) {
-                    showStatus('Please enter some text to extract from', 'error');
-                    return;
-                }
-            } else if (extractionMode === 'pdf') {
-                if (!uploadedPdfFile) {
-                    showStatus('Please upload a PDF file', 'error');
-                    return;
-                }
-                // If vision or ChemExtract is enabled, check for vision-capable provider
-                if ((useVision || useChemExtract) && !VISION_PROVIDERS.includes(selectedProvider)) {
-                    showStatus('Vision/ChemExtract AI requires DeepSeek, OpenAI, Gemini, or Anthropic. Please select one of these providers.', 'error');
-                    return;
-                }
-            }
-
-            extractBtn.disabled = true;
-            extractBtn.innerHTML = '<span class="loading-spinner"></span> Extracting...';
-            
-            try {
-                let data;
-                
-                if (extractionMode === 'pdf' && useChemExtract && uploadedPdfFile) {
-                    // ChemExtract AI (comprehensive multimodal)
-                    showStatus('Running ChemExtract AI extraction (text + images + tables)...', 'info');
-                    data = await extractWithChemExtract(uploadedPdfFile, apiKey);
-                } else if (extractionMode === 'pdf' && useVision && uploadedPdfFile) {
-                    // Vision-based extraction from PDF
-                    showStatus('Converting PDF to images and analyzing with Vision AI...', 'info');
-                    data = await extractWithVision(uploadedPdfFile, apiKey);
-                } else if (extractionMode === 'pdf' && uploadedPdfFile) {
-                    // Text-based extraction from PDF
-                    showStatus('Extracting text from PDF and analyzing...', 'info');
-                    data = await extractFromPdf(uploadedPdfFile, apiKey);
-                } else {
-                    // Text-based extraction from pasted text
-                    showStatus('Extracting chemical data from text...', 'info');
-                    data = await extractFromText(text, apiKey);
-                }
-
-                if (data.success) {
-                    extractedData = data.data;
-                    console.log('Extraction successful, data:', data.data);
-                    displayResults(data.data);
-                    
-                    // Show warning if no data was found
-                    if (data.warning) {
-                        showStatus(data.warning, 'warning');
-                    } else {
-                        showStatus(`✓ Extraction complete using ${info.name}! Scroll down to see results.`, 'success');
-                    }
-                } else {
-                    showStatus(data.error || 'Extraction failed', 'error');
-                }
-            } catch (error) {
-                showStatus('Error during extraction: ' + error.message, 'error');
-            } finally {
-                extractBtn.disabled = false;
-                extractBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="M21 21l-4.35-4.35"/>
-                    </svg>
-                    Extract Data
-                `;
-            }
-        });
-
-        // Text-based extraction from pasted text
-        async function extractFromText(text, apiKey) {
-            const info = PROVIDER_INFO[selectedProvider];
-            
-            const requestBody = {
-                text: text,
-                provider: selectedProvider,
-                model: selectedModel || undefined
-            };
-
-            if (info.needsKey) {
-                requestBody.api_key = apiKey;
-            }
-
-            const response = await fetch(`${API_BASE_URL}/api/extract`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            return await response.json();
-        }
-
-        // Text-based extraction from PDF (extract text first, then send to LLM)
-        async function extractFromPdf(pdfFile, apiKey) {
-            const info = PROVIDER_INFO[selectedProvider];
-            
-            const formData = new FormData();
-            formData.append('file', pdfFile);
-            
-            // First extract text from PDF
-            showStatus('Extracting text from PDF...', 'info');
-            
-            const pdfResponse = await fetch(`${API_BASE_URL}/api/extract/pdf`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            const pdfData = await pdfResponse.json();
-            
-            if (!pdfData.success) {
-                // PDF text extraction failed
-                return {
-                    success: false,
-                    error: pdfData.error || 'Failed to extract text from PDF'
-                };
-            }
-            
-            // Check if we got meaningful text
-            if (!pdfData.text || pdfData.text.trim().length < 50) {
-                return {
-                    success: false,
-                    error: 'The PDF contains very little or no extractable text. This may be a scanned document. Try enabling "Extract from Images (Vision AI)" option for better results.'
-                };
-            }
-            
-            showStatus(`Extracted ${pdfData.text_length || pdfData.text.length} characters. Analyzing with ${info.name}...`, 'info');
-            
-            // Then extract chemical data from the text
-            const result = await extractFromText(pdfData.text, apiKey);
-            
-            // Add PDF metadata to result
-            if (result.success && result.data) {
-                result.data._pdfMetadata = pdfData.metadata;
-            }
-            
-            return result;
-        }
-
-        // Vision-based extraction
-        async function extractWithVision(pdfFile, apiKey) {
-            const formData = new FormData();
-            formData.append('file', pdfFile);
-            formData.append('provider', selectedProvider);
-            formData.append('api_key', apiKey);
-            if (selectedModel) {
-                formData.append('model', selectedModel);
-            }
-            formData.append('max_pages', '5');  // Limit to 5 pages
-
-            const response = await fetch(`${API_BASE_URL}/api/extract/pdf/vision`, {
-                method: 'POST',
-                body: formData
-            });
-
-            return await response.json();
-        }
-
-        // ChemExtract AI (comprehensive multimodal)
-        async function extractWithChemExtract(pdfFile, apiKey) {
-            const formData = new FormData();
-            formData.append('file', pdfFile);
-            formData.append('provider', selectedProvider);
-            formData.append('api_key', apiKey);
-            if (selectedModel) {
-                formData.append('model', selectedModel);
-            }
-            formData.append('max_pages', '10');  // Allow more pages for comprehensive extraction
-            formData.append('extract_figures', 'true');
-            formData.append('extract_text', 'true');
-
-            const response = await fetch(`${API_BASE_URL}/api/extract/pdf/chemextract`, {
-                method: 'POST',
-                body: formData
-            });
-
-            return await response.json();
-        }
-
-        // Clear
-        clearBtn.addEventListener('click', () => {
-            textInput.value = '';
-            pdfText = '';
-            extractedData = null;
-            uploadedPdfFile = null;  // Reset uploaded file
-            
-            // Hide vision and ChemExtract options
-            visionOption.style.display = 'none';
-            chemextractOption.style.display = 'none';
-            if (enableVision) enableVision.checked = false;
-            if (enableChemExtract) enableChemExtract.checked = false;
-            
-            // Hide PDF preview
-            pdfPreview.style.display = 'none';
-            pdfPreviewText.textContent = '';
-            
-            resultsContent.innerHTML = `
-                <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    <p>Select a mode and enter your API key to extract chemical data</p>
-                </div>
-            `;
-            
-            // Remove visual indicator
-            const resultsSection = document.querySelector('.results-section');
-            resultsSection.classList.remove('has-data');
-            
-            // Reset drop zone display - restore original text with centered SVG
-            const dropSvg = dropZone.querySelector('svg');
-            const dropText = dropZone.querySelector('p');
-            
-            // Remove any inline display style that might break centering
-            if (dropSvg) {
-                dropSvg.style.removeProperty('display');
-            }
-            
-            // Restore original text
-            if (dropText) {
-                dropText.innerHTML = 'Drag & drop PDF file here or <span class="file-name">click to browse</span>';
-            }
-            
-            // Clear the file input value so a new file can be selected
-            fileInput.value = '';
-            
-            statusMessage.style.display = 'none';
-        });
-
-        // Helper function to get SMILES from object (case-insensitive)
-        function getSmiles(obj) {
-            if (!obj || typeof obj !== 'object') return '';
-            // Check common variations of the SMILES property name
-            return obj.smiles || obj.SMILES || obj.Smiles || obj.smile || obj.SMILE || '';
-        }
-
-        // Helper function to get role from object (case-insensitive)
-        function getRole(obj) {
-            if (!obj || typeof obj !== 'object') return '';
-            return obj.role || obj.type || obj.classification || obj.category || '';
-        }
-
-        // Helper function to create role badge HTML
-        function getRoleBadge(role) {
-            if (!role) return '';
-            const roleColors = {
-                'reactant': '#3b82f6',
-                'product': '#10b981',
-                'catalyst': '#f59e0b',
-                'ligand': '#8b5cf6',
-                'solvent': '#06b6d4',
-                'reagent': '#ec4899',
-                'substrate': '#6366f1',
-                'byproduct': '#ef4444',
-                'additive': '#84cc16'
-            };
-            const color = roleColors[role.toLowerCase()] || '#64748b';
-            return `<span style="background: ${color}; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: 500; margin-left: 4px; text-transform: capitalize;">${role}</span>`;
-        }
-
-        // Render ChemExtract AI format results (reactions, compounds, tables, figures)
-        function renderChemExtractResults(data) {
-            let html = '';
-            
-            // Reactions
-            if (data.reactions && data.reactions.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M12 2v4"/>
-                                <path d="M12 18v4"/>
-                            </svg>
-                            Reactions Found (${data.reactions.length})
-                        </h4>
-                `;
-                
-                data.reactions.forEach((reaction, idx) => {
-                    html += `
-                        <div class="result-detail" style="margin-bottom: 12px; border-left: 3px solid #8b5cf6; padding-left: 12px;">
-                            <div class="result-detail-label">Reaction ${idx + 1}</div>
-                            ${reaction.reaction_type ? `<div style="font-weight: 600; color: #1e293b; margin: 4px 0;">Type: ${reaction.reaction_type}</div>` : ''}
-                    `;
-                    
-                    // Reactants with SMILES and role
-                    if (reaction.reactants && reaction.reactants.length > 0) {
-                        html += `<div style="margin: 4px 0;"><span style="color: #64748b;">Reactants:</span>`;
-                        reaction.reactants.forEach((r, i) => {
-                            if (typeof r === 'object' && r !== null) {
-                                const name = r.name || r.compound || r.formula || JSON.stringify(r);
-                                const smiles = getSmiles(r);
-                                const role = getRole(r);
-                                html += `<div style="margin-left: 12px; margin-top: 2px;">• ${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; color: #7c3aed;">${smiles}</code>` : ''}</div>`;
-                            } else {
-                                html += (i === 0 ? ' ' : ', ') + r;
-                            }
-                        });
-                        html += `</div>`;
-                    }
-                    
-                    // Products with SMILES and role
-                    if (reaction.products && reaction.products.length > 0) {
-                        html += `<div style="margin: 4px 0;"><span style="color: #64748b;">Products:</span>`;
-                        reaction.products.forEach((p, i) => {
-                            if (typeof p === 'object' && p !== null) {
-                                const name = p.name || p.compound || p.formula || JSON.stringify(p);
-                                const smiles = getSmiles(p);
-                                const role = getRole(p);
-                                html += `<div style="margin-left: 12px; margin-top: 2px;">• ${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; color: #7c3aed;">${smiles}</code>` : ''}</div>`;
-                            } else {
-                                html += (i === 0 ? ' ' : ', ') + p;
-                            }
-                        });
-                        html += `</div>`;
-                    }
-                    
-                    html += `
-                            ${reaction.catalyst ? `<div><span style="color: #64748b;">Catalyst:</span> ${reaction.catalyst}</div>` : ''}
-                            ${reaction.conditions ? `<div><span style="color: #64748b;">Conditions:</span> ${typeof reaction.conditions === 'object' ? JSON.stringify(reaction.conditions) : reaction.conditions}</div>` : ''}
-                            ${reaction.yield ? `<div><span style="color: #64748b;">Yield:</span> ${reaction.yield}</div>` : ''}
-                            ${reaction.description ? `<div style="margin-top: 4px; font-size: 0.9rem; color: #475569;">${reaction.description}</div>` : ''}
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            // Compounds
-            if (data.compounds && data.compounds.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4"/>
-                                <path d="M12 8h.01"/>
-                            </svg>
-                            Compounds Found (${data.compounds.length})
-                        </h4>
-                `;
-                
-                data.compounds.forEach((compound, idx) => {
-                    let name = '';
-                    let smiles = '';
-                    let formula = '';
-                    let mw = '';
-                    let role = '';
-                    
-                    if (typeof compound === 'object' && compound !== null) {
-                        name = compound.name || compound.compound || compound.formula || '';
-                        smiles = getSmiles(compound);
-                        formula = compound.formula || '';
-                        mw = compound.mw || compound.molecular_weight || '';
-                        // Get role/classification (case-insensitive)
-                        role = getRole(compound);
-                    } else {
-                        name = String(compound);
-                    }
-                    
-                    html += `
-                        <div class="result-detail" style="margin-bottom: 8px;">
-                            <div class="result-detail-label">Compound ${idx + 1}</div>
-                            <div class="result-detail-value" style="font-weight: 600;">
-                                ${name || 'Unknown'}${getRoleBadge(role)}
-                            </div>
-                            ${smiles ? `<div style="margin-top: 4px;"><span style="color: #64748b; font-size: 0.8rem;">SMILES:</span> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: #7c3aed;">${smiles}</code></div>` : ''}
-                            ${formula && formula !== name ? `<div style="margin-top: 2px;"><span style="color: #64748b; font-size: 0.8rem;">Formula:</span> ${formula}</div>` : ''}
-                            ${mw ? `<div style="margin-top: 2px;"><span style="color: #64748b; font-size: 0.8rem;">MW:</span> ${mw}</div>` : ''}
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            // Tables
-            if (data.tables && data.tables.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="3" y1="9" x2="21" y2="9"/>
-                                <line x1="9" y1="21" x2="9" y2="9"/>
-                            </svg>
-                            Tables Extracted (${data.tables.length})
-                        </h4>
-                `;
-                
-                data.tables.forEach((table, idx) => {
-                    html += `
-                        <div class="result-detail">
-                            <div class="result-detail-label">Table ${idx + 1}</div>
-                            <div class="result-detail-value">${table.description || table.title || 'Chemical data table'}</div>
-                            ${table.headers ? `<div style="font-size: 0.85rem; color: #64748b;">Columns: ${Array.isArray(table.headers) ? table.headers.join(', ') : table.headers}</div>` : ''}
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            // Figures
-            if (data.figures && data.figures.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                            Figures Analyzed (${data.figures.length})
-                        </h4>
-                `;
-                
-                data.figures.forEach((figure, idx) => {
-                    html += `
-                        <div class="result-detail">
-                            <div class="result-detail-label">Figure ${idx + 1}</div>
-                            <div class="result-detail-value">${figure.description || figure.caption || 'Chemical structure or scheme'}</div>
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            // Text content preview
-            if (data.text_content) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            Extracted Text Preview
-                        </h4>
-                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">
-                            ${data.text_content.substring(0, 1000)}${data.text_content.length > 1000 ? '...' : ''}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            return html;
-        }
-
-        // Display Results
-        function displayResults(data) {
-            console.log('displayResults called with:', data);
-            let html = '';
-            
-            // Check if this is ChemExtract AI format (has reactions/compounds) or text format (has reactants/products)
-            const isChemExtractFormat = data.reactions || data.compounds || data.tables || data.figures;
-            
-            // Check if there's any actual data (handle both formats)
-            let hasData = false;
-            
-            if (isChemExtractFormat) {
-                // ChemExtract AI format
-                hasData = (
-                    (data.reactions && data.reactions.length > 0) ||
-                    (data.compounds && data.compounds.length > 0) ||
-                    (data.tables && data.tables.length > 0) ||
-                    (data.figures && data.figures.length > 0) ||
-                    (data.summary && Object.keys(data.summary).length > 0)
-                );
-            } else {
-                // Text extraction format
-                hasData = (
-                    (data.reactants && data.reactants.length > 0) ||
-                    (data.products && data.products.length > 0) ||
-                    (data.catalysts && data.catalysts.length > 0) ||
-                    (data.ligands && data.ligands.length > 0) ||
-                    (data.solvents && data.solvents.length > 0) ||
-                    (data.yields && data.yields.length > 0) ||
-                    (data.conditions && Object.keys(data.conditions).length > 0) ||
-                    data.reactionType ||
-                    data.selectivity ||
-                    (data.mechanisms && data.mechanisms.length > 0)
-                );
-            }
-
-            // Add banner at top
-            if (hasData) {
-                const extractionType = isChemExtractFormat ? 'ChemExtract AI' : 'Text';
-                html += `
-                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
-                        ✓ Extraction Complete! (${extractionType}) Results are displayed below.
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;">
-                        ⚠ No chemical reaction data found. Try using "Extract from Images (Vision AI)" for scanned PDFs.
-                    </div>
-                `;
-            }
-            
-            // Handle ChemExtract AI format (reactions, compounds, tables, figures)
-            if (isChemExtractFormat) {
-                html += renderChemExtractResults(data);
-            } else {
-                // Text extraction format (reactants, products, etc.)
-            
-            // Reactants
-            if (data.reactants && data.reactants.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            Reactants
-                        </h4>
-                        <div class="result-items">
-                            ${data.reactants.map(r => {
-                                if (typeof r === 'object' && r !== null) {
-                                    const name = r.name || r.compound || r.formula || JSON.stringify(r);
-                                    const smiles = getSmiles(r);
-                                    const role = getRole(r);
-                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
-                                }
-                                return `<span class="result-tag">${r}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Products
-            if (data.products && data.products.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
-                            Products
-                        </h4>
-                        <div class="result-items">
-                            ${data.products.map(p => {
-                                if (typeof p === 'object' && p !== null) {
-                                    const name = p.name || p.compound || p.formula || JSON.stringify(p);
-                                    const smiles = getSmiles(p);
-                                    const role = getRole(p);
-                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
-                                }
-                                return `<span class="result-tag">${p}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Catalysts
-            if (data.catalysts && data.catalysts.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            </svg>
-                            Catalysts
-                        </h4>
-                        <div class="result-items">
-                            ${data.catalysts.map(c => {
-                                if (typeof c === 'object' && c !== null) {
-                                    const name = c.name || c.compound || c.formula || JSON.stringify(c);
-                                    const smiles = getSmiles(c);
-                                    const role = getRole(c);
-                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
-                                }
-                                return `<span class="result-tag">${c}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Ligands
-            if (data.ligands && data.ligands.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10 2v7.31"/>
-                                <path d="M14 9.3V1.99"/>
-                                <path d="M8.5 2h7"/>
-                            </svg>
-                            Ligands
-                        </h4>
-                        <div class="result-items">
-                            ${data.ligands.map(l => {
-                                if (typeof l === 'object' && l !== null) {
-                                    const name = l.name || l.compound || l.formula || JSON.stringify(l);
-                                    const smiles = getSmiles(l);
-                                    const role = getRole(l);
-                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
-                                }
-                                return `<span class="result-tag">${l}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Solvents
-            if (data.solvents && data.solvents.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
-                            </svg>
-                            Solvents
-                        </h4>
-                        <div class="result-items">
-                            ${data.solvents.map(s => {
-                                if (typeof s === 'object' && s !== null) {
-                                    const name = s.name || s.compound || s.formula || JSON.stringify(s);
-                                    const smiles = getSmiles(s);
-                                    const role = getRole(s);
-                                    return `<span class="result-tag">${name}${getRoleBadge(role)}${smiles ? ` <code style="background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; color: #7c3aed;">${smiles}</code>` : ''}</span>`;
-                                }
-                                return `<span class="result-tag">${s}</span>`;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Conditions
-            if (data.conditions && Object.keys(data.conditions).length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
-                            </svg>
-                            Reaction Conditions
-                        </h4>
-                        ${data.conditions.temperature ? `<div class="result-detail"><div class="result-detail-label">Temperature</div><div class="result-detail-value">${data.conditions.temperature}</div></div>` : ''}
-                        ${data.conditions.time ? `<div class="result-detail"><div class="result-detail-label">Time</div><div class="result-detail-value">${data.conditions.time}</div></div>` : ''}
-                        ${data.conditions.pressure ? `<div class="result-detail"><div class="result-detail-label">Pressure</div><div class="result-detail-value">${data.conditions.pressure}</div></div>` : ''}
-                        ${data.conditions.atmosphere ? `<div class="result-detail"><div class="result-detail-label">Atmosphere</div><div class="result-detail-value">${data.conditions.atmosphere}</div></div>` : ''}
-                    </div>
-                `;
-            }
-
-            // Yields
-            if (data.yields && data.yields.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                            </svg>
-                            Yields
-                        </h4>
-                        ${data.yields.map(y => `
-                            <div class="result-detail">
-                                <div class="result-detail-label">${y.product || 'Product'}</div>
-                                <div class="result-detail-value">${y.yield || 'N/A'}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            // Selectivity
-            if (data.selectivity) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                            </svg>
-                            Selectivity
-                        </h4>
-                        <div class="result-detail">
-                            <div class="result-detail-value">${data.selectivity}</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Reaction Type
-            if (data.reactionType) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                            </svg>
-                            Reaction Type
-                        </h4>
-                        <div class="result-items">
-                            <span class="result-tag">${data.reactionType}</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Mechanisms
-            if (data.mechanisms && data.mechanisms.length > 0) {
-                html += `
-                    <div class="result-category">
-                        <h4>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v4"/>
-                                <path d="M12 18v4"/>
-                                <path d="M4.93 4.93l2.83 2.83"/>
-                                <path d="M16.24 16.24l2.83 2.83"/>
-                                <path d="M2 12h4"/>
-                                <path d="M18 12h4"/>
-                            </svg>
-                            Mechanisms
-                        </h4>
-                        <div class="result-items">
-                            ${data.mechanisms.map(m => `<span class="result-tag">${m}</span>`).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            } // End of else block for text extraction format
-
-            if (!html) {
-                html = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4"/>
-                            <path d="M12 8h.01"/>
-                        </svg>
-                        <p>No chemical data could be extracted from the text</p>
-                    </div>
-                `;
-            }
-
-            resultsContent.innerHTML = html;
-
-            // Add visual indicator that results are ready
-            const resultsSection = document.querySelector('.results-section');
-            resultsSection.classList.add('has-data');
-
-            // Force scroll to results - scroll the content-area, not the window
-            setTimeout(() => {
-                const contentArea = document.querySelector('.content-area');
-                if (contentArea) {
-                    contentArea.scrollTo({
-                        top: resultsSection.offsetTop - 20,
-                        behavior: 'smooth'
-                    });
-                    console.log('Scrolled content-area to:', resultsSection.offsetTop);
-                }
-                // Also try scrollIntoView as backup
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-
-        // Status Messages
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message ${type}`;
-            statusMessage.style.display = 'block';
-        }
-
-        // View Raw JSON
-        viewJsonBtn.addEventListener('click', () => {
-            if (!extractedData) {
-                showStatus('No data to view', 'error');
-                return;
-            }
-            
-            // Create modal to display JSON
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            `;
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.cssText = `
-                background: white;
-                border-radius: 12px;
-                padding: 24px;
-                max-width: 800px;
-                max-height: 80vh;
-                overflow: auto;
-                width: 90%;
-            `;
-            
-            modalContent.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3 style="margin: 0; color: var(--tmc-primary);">Raw JSON Output</h3>
-                    <button id="closeModal" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
-                </div>
-                <pre style="background: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5;">${JSON.stringify(extractedData, null, 2)}</pre>
-            `;
-            
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-            
-            // Close modal handlers
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
-                }
-            });
-            
-            modalContent.querySelector('#closeModal').addEventListener('click', () => {
-                document.body.removeChild(modal);
-            });
-        });
-
-        // Export JSON
-        exportJsonBtn.addEventListener('click', () => {
-            if (!extractedData) {
-                showStatus('No data to export', 'error');
-                return;
-            }
-            
-            const blob = new Blob([JSON.stringify(extractedData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'extraction_result.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        // Initialize
+    // ==================================================================
+    // PROVIDER SELECTION
+    // ==================================================================
+    providerSelector.addEventListener('click', e => {
+        const pill = e.target.closest('.provider-pill');
+        if (!pill) return;
+        providerSelector.querySelectorAll('.provider-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        selectedProvider = pill.dataset.provider;
         updateApiKeySection();
-        updateInputSections();  // Set initial input section visibility
+        updateVisionOptions();
+    });
+
+    function updateApiKeySection() {
+        const info = PROVIDER_INFO[selectedProvider];
+        if (info.needsKey) {
+            apiKeySection.style.display = 'block';
+            apiKeyHint.innerHTML = `Get your ${info.name} API key at <a href="${info.keyUrl}" target="_blank">${info.keyUrl}</a>`;
+        } else {
+            apiKeySection.style.display = 'none';
+        }
+    }
+
+    function updateVisionOptions() {
+        // Both modes require a vision-capable provider
+    }
+
+    // ==================================================================
+    // TOGGLE API KEY VISIBILITY
+    // ==================================================================
+    toggleVisibility.addEventListener('click', () => {
+        apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+    });
+
+    // ==================================================================
+    // MODEL SELECTION
+    // ==================================================================
+    modelSelect.addEventListener('change', () => { selectedModel = modelSelect.value; });
+
+    // ==================================================================
+    // MODE SELECTION
+    // ==================================================================
+    modeSelector.addEventListener('click', e => {
+        const card = e.target.closest('.mode-card');
+        if (!card) return;
+        modeSelector.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        extractionMode = card.dataset.mode;
+        updateInputPanels();
+    });
+
+    function updateInputPanels() {
+        // PDF panel always visible (shared upload)
+        pdfInputPanel.classList.add('active');
+        // ReactionLens options only when that mode is selected
+        reactionlensPanel.classList.toggle('active', extractionMode === 'reactionlens');
+    }
+
+    // ==================================================================
+    // MAX PAGES SLIDER
+    // ==================================================================
+    rlMaxPages.addEventListener('input', () => {
+        rlMaxPagesValue.textContent = rlMaxPages.value;
+    });
+
+    // ==================================================================
+    // FILE UPLOAD
+    // ==================================================================
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.pdf')) handleFileUpload(file);
+        else showStatus('Please upload a PDF file.', 'error');
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFileUpload(e.target.files[0]); });
+
+    async function handleFileUpload(file) {
+        uploadedPdfFile = file;
+        showStatus('Processing PDF...', 'info');
+        dropZone.classList.add('has-file');
+        dropZone.querySelector('.drop-text').innerHTML = `<strong>${file.name}</strong>`;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/extract/pdf`, { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                pdfText = data.text;
+                pdfPreviewTitle.textContent = `${file.name} (${data.metadata?.pages || '?'} pages, ${data.text_length || data.text.length} chars)`;
+                pdfPreviewText.textContent = data.text.substring(0, 5000) + (data.text.length > 5000 ? '\n\n… (truncated)' : '');
+                pdfPreview.classList.add('visible');
+                pdfPreviewBody.style.display = 'block';
+                pdfPreviewExpanded = true;
+                togglePdfPreview.textContent = 'Collapse';
+                showStatus(`PDF processed: ${data.metadata?.pages || '?'} pages extracted.`, 'success');
+            } else {
+                showStatus(data.error || 'Failed to process PDF.', 'error');
+                pdfPreview.classList.remove('visible');
+            }
+        } catch (err) {
+            showStatus('Error uploading PDF: ' + err.message, 'error');
+            pdfPreview.classList.remove('visible');
+        }
+    }
+
+    // PDF preview toggle
+    togglePdfPreview.addEventListener('click', () => {
+        pdfPreviewExpanded = !pdfPreviewExpanded;
+        pdfPreviewBody.style.display = pdfPreviewExpanded ? 'block' : 'none';
+        togglePdfPreview.textContent = pdfPreviewExpanded ? 'Collapse' : 'Expand';
+    });
+
+    // ==================================================================
+    // TAB SWITCHING
+    // ==================================================================
+    resultTabs.addEventListener('click', e => {
+        const tab = e.target.closest('.result-tab');
+        if (!tab) return;
+        resultTabs.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        $('tab-' + tab.dataset.tab).classList.add('active');
+    });
+
+    // ==================================================================
+    // STATUS MESSAGES
+    // ==================================================================
+    function showStatus(msg, type = 'info') {
+        const icons = {
+            error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+            success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+            warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+        };
+        statusMessage.innerHTML = `${icons[type] || icons.info}<span>${msg}</span>`;
+        statusMessage.className = `status-msg visible ${type}`;
+    }
+
+    // ==================================================================
+    // EXTRACTION
+    // ==================================================================
+    extractBtn.addEventListener('click', async () => {
+        const apiKey = apiKeyInput.value.trim();
+        const info = PROVIDER_INFO[selectedProvider];
+
+        // Validation
+        if (info.needsKey && !apiKey) { showStatus('Please enter your API key.', 'error'); return; }
+        if (!uploadedPdfFile) { showStatus('Please upload a PDF file.', 'error'); return; }
+
+        if (!VISION_PROVIDERS.includes(selectedProvider)) {
+            showStatus('Both ChemExtract and ReactionLens require a vision-capable provider (DeepSeek, OpenAI, Gemini, or Anthropic).', 'error');
+            return;
+        }
+
+        extractBtn.disabled = true;
+        extractBtn.innerHTML = '<span class="spinner"></span> Extracting...';
+
+        try {
+            let data;
+            if (extractionMode === 'reactionlens') {
+                showStatus('Running ReactionLens pipeline...', 'info');
+                data = await extractWithReactionLens(uploadedPdfFile, apiKey);
+            } else {
+                showStatus('Running ChemExtract AI...', 'info');
+                data = await extractWithChemExtract(uploadedPdfFile, apiKey);
+            }
+
+            if (data.success) {
+                extractedData = data.data;
+                displayResults(data.data);
+                showStatus(data.warning || `Extraction complete using ${info.name}!`, 'success');
+            } else {
+                showStatus(data.error || 'Extraction failed.', 'error');
+            }
+        } catch (err) {
+            showStatus('Error during extraction: ' + err.message, 'error');
+        } finally {
+            extractBtn.disabled = false;
+            extractBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Extract Data';
+        }
+    });
+
+    // ==================================================================
+    // API CALLS
+    // ==================================================================
+    async function extractWithChemExtract(pdfFile, apiKey) {
+        const formData = new FormData();
+        formData.append('file', pdfFile);
+        formData.append('provider', selectedProvider);
+        formData.append('api_key', apiKey);
+        if (selectedModel) formData.append('model', selectedModel);
+        formData.append('max_pages', '20');
+        formData.append('extract_figures', 'true');
+        formData.append('extract_text', 'true');
+        const res = await fetch(`${API_BASE_URL}/api/extract/pdf/chemextract`, { method: 'POST', body: formData });
+        return res.json();
+    }
+
+    async function extractWithReactionLens(pdfFile, apiKey) {
+        const useFilter = $('rlFilter').checked;
+        const useSegmentation = $('rlSegmentation').checked;
+        const useEntityResolution = $('rlEntityResolution').checked;
+        const maxPages = $('rlMaxPages').value;
+
+        const formData = new FormData();
+        formData.append('file', pdfFile);
+        formData.append('provider', selectedProvider);
+        formData.append('api_key', apiKey);
+        if (selectedModel) formData.append('model', selectedModel);
+        formData.append('max_pages', maxPages);
+        formData.append('enable_filtering', String(useFilter));
+        formData.append('enable_segmentation', String(useSegmentation));
+        formData.append('enable_entity_resolution', String(useEntityResolution));
+        const res = await fetch(`${API_BASE_URL}/api/extract/pdf/reactionlens`, { method: 'POST', body: formData });
+        return res.json();
+    }
+
+    // ==================================================================
+    // FORMAT SCHEMES
+    // ==================================================================
+    async function fetchSchemes() {
+        if (!extractedData) return null;
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/extract/format/schemes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: extractedData })
+            });
+            return await res.json();
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // ==================================================================
+    // HELPER UTILITIES
+    // ==================================================================
+    function isValidSmiles(s) {
+        if (!s || typeof s !== 'string') return false;
+        // Real SMILES contains organic subset chars: C, N, O, S, P, F, Cl, Br, I, c, n, o, s, p, [, ], (, ), =, #, +, -, @, %, digits, *, ., :
+        // Reject if it looks like a plain name (has spaces, or starts with uppercase letter followed by lowercase name-like text without brackets)
+        const trimmed = s.trim();
+        if (trimmed.length < 2) return false;
+        // Reject names with spaces
+        if (/\s/.test(trimmed)) return false;
+        // Reject pure name-like strings (e.g. "ArCH2Cl", "RC(O)Cl" — these are pseudo-SMILES with R/Ar placeholders)
+        if (/\b[A-Z][a-z]?\b/.test(trimmed) && !/[\[\(]/.test(trimmed) && /[A-Za-z]{2,}/.test(trimmed)) {
+            // Check if it contains actual SMILES patterns
+            const hasSmilesChars = /[C=NOSPFIBrcnosp#@\+\-\[\]\(\)\\\/]/.test(trimmed);
+            const hasPlaceholder = /\b[A-Z][a-z]?\b/.test(trimmed) && !/Cl|Br|Si|Se|As|Te|Ge|Sn|Pb|Bi|Na|Li|K|Ca|Mg|Al|Zn|Fe|Cu|Ni|Co|Mn|Cr|Mo|W|V|Ti|Ru|Rh|Pd|Ag|Cd|Hg|Au|Pt|Ba|Sr|Cs|Rb/.test(trimmed);
+            if (hasPlaceholder && !/\[.*\]/.test(trimmed)) return false;
+        }
+        // Reject strings with generic R/Ar/X/Y placeholders outside of brackets
+        if (/^[A-Za-z][a-z]?(CH|C[=]/.test(trimmed) && /[^a-zA-Z][AR][^a-z]/.test(trimmed)) return false;
+        return true;
+    }
+
+    function getSmiles(obj) {
+        if (!obj || typeof obj !== 'object') return '';
+        return obj.smiles || obj.SMILES || obj.Smiles || obj.smile || obj.SMILE || '';
+    }
+    function getRole(obj) {
+        if (!obj || typeof obj !== 'object') return '';
+        return obj.role || obj.type || obj.classification || obj.category || '';
+    }
+    function roleBadge(role) {
+        if (!role) return '';
+        return `<span class="role-badge ${role.toLowerCase()}">${role}</span>`;
+    }
+    function yieldBadge(yieldStr) {
+        const num = parseFloat(yieldStr);
+        if (isNaN(num)) return `<span class="yield-badge medium">${yieldStr}</span>`;
+        const cls = num > 80 ? 'high' : num >= 50 ? 'medium' : 'low';
+        return `<span class="yield-badge ${cls}">${yieldStr}${yieldStr.includes('%') ? '' : '%'}</span>`;
+    }
+
+    // ==================================================================
+    // DISPLAY RESULTS
+    // ==================================================================
+    function displayResults(data) {
+        console.log('displayResults:', data);
+        resultsCard.classList.add('has-data');
+        exportActions.style.display = 'flex';
+
+        // Determine format
+        const isChemExtract = !!(data.reactions || data.compounds || data.tables || data.figures);
+
+        // Flatten data for easier tab rendering
+        let reactions = [], compounds = [], conditions = [];
+
+        if (isChemExtract) {
+            reactions = data.reactions || [];
+            compounds = data.compounds || [];
+            if (reactions.length > 0) {
+                reactions.forEach(r => { if (r.conditions) conditions.push({ reaction: r, conditions: r.conditions }); });
+            }
+        } else {
+            // Legacy format
+            if (data.reactants) data.reactants.forEach(r => compounds.push(typeof r === 'object' ? { ...r, role: r.role || 'reactant' } : { name: r, role: 'reactant' }));
+            if (data.products) data.products.forEach(p => compounds.push(typeof p === 'object' ? { ...p, role: p.role || 'product' } : { name: p, role: 'product' }));
+            if (data.catalysts) data.catalysts.forEach(c => compounds.push(typeof c === 'object' ? { ...c, role: c.role || 'catalyst' } : { name: c, role: 'catalyst' }));
+            if (data.ligands) data.ligands.forEach(l => compounds.push(typeof l === 'object' ? { ...l, role: l.role || 'ligand' } : { name: l, role: 'ligand' }));
+            if (data.solvents) data.solvents.forEach(s => compounds.push(typeof s === 'object' ? { ...s, role: s.role || 'solvent' } : { name: s, role: 'solvent' }));
+            if (data.yields && data.yields.length > 0) {
+                data.yields.forEach((y, i) => {
+                    reactions.push({
+                        reactants: data.reactants ? data.reactants.slice(0, Math.ceil(data.reactants.length/2)) : [],
+                        products: data.products || [],
+                        yield: typeof y === 'object' ? y.value || JSON.stringify(y) : y,
+                        conditions: data.conditions || {},
+                        reaction_type: data.reactionType || ''
+                    });
+                });
+            } else {
+                reactions.push({
+                    reactants: data.reactants || [],
+                    products: data.products || [],
+                    catalyst: data.catalysts?.join(', '),
+                    conditions: data.conditions || {},
+                    yield: data.yields?.[0],
+                    reaction_type: data.reactionType || '',
+                    selectivity: data.selectivity
+                });
+            }
+        }
+
+        // Update tab counts
+        $('rxnCount').textContent = reactions.length;
+        $('cmpCount').textContent = compounds.length;
+
+        // ---- OVERVIEW TAB ----
+        let overviewHtml = '<div class="summary-grid">';
+        overviewHtml += `<div class="summary-card"><div class="summary-num">${reactions.length}</div><div class="summary-label">Reactions</div></div>`;
+        overviewHtml += `<div class="summary-card"><div class="summary-num">${compounds.length}</div><div class="summary-label">Compounds</div></div>`;
+        overviewHtml += `<div class="summary-card"><div class="summary-num">${data.tables?.length || 0}</div><div class="summary-label">Tables</div></div>`;
+        overviewHtml += `<div class="summary-card"><div class="summary-num">${conditions.length || Object.keys(data.conditions || {}).length || 0}</div><div class="summary-label">Conditions</div></div>`;
+        overviewHtml += '</div>';
+
+        // Quick reaction list
+        if (reactions.length > 0) {
+            overviewHtml += '<h3 style="font-size:0.9rem;font-weight:700;color:var(--text-main);margin-bottom:12px;">Quick Glance</h3>';
+            reactions.slice(0, 5).forEach((r, i) => {
+                const rNames = (r.reactants || []).map(x => typeof x === 'object' ? (x.name || x.compound || '?') : x).join(', ');
+                const pNames = (r.products || []).map(x => typeof x === 'object' ? (x.name || x.compound || '?') : x).join(', ');
+                overviewHtml += `<div style="padding:10px 14px;background:var(--bg-input);border-radius:var(--radius);margin-bottom:8px;font-size:0.85rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">`;
+                overviewHtml += `<span style="color:var(--info);font-weight:600;">${rNames || '?'}</span>`;
+                overviewHtml += `<span style="color:var(--text-muted);">→</span>`;
+                overviewHtml += `<span style="color:var(--success);font-weight:600;">${pNames || '?'}</span>`;
+                if (r.yield) overviewHtml += yieldBadge(r.yield);
+                overviewHtml += '</div>';
+            });
+            if (reactions.length > 5) overviewHtml += `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">+ ${reactions.length - 5} more reactions — see Reactions tab</p>`;
+        }
+        if (data.summary && typeof data.summary === 'object') {
+            overviewHtml += '<div style="margin-top:16px;padding:14px;background:var(--bg-input);border-radius:var(--radius);font-size:0.85rem;color:var(--text-secondary);"><strong>Summary:</strong> ' + JSON.stringify(data.summary) + '</div>';
+        }
+        $('tab-overview').innerHTML = overviewHtml;
+
+        // ---- REACTIONS TAB ----
+        let rxnHtml = '';
+        if (reactions.length === 0) {
+            rxnHtml = '<div class="empty-state"><p>No reactions found.</p></div>';
+        } else {
+            reactions.forEach((r, i) => {
+                rxnHtml += '<div class="reaction-card">';
+                rxnHtml += `<div class="rxn-entry">Reaction ${i + 1}</div>`;
+
+                // Scheme — only show if we have real SMILES (not names/placeholders)
+                const rSmilesList = (r.reactants || []).map(x => getSmiles(x)).filter(s => s && isValidSmiles(s));
+                const pSmilesList = (r.products || []).map(x => getSmiles(x)).filter(s => s && isValidSmiles(s));
+                const rSmiles = rSmilesList.join('.');
+                const pSmiles = pSmilesList.join('.');
+                if (rSmiles && pSmiles) {
+                    rxnHtml += `<div class="rxn-scheme">${rSmiles} &gt;&gt; ${pSmiles}</div>`;
+                }
+
+                // Reactants
+                if (r.reactants && r.reactants.length > 0) {
+                    rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Reactants</div><div class="rxn-tags">';
+                    r.reactants.forEach(x => {
+                        const name = typeof x === 'object' ? (x.name || x.compound || x.formula || JSON.stringify(x)) : x;
+                        rxnHtml += `<span class="rxn-tag reactant">${name}</span>`;
+                    });
+                    rxnHtml += '</div></div>';
+                }
+
+                // Products
+                if (r.products && r.products.length > 0) {
+                    rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Products</div><div class="rxn-tags">';
+                    r.products.forEach(x => {
+                        const name = typeof x === 'object' ? (x.name || x.compound || x.formula || JSON.stringify(x)) : x;
+                        rxnHtml += `<span class="rxn-tag product">${name}</span>`;
+                    });
+                    rxnHtml += '</div></div>';
+                }
+
+                // Catalyst / Ligands
+                if (r.catalyst) rxnHtml += `<div class="rxn-section"><div class="rxn-section-title">Catalyst</div><div class="rxn-tags"><span class="rxn-tag catalyst">${r.catalyst}</span></div></div>`;
+
+                // Conditions
+                const conds = r.conditions;
+                if (conds && (typeof conds === 'object' ? Object.keys(conds).length > 0 : conds)) {
+                    rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Conditions</div><div class="rxn-conditions">';
+                    if (typeof conds === 'object') {
+                        Object.entries(conds).forEach(([k, v]) => {
+                            rxnHtml += `<span class="rxn-cond-badge">${k}: ${v}</span>`;
+                        });
+                    } else {
+                        rxnHtml += `<span class="rxn-cond-badge">${conds}</span>`;
+                    }
+                    rxnHtml += '</div></div>';
+                }
+
+                // Yield
+                if (r.yield) {
+                    rxnHtml += `<div style="margin-top:10px;display:flex;align-items:center;gap:8px;"><span style="font-size:0.78rem;font-weight:600;color:var(--text-muted);">YIELD</span> ${yieldBadge(r.yield)}</div>`;
+                }
+
+                // Description
+                if (r.description) {
+                    rxnHtml += `<p style="margin-top:10px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">${r.description}</p>`;
+                }
+
+                rxnHtml += '</div>';
+            });
+        }
+        $('tab-reactions').innerHTML = rxnHtml;
+
+        // ---- COMPOUNDS TAB ----
+        let cmpHtml = '';
+        if (compounds.length === 0) {
+            cmpHtml = '<div class="empty-state"><p>No compounds found.</p></div>';
+        } else {
+            cmpHtml = '<div class="compound-grid">';
+            compounds.forEach(c => {
+                let name, smiles, formula, mw, role;
+                if (typeof c === 'object' && c !== null) {
+                    name = c.name || c.compound || c.formula || 'Unknown';
+                    smiles = getSmiles(c);
+                    formula = c.formula || '';
+                    mw = c.mw || c.molecular_weight || '';
+                    role = getRole(c);
+                } else {
+                    name = String(c);
+                }
+                cmpHtml += '<div class="compound-card">';
+                cmpHtml += `<div class="compound-name">${name} ${roleBadge(role)}</div>`;
+                if (smiles) cmpHtml += `<div class="compound-smiles">${smiles}</div>`;
+                if (formula && formula !== name) cmpHtml += `<div class="compound-meta">Formula: ${formula}</div>`;
+                if (mw) cmpHtml += `<div class="compound-meta">MW: ${mw}</div>`;
+                cmpHtml += '</div>';
+            });
+            cmpHtml += '</div>';
+        }
+        $('tab-compounds').innerHTML = cmpHtml;
+
+        // ---- CONDITIONS TAB ----
+        let condHtml = '';
+        if (reactions.length === 0 && (!data.conditions || Object.keys(data.conditions).length === 0)) {
+            condHtml = '<div class="empty-state"><p>No condition data found.</p></div>';
+        } else {
+            condHtml = '<table class="conditions-table"><thead><tr><th>#</th><th>Temperature</th><th>Time</th><th>Solvent</th><th>Catalyst</th><th>Yield</th><th>Other</th></tr></thead><tbody>';
+            const allConds = reactions.map((r, i) => ({
+                idx: i + 1,
+                conditions: r.conditions || (typeof data.conditions === 'object' ? data.conditions : {}),
+                yield: r.yield,
+                catalyst: r.catalyst
+            }));
+            if (allConds.length === 0 && data.conditions && typeof data.conditions === 'object') {
+                allConds.push({ idx: 1, conditions: data.conditions });
+            }
+            allConds.forEach(c => {
+                const conds = c.conditions || {};
+                const temp = conds.temperature || conds.temp || conds.T || '—';
+                const time = conds.time || conds.duration || conds.t || '—';
+                const solvent = conds.solvent || conds.solvents || '—';
+                const catalyst = c.catalyst || conds.catalyst || conds.catalysts || '—';
+                const yld = c.yield || conds.yield || '—';
+                const other = [];
+                Object.entries(conds).forEach(([k, v]) => {
+                    if (!['temperature', 'temp', 'T', 'time', 'duration', 't', 'solvent', 'solvents', 'catalyst', 'catalysts', 'yield'].includes(k)) {
+                        other.push(`${k}: ${v}`);
+                    }
+                });
+                condHtml += `<tr><td>${c.idx}</td><td>${temp}</td><td>${time}</td><td>${solvent}</td><td>${catalyst}</td><td>${typeof yld === 'object' ? JSON.stringify(yld) : yld}</td><td>${other.join(', ') || '—'}</td></tr>`;
+            });
+            condHtml += '</tbody></table>';
+        }
+        $('tab-conditions').innerHTML = condHtml;
+
+        // ---- RAW JSON TAB ----
+        $('tab-rawjson').innerHTML = `<div class="json-viewer">${syntaxHighlightJSON(data)}</div>`;
+
+        // Scroll to results
+        resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ==================================================================
+    // JSON SYNTAX HIGHLIGHT
+    // ==================================================================
+    function syntaxHighlightJSON(obj) {
+        const json = JSON.stringify(obj, null, 2);
+        return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+            .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>')
+            .replace(/: (\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+            .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>')
+            .replace(/: (null)/g, ': <span class="json-null">$1</span>');
+    }
+
+    // ==================================================================
+    // EXPORT FUNCTIONS
+    // ==================================================================
+    $('exportJsonBtn').addEventListener('click', () => {
+        if (!extractedData) return;
+        const blob = new Blob([JSON.stringify(extractedData, null, 2)], { type: 'application/json' });
+        downloadBlob(blob, 'extraction-results.json');
+    });
+
+    $('exportSchemesBtn').addEventListener('click', async () => {
+        if (!extractedData) return;
+        const schemes = await fetchSchemes();
+        if (schemes && schemes.success) {
+            const blob = new Blob([JSON.stringify(schemes.data || schemes, null, 2)], { type: 'application/json' });
+            downloadBlob(blob, 'reaction-schemes.json');
+        } else {
+            // Fallback: build from extracted data
+            let smiData = '';
+            const rxns = extractedData.reactions || [];
+            rxns.forEach((r, i) => {
+                const rSmiles = (r.reactants || []).map(x => getSmiles(x) || (typeof x === 'object' ? (x.name || '?') : x)).join('.');
+                const pSmiles = (r.products || []).map(x => getSmiles(x) || (typeof x === 'object' ? (x.name || '?') : x)).join('.');
+                smiData += `Reaction ${i + 1}: ${rSmiles}>>${pSmiles}\n`;
+                if (r.yield) smiData += `  Yield: ${r.yield}\n`;
+                if (r.conditions) smiData += `  Conditions: ${JSON.stringify(r.conditions)}\n\n`;
+            });
+            const blob = new Blob([smiData || JSON.stringify(extractedData, null, 2)], { type: 'text/plain' });
+            downloadBlob(blob, 'reaction-schemes.txt');
+        }
+    });
+
+    $('copyClipboardBtn').addEventListener('click', () => {
+        if (!extractedData) return;
+        navigator.clipboard.writeText(JSON.stringify(extractedData, null, 2)).then(() => {
+            showStatus('Copied to clipboard!', 'success');
+        }).catch(() => {
+            showStatus('Failed to copy.', 'error');
+        });
+    });
+
+    $('downloadTxtBtn').addEventListener('click', () => {
+        if (!extractedData) return;
+        const blob = new Blob([JSON.stringify(extractedData, null, 2)], { type: 'text/plain' });
+        downloadBlob(blob, 'extraction-results.txt');
+    });
+
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showStatus(`Downloaded ${filename}`, 'success');
+    }
+
+    // ==================================================================
+    // CLEAR
+    // ==================================================================
+    clearBtn.addEventListener('click', () => {
+        pdfText = '';
+        extractedData = null;
+        uploadedPdfFile = null;
+        pdfPreview.classList.remove('visible');
+        pdfPreviewText.textContent = '';
+        dropZone.classList.remove('has-file');
+        dropZone.querySelector('.drop-text').innerHTML = 'Drag &amp; drop PDF here or <strong>click to browse</strong>';
+        fileInput.value = '';
+        resultsCard.classList.remove('has-data');
+        exportActions.style.display = 'none';
+        $('rxnCount').textContent = '0';
+        $('cmpCount').textContent = '0';
+        ['overview', 'reactions', 'compounds', 'conditions', 'rawjson'].forEach(t => {
+            if (t === 'overview') {
+                $('tab-overview').innerHTML = '<div class="empty-state"><svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Select a mode, enter your API key, and click Extract to begin</p></div>';
+            } else {
+                $('tab-' + t).innerHTML = '';
+            }
+        });
+        resultTabs.querySelectorAll('.result-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+        document.querySelectorAll('.tab-content').forEach((tc, i) => tc.classList.toggle('active', i === 0));
+        statusMessage.className = 'status-msg';
+    });
     </script>
 </body>
 </html>

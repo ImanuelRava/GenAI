@@ -4,7 +4,6 @@ Generates data for Graph Neural Network visualizations
 """
 
 import numpy as np
-import json
 from typing import Dict, List, Any
 
 ELEMENT_COLORS = {

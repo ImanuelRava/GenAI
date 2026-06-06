@@ -1,10 +1,17 @@
+"""
+Database API routes for NiCOBot data.
+
+NOTE: These routes are currently not called by any frontend page.
+They are conditionally imported in app.py for future API use.
+Consider adding frontend integration or removing this blueprint.
+"""
+
 import logging
-from typing import Dict, Any
+
 
 from flask import Blueprint, request, jsonify
 
 from errors import APIError, NotFoundError
-from cache import cached
 
 logger = logging.getLogger(__name__)
 

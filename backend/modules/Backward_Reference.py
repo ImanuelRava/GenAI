@@ -1,9 +1,6 @@
 import networkx as nx
 import time
-import logging
 from .DOI import extract_doi_from_pdf, get_paper_details, get_referenced_dois
-
-logger = logging.getLogger(__name__)
 
 def build_reference_network(pdf_path, progress_callback=None):
     try:

@@ -1,12 +1,11 @@
 import io
 import base64
 import logging
-from typing import Dict, Any, Optional
+from typing import Optional
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
 from errors import APIError, NotFoundError
-from cache import cached
 
 logger = logging.getLogger(__name__)
 

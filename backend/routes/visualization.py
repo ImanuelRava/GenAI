@@ -4,14 +4,13 @@ Handles GNN and PCA visualization endpoints
 """
 
 import logging
-from typing import Dict, Any
+
 
 from flask import Blueprint, request, jsonify
 
-from errors import ValidationError, APIError
+from errors import APIError
 from modules.gnn_viz import (
     generate_sample_graph,
-    simulate_message_passing,
     get_molecule_data,
     get_gnn_embedding_demo
 )
@@ -39,23 +38,6 @@ def api_gnn_graph():
     except Exception as e:
         logger.error(f"GNN graph error: {e}")
         raise APIError(f"Error generating graph: {str(e)}", 500)
-
-@viz_bp.route('/gnn/message-passing', methods=['POST'])
-def api_gnn_message_passing():
-    try:
-        data = request.get_json()
-        nodes = data.get('nodes', [])
-        edges = data.get('edges', [])
-        current_step = data.get('currentStep', 0)
-
-        result = simulate_message_passing(nodes, edges, current_step)
-        return jsonify({
-            'success': True,
-            'data': result
-        })
-    except Exception as e:
-        logger.error(f"Message passing error: {e}")
-        raise APIError(f"Error simulating message passing: {str(e)}", 500)
 
 @viz_bp.route('/gnn/molecule/<molecule_type>')
 def api_gnn_molecule(molecule_type: str):

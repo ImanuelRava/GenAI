@@ -2,9 +2,7 @@ import os
 import sys
 import time
 import logging
-import asyncio
 from datetime import datetime
-from typing import Optional
 
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(BACKEND_DIR)
@@ -38,8 +36,43 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from config import config
-from errors import APIError, register_error_handlers, success_response
+from errors import APIError, register_error_handlers
 from cache import get_cache
+try:
+    from . import __version__
+except ImportError:
+    __version__ = '2.0.0'
+
+# ─── Shared System Prompts ─────────────────────────────────────────────────
+
+NICOBOT_BASE_SYSTEM_PROMPT = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
+Provide accurate, helpful responses about:
+- Nickel catalysis mechanisms and applications
+- C-O bond activation strategies
+- Cross-coupling reactions (Suzuki, Heck, Kumada, etc.)
+- Ligand design for transition metal catalysis
+- Comparison of Ni vs Pd catalysis
+
+Keep responses concise but informative. Use proper chemical nomenclature."""
+
+REDOX_SYSTEM_PROMPT = """You are a specialized AI assistant for Redox-Active Ligands chemistry.
+Provide accurate, helpful responses about:
+- Redox-active (non-innocent) ligands and their behavior
+- Metal-ligand cooperativity and electron reservoir concepts
+- Ligand classes: PDI (bis-imino)pyridine, catecholate/o-quinone, dithiolenes
+- Nickel and first-row transition metal catalysis
+Keep responses concise but informative."""
+
+KNOWLEDGE_GRAPH_EXPLANATIONS = {
+    'oxidative addition': 'Oxidative addition is the first step in cross-coupling. The metal catalyst (M) inserts into the C-X bond of the organic halide. The metal oxidation state increases by 2 (e.g., Pd(0) -> Pd(II)) as it forms two new bonds.',
+    'transmetalation': 'Transmetalation is the transfer of an organic group from the nucleophilic reagent (R-M) to the metal center. This step pairs the two organic fragments on the metal before coupling.',
+    'reductive elimination': 'Reductive elimination is the final step where the two organic groups couple together and are released as the product. The metal is reduced back to its original oxidation state (e.g., Pd(II) -> Pd(0)).',
+    'palladium': 'Palladium is the most widely used catalyst for cross-coupling reactions. Pd(0) complexes are nucleophilic and readily undergo oxidative addition. The 2010 Nobel Prize was awarded for Pd-catalyzed cross-couplings.',
+    'nickel': 'Nickel is a cost-effective alternative to palladium. Ni is more electrophilic and can activate stronger bonds like C-Cl and C-O. This makes it valuable for sustainable chemistry using biomass-derived feedstocks.',
+    'suzuki': 'Suzuki-Miyaura coupling uses organoboron reagents. Key advantages: non-toxic, air-stable reagents, aqueous compatible. Won the 2010 Nobel Prize (Suzuki).',
+    'heck': 'Heck reaction couples aryl halides with alkenes. Unique in that it does not require an organometallic nucleophile. Products are substituted alkenes.',
+    'ligand': 'Ligands control the reactivity, selectivity, and stability of metal catalysts. Electron-rich ligands favor oxidative addition, while bulky ligands prevent unwanted side reactions.'
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -101,7 +134,7 @@ def health_check():
     return jsonify({
         'success': True,
         'status': 'healthy',
-        'version': '2.0.0',
+        'version': __version__,
         'timestamp': datetime.utcnow().isoformat() + 'Z',
         'components': {
             'rdkit': rdkit_available,
@@ -115,7 +148,7 @@ def api_status():
     return jsonify({
         'success': True,
         'service': 'GenAI Research Platform',
-        'version': '2.1.0',
+        'version': __version__,
         'features': {
             'async_support': True,
             'http_llm_client': True,
@@ -193,10 +226,10 @@ except ImportError:
 
 from llm_client import get_llm_response, generate_knowledge_graph
 from utils import sanitize_input
-from errors import ValidationError, LLMError
+from errors import ValidationError
 
 try:
-    from modules.nicobot_rag import get_rag, enhance_prompt_with_context
+    from modules.nicobot_rag import get_rag
     RAG_AVAILABLE = True
 except ImportError:
     RAG_AVAILABLE = False
@@ -227,16 +260,6 @@ def nicobot_chat():
 
         logger.info(f"[NiCOBot] Provider: {provider}, Has API Key: {bool(api_key)}, RAG: {use_rag}")
 
-        base_system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
-Provide accurate, helpful responses about:
-- Nickel catalysis mechanisms and applications
-- C-O bond activation strategies
-- Cross-coupling reactions (Suzuki, Heck, Kumada, etc.)
-- Ligand design for transition metal catalysis
-- Comparison of Ni vs Pd catalysis
-
-Keep responses concise but informative. Use proper chemical nomenclature."""
-
         database_context = None
         if RAG_AVAILABLE and use_rag:
             try:
@@ -244,7 +267,7 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
                 context = rag.retrieve_context(message)
                 if context.formatted_context:
                     database_context = context.formatted_context
-                    system_prompt = f"""{base_system_prompt}
+                    system_prompt = f"""{NICOBOT_BASE_SYSTEM_PROMPT}
 
 ## Database Context
 The following information has been retrieved from the NiCOBot chemical database. Use this to enhance your response:
@@ -254,12 +277,12 @@ The following information has been retrieved from the NiCOBot chemical database.
 When answering, reference specific compounds, papers, or data from the database when relevant. If the user asks about a specific compound or reaction, provide the SMILES notation and any relevant publication references."""
                     logger.info(f"[NiCOBot] RAG context retrieved: {len(context.compounds)} compounds, {len(context.papers)} papers")
                 else:
-                    system_prompt = base_system_prompt
+                    system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
             except Exception as e:
                 logger.warning(f"[NiCOBot] RAG error: {e}. Falling back to base prompt.")
-                system_prompt = base_system_prompt
+                system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
         else:
-            system_prompt = base_system_prompt
+            system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
 
         response = get_llm_response(
             system_prompt,
@@ -323,16 +346,6 @@ async def nicobot_chat_async():
 
         logger.info(f"[NiCOBot Async] Provider: {provider}, Has API Key: {bool(api_key)}, RAG: {use_rag}")
 
-        base_system_prompt = """You are NiCOBot, a specialized AI assistant for Nickel-catalyzed cross-coupling reactions and C-O bond activation chemistry.
-Provide accurate, helpful responses about:
-- Nickel catalysis mechanisms and applications
-- C-O bond activation strategies
-- Cross-coupling reactions (Suzuki, Heck, Kumada, etc.)
-- Ligand design for transition metal catalysis
-- Comparison of Ni vs Pd catalysis
-
-Keep responses concise but informative. Use proper chemical nomenclature."""
-
         database_context = None
         if RAG_AVAILABLE and use_rag:
             try:
@@ -340,7 +353,7 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
                 context = rag.retrieve_context(message)
                 if context.formatted_context:
                     database_context = context.formatted_context
-                    system_prompt = f"""{base_system_prompt}
+                    system_prompt = f"""{NICOBOT_BASE_SYSTEM_PROMPT}
 
 ## Database Context
 The following information has been retrieved from the NiCOBot chemical database. Use this to enhance your response:
@@ -350,12 +363,12 @@ The following information has been retrieved from the NiCOBot chemical database.
 When answering, reference specific compounds, papers, or data from the database when relevant."""
                     logger.info(f"[NiCOBot Async] RAG context retrieved")
                 else:
-                    system_prompt = base_system_prompt
+                    system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
             except Exception as e:
                 logger.warning(f"[NiCOBot Async] RAG error: {e}")
-                system_prompt = base_system_prompt
+                system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
         else:
-            system_prompt = base_system_prompt
+            system_prompt = NICOBOT_BASE_SYSTEM_PROMPT
 
         response = await get_llm_response_async(
             system_prompt,
@@ -416,15 +429,7 @@ def redox_chat():
 
         logger.info(f"[RAL Bot] Provider: {provider}, Has API Key: {bool(api_key)}")
 
-        system_prompt = """You are a specialized AI assistant for Redox-Active Ligands chemistry.
-Provide accurate, helpful responses about:
-- Redox-active (non-innocent) ligands and their behavior
-- Metal-ligand cooperativity and electron reservoir concepts
-- Ligand classes: PDI (bis-imino)pyridine, catecholate/o-quinone, dithiolenes
-- Nickel and first-row transition metal catalysis
-Keep responses concise but informative."""
-
-        response = get_llm_response(system_prompt, message, provider=provider, api_key=api_key, model=model)
+        response = get_llm_response(REDOX_SYSTEM_PROMPT, message, provider=provider, api_key=api_key, model=model)
 
         if response:
             return jsonify({'success': True, 'response': response, 'provider': provider or 'default'})
@@ -459,15 +464,7 @@ async def redox_chat_async():
 
         logger.info(f"[RAL Bot Async] Provider: {provider}, Has API Key: {bool(api_key)}")
 
-        system_prompt = """You are a specialized AI assistant for Redox-Active Ligands chemistry.
-Provide accurate, helpful responses about:
-- Redox-active (non-innocent) ligands and their behavior
-- Metal-ligand cooperativity and electron reservoir concepts
-- Ligand classes: PDI (bis-imino)pyridine, catecholate/o-quinone, dithiolenes
-- Nickel and first-row transition metal catalysis
-Keep responses concise but informative."""
-
-        response = await get_llm_response_async(system_prompt, message, provider=provider, api_key=api_key, model=model)
+        response = await get_llm_response_async(REDOX_SYSTEM_PROMPT, message, provider=provider, api_key=api_key, model=model)
 
         if response:
             return jsonify({'success': True, 'response': response, 'provider': provider or 'default', 'async': True})
@@ -598,18 +595,7 @@ Keep the explanation accessible to graduate-level chemistry students."""
                 'source': 'llm'
             })
 
-        explanations = {
-            'oxidative addition': 'Oxidative addition is the first step in cross-coupling. The metal catalyst (M) inserts into the C-X bond of the organic halide. The metal oxidation state increases by 2 (e.g., Pd(0) -> Pd(II)) as it forms two new bonds.',
-            'transmetalation': 'Transmetalation is the transfer of an organic group from the nucleophilic reagent (R-M) to the metal center. This step pairs the two organic fragments on the metal before coupling.',
-            'reductive elimination': 'Reductive elimination is the final step where the two organic groups couple together and are released as the product. The metal is reduced back to its original oxidation state (e.g., Pd(II) -> Pd(0)).',
-            'palladium': 'Palladium is the most widely used catalyst for cross-coupling reactions. Pd(0) complexes are nucleophilic and readily undergo oxidative addition. The 2010 Nobel Prize was awarded for Pd-catalyzed cross-couplings.',
-            'nickel': 'Nickel is a cost-effective alternative to palladium. Ni is more electrophilic and can activate stronger bonds like C-Cl and C-O. This makes it valuable for sustainable chemistry using biomass-derived feedstocks.',
-            'suzuki': 'Suzuki-Miyaura coupling uses organoboron reagents. Key advantages: non-toxic, air-stable reagents, aqueous compatible. Won the 2010 Nobel Prize (Suzuki).',
-            'heck': 'Heck reaction couples aryl halides with alkenes. Unique in that it does not require an organometallic nucleophile. Products are substituted alkenes.',
-            'ligand': 'Ligands control the reactivity, selectivity, and stability of metal catalysts. Electron-rich ligands favor oxidative addition, while bulky ligands prevent unwanted side reactions.'
-        }
-
-        explanation = explanations.get(
+        explanation = KNOWLEDGE_GRAPH_EXPLANATIONS.get(
             node_label.lower(),
             f'{node_label} is an important concept in transition metal catalysis. It plays a crucial role in the catalytic cycle and influences reaction outcomes.'
         )
@@ -663,18 +649,7 @@ Keep the explanation accessible to graduate-level chemistry students."""
                 'async': True
             })
 
-        explanations = {
-            'oxidative addition': 'Oxidative addition is the first step in cross-coupling. The metal catalyst (M) inserts into the C-X bond of the organic halide. The metal oxidation state increases by 2 (e.g., Pd(0) -> Pd(II)) as it forms two new bonds.',
-            'transmetalation': 'Transmetalation is the transfer of an organic group from the nucleophilic reagent (R-M) to the metal center. This step pairs the two organic fragments on the metal before coupling.',
-            'reductive elimination': 'Reductive elimination is the final step where the two organic groups couple together and are released as the product. The metal is reduced back to its original oxidation state (e.g., Pd(II) -> Pd(0)).',
-            'palladium': 'Palladium is the most widely used catalyst for cross-coupling reactions. Pd(0) complexes are nucleophilic and readily undergo oxidative addition. The 2010 Nobel Prize was awarded for Pd-catalyzed cross-couplings.',
-            'nickel': 'Nickel is a cost-effective alternative to palladium. Ni is more electrophilic and can activate stronger bonds like C-Cl and C-O. This makes it valuable for sustainable chemistry using biomass-derived feedstocks.',
-            'suzuki': 'Suzuki-Miyaura coupling uses organoboron reagents. Key advantages: non-toxic, air-stable reagents, aqueous compatible. Won the 2010 Nobel Prize (Suzuki).',
-            'heck': 'Heck reaction couples aryl halides with alkenes. Unique in that it does not require an organometallic nucleophile. Products are substituted alkenes.',
-            'ligand': 'Ligands control the reactivity, selectivity, and stability of metal catalysts. Electron-rich ligands favor oxidative addition, while bulky ligands prevent unwanted side reactions.'
-        }
-
-        explanation = explanations.get(
+        explanation = KNOWLEDGE_GRAPH_EXPLANATIONS.get(
             node_label.lower(),
             f'{node_label} is an important concept in transition metal catalysis. It plays a crucial role in the catalytic cycle and influences reaction outcomes.'
         )
@@ -764,7 +739,7 @@ def generate_mock_knowledge_graph(topic: str) -> dict:
 
     return default_graph
 
-print(f"[STARTUP] GenAI Research Platform v2.0.0")
+print(f"[STARTUP] GenAI Research Platform v{__version__}")
 print(f"[STARTUP] Backend Dir: {BACKEND_DIR}")
 print(f"[STARTUP] Static Folder: {config.static_folder}")
 print(f"[STARTUP] Upload Folder: {config.UPLOAD_FOLDER}")

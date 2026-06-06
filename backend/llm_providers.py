@@ -9,7 +9,6 @@ import requests
 import aiohttp
 
 from utils import sanitize_input
-from cache import cached
 
 logger = logging.getLogger(__name__)
 
@@ -665,11 +664,6 @@ class OpenRouterProvider(BaseLLMProvider):
 
 
 class LLMProviderFactory:
-    HK_FRIENDLY_PROVIDERS: List[str] = ['ollama', 'openrouter', 'huggingface', 'deepseek']
-    ALL_PROVIDERS: List[str] = [
-        'ollama', 'openrouter', 'huggingface', 'deepseek',
-        'gemini', 'groq', 'openai', 'anthropic'
-    ]
 
     @staticmethod
     def create(provider: str = 'ollama', **kwargs) -> BaseLLMProvider:
@@ -868,66 +862,3 @@ Rules:
 
     return None
 
-
-def explain_concept(
-    concept: str,
-    context: str = "",
-    provider: str = None,
-    api_key: str = None
-) -> Optional[str]:
-    """Explain a chemistry concept (synchronous)."""
-    concept = sanitize_input(concept, max_length=200)
-    context = sanitize_input(context, max_length=500)
-
-    system_prompt = """You are an expert chemistry educator specializing in transition metal catalysis.
-Provide a clear, concise explanation (2-3 sentences) for the given chemistry concept.
-Focus on practical understanding and real-world applications.
-Keep the explanation accessible to graduate-level chemistry students."""
-
-    user_message = f"Explain {concept} in the context of transition metal catalysis. Context: {context}"
-    return get_llm_response(system_prompt, user_message, provider=provider, api_key=api_key)
-
-
-async def explain_concept_async(
-    concept: str,
-    context: str = "",
-    provider: str = None,
-    api_key: str = None
-) -> Optional[str]:
-    """Explain a chemistry concept (asynchronous)."""
-    concept = sanitize_input(concept, max_length=200)
-    context = sanitize_input(context, max_length=500)
-
-    system_prompt = """You are an expert chemistry educator specializing in transition metal catalysis.
-Provide a clear, concise explanation (2-3 sentences) for the given chemistry concept.
-Focus on practical understanding and real-world applications.
-Keep the explanation accessible to graduate-level chemistry students."""
-
-    user_message = f"Explain {concept} in the context of transition metal catalysis. Context: {context}"
-    return await get_llm_response_async(system_prompt, user_message, provider=provider, api_key=api_key)
-
-
-if __name__ == "__main__":
-    print("Testing LLM Provider...")
-    provider = LLMProviderFactory.get_default_provider()
-    print(f"Default provider: {provider}")
-
-    response = get_llm_response(
-        "You are a helpful chemistry assistant.",
-        "What is Suzuki coupling in one sentence?"
-    )
-
-    if response:
-        print(f"Response: {response}")
-    else:
-        print("No response received. Check your API key configuration.")
-
-    async def test_async():
-        response = await get_llm_response_async(
-            "You are a helpful chemistry assistant.",
-            "What is Heck reaction in one sentence?"
-        )
-        if response:
-            print(f"Async Response: {response}")
-
-    asyncio.run(test_async())

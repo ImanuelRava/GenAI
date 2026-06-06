@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any
-from flask import jsonify, Response
+from flask import jsonify
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,29 +36,9 @@ class ValidationError(APIError):
         super().__init__(message, status_code=400, payload=payload)
 
 
-class AuthenticationError(APIError):
-    def __init__(self, message: str = "Authentication required", **kwargs):
-        super().__init__(message, status_code=401, **kwargs)
-
-
-class AuthorizationError(APIError):
-    def __init__(self, message: str = "Access denied", **kwargs):
-        super().__init__(message, status_code=403, **kwargs)
-
-
 class NotFoundError(APIError):
     def __init__(self, message: str = "Resource not found", **kwargs):
         super().__init__(message, status_code=404, **kwargs)
-
-
-class RateLimitError(APIError):
-    def __init__(self, message: str = "Rate limit exceeded", **kwargs):
-        super().__init__(message, status_code=429, **kwargs)
-
-
-class ExternalAPIError(APIError):
-    def __init__(self, message: str = "External API error", **kwargs):
-        super().__init__(message, status_code=502, **kwargs)
 
 
 class LLMError(APIError):
@@ -123,13 +103,3 @@ def register_error_handlers(app):
             'status_code': 500
         }), 500
 
-
-def success_response(data: Any, message: Optional[str] = None, **kwargs) -> Dict[str, Any]:
-    response = {
-        'success': True,
-        'data': data
-    }
-    if message:
-        response['message'] = message
-    response.update(kwargs)
-    return response
