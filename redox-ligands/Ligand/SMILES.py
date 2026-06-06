@@ -9,8 +9,8 @@ import time
 # CONFIGURATION - Edit these settings
 # =============================================================================
 
-INPUT_FILE = "Nitrogen_ligands.xlsx"      
-OUTPUT_FILE = "output_with_smiles.xlsx"   
+INPUT_FILE = r"C:\Users\DELL\Documents\PhD\GenAI\redox-ligands\Ligand\Nitrogen_ligands.xlsx"      
+OUTPUT_FILE = r"C:\Users\DELL\Documents\PhD\GenAI\redox-ligands\Ligand\output_with_smiles.xlsx"   
 NAME_COLUMN = "Ligand Name"              
 
 # API settings
