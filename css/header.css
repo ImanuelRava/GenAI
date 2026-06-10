@@ -1,191 +1,191 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --ai-primary: #3b82f6;
-    --ai-light: #dbeafe;
-    --ai-dark: #1d4ed8;
-    --tmc-primary: #8b5cf6;
-    --tmc-light: #ede9fe;
-    --tmc-dark: #6d28d9;
-    --ral-primary: #10b981;
-    --ral-light: #d1fae5;
-    --ral-dark: #059669;
-    --virus-primary: #ef4444;
-    --virus-light: #fee2e2;
-    --virus-dark: #dc2626;
-    --bg-main: #f8fafc;
-    --bg-white: #ffffff;
-    --bg-dark: #0f172a;
-    --text-main: #1e293b;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --text-light: #94a3b8;
-    --border-color: #e2e8f0;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    --radius: 12px;
-    --radius-lg: 20px;
-    --radius-xl: 28px;
+  --ai-primary: #3b82f6;
+  --ai-light: #dbeafe;
+  --ai-dark: #1d4ed8;
+  --tmc-primary: #8b5cf6;
+  --tmc-light: #ede9fe;
+  --tmc-dark: #6d28d9;
+  --ral-primary: #10b981;
+  --ral-light: #d1fae5;
+  --ral-dark: #059669;
+  --virus-primary: #ef4444;
+  --virus-light: #fee2e2;
+  --virus-dark: #dc2626;
+  --bg-main: #f8fafc;
+  --bg-white: #ffffff;
+  --bg-dark: #0f172a;
+  --text-main: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
-    height: auto;
-    min-height: 100vh;
+  scroll-behavior: smooth;
+  height: auto;
+  min-height: 100vh;
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    line-height: 1.6;
-    overflow-x: hidden;
-    min-height: 100vh;
-    padding-top: 72px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+  padding-top: 72px;
 }
 
 header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    padding: 0 24px;
-    border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 72px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
 }
 
 .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
 }
 
 .logo-icon {
-    width: 52px;
-    height: 52px;
-    position: relative;
+  width: 52px;
+  height: 52px;
+  position: relative;
 }
 
 .logo-icon svg {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .logo-text {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-title {
-    font-size: 1.35rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .logo-subtitle {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 nav {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 nav ul {
-    display: flex;
-    list-style: none;
-    gap: 8px;
+  display: flex;
+  list-style: none;
+  gap: 8px;
 }
 
 nav a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    padding: 10px 18px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    position: relative;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 nav a:hover {
-    color: var(--text-main);
-    background: var(--bg-main);
+  color: var(--text-main);
+  background: var(--bg-main);
 }
 
 nav a.active {
-    color: var(--ai-primary);
-    background: var(--ai-light);
+  color: var(--ai-primary);
+  background: var(--ai-light);
 }
 
 nav a.active-ai {
-    color: var(--ai-primary);
-    background: var(--ai-light);
+  color: var(--ai-primary);
+  background: var(--ai-light);
 }
 
 nav a.active-tmc {
-    color: var(--tmc-primary);
-    background: var(--tmc-light);
+  color: var(--tmc-primary);
+  background: var(--tmc-light);
 }
 
 nav a.active-ral {
-    color: var(--ral-primary);
-    background: var(--ral-light);
+  color: var(--ral-primary);
+  background: var(--ral-light);
 }
 
 nav a.active-virus {
-    color: var(--virus-primary);
-    background: var(--virus-light);
+  color: var(--virus-primary);
+  background: var(--virus-light);
 }
 
 @media (max-width: 768px) {
-    .header-inner {
-        flex-direction: column;
-        height: auto;
-        padding: 16px 0;
-        gap: 16px;
-    }
+  .header-inner {
+  flex-direction: column;
+  height: auto;
+  padding: 16px 0;
+  gap: 16px;
+  }
 
-    nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 4px;
-    }
+  nav ul {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  }
 
-    nav a {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-    }
+  nav a {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  }
 
-    body {
-        padding-top: 120px;
-    }
+  body {
+  padding-top: 120px;
+  }
 }

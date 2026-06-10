@@ -6,7 +6,7 @@
     <title>AI | GenAI Research</title>
     <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        /* Content Panel - Add padding to prevent touching outer container */
+        
         .content-panel {
             padding: 24px;
         }
@@ -53,7 +53,7 @@
 </head>
 <body class="theme-blue">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -87,9 +87,9 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    
     <div class="main-wrapper">
-        <!-- Sidebar -->
+        
         <aside class="sidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">Machine Learning</span>
@@ -132,9 +132,9 @@
             </ul>
         </aside>
 
-        <!-- Content Area -->
+        
         <main class="content-area">
-            <!-- Welcome Panel -->
+            
             <div id="welcome" class="content-panel active">
                 <div class="welcome-panel">
                     <div class="welcome-icon">
@@ -150,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- Module 1 Panel -->
+            
             <div id="module1" class="content-panel">
                 <div class="content-header">
                     <h2>Module 1: Introduction to Machine Learning</h2>
@@ -198,7 +198,7 @@
                 </div>
             </div>
 
-            <!-- Module 2 Panel -->
+            
             <div id="module2" class="content-panel">
                 <div class="content-header">
                     <h2>Module 2: Supervised Learning</h2>
@@ -247,7 +247,7 @@
                 </div>
             </div>
 
-            <!-- Module 3 Panel -->
+            
             <div id="module3" class="content-panel">
                 <div class="content-header">
                     <h2>Module 3: Deep Learning</h2>
@@ -296,7 +296,7 @@
                 </div>
             </div>
 
-            <!-- Visualizations Panel -->
+            
             <div id="visualizations" class="content-panel">
                 <div class="content-header">
                     <h2>Interactive Visualizations</h2>
@@ -333,26 +333,26 @@
         </main>
     </div>
 
-    <!-- Footer -->
+    
     <footer>
         <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
     </footer>
 
     <script>
-        // Sidebar Navigation
+        
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         const contentPanels = document.querySelectorAll('.content-panel');
 
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
-                // Remove active class from all items
+                
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 contentPanels.forEach(p => p.classList.remove('active'));
 
-                // Add active class to clicked item
+                
                 item.classList.add('active');
 
-                // Show corresponding panel
+                
                 const panelId = item.getAttribute('data-panel');
                 document.getElementById(panelId).classList.add('active');
             });

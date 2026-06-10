@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Section Logic Flow - GenAI Research Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ai-primary: #3b82f6;
+            --ai-light: #dbeafe;
+            --ai-dark: #1d4ed8;
+            --tmc-primary: #8b5cf6;
+            --tmc-light: #ede9fe;
+            --tmc-dark: #6d28d9;
+            --ral-primary: #10b981;
+            --ral-light: #d1fae5;
+            --ral-dark: #059669;
+            --virus-primary: #ef4444;
+            --virus-light: #fee2e2;
+            --virus-dark: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-dark: #0f172a;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 50%, #F8FAFC 100%);
+            min-height: 100vh;
+            padding-top: 72px;
+        }
+
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-main);
+            background: var(--bg-main);
+        }
+
+        nav a.active-ai {
+            color: var(--ai-primary);
+            background: var(--ai-light);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        
+        .main-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .main-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .main-title p {
+            font-size: 16px;
+            color: #64748B;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        
+        .phase-group {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            margin-bottom: 32px;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+
+        .phase-header {
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .phase-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phase-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .phase-icon.user { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+        .phase-icon.user svg { color: #1D4ED8; }
+        .phase-icon.frontend { background: linear-gradient(135deg, #EFF6FF, #DBEAFE); }
+        .phase-icon.frontend svg { color: #3B82F6; }
+        .phase-icon.backend { background: linear-gradient(135deg, #F5F3FF, #EDE9FE); }
+        .phase-icon.backend svg { color: #8B5CF6; }
+        .phase-icon.ai { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .phase-icon.ai svg { color: #D97706; }
+
+        .phase-title {
+            flex: 1;
+        }
+
+        .phase-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 4px;
+        }
+
+        .phase-title p {
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .phase-content {
+            padding: 24px 32px;
+        }
+
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .module-card:hover {
+            border-color: #3B82F6;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .module-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .module-icon.overview { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+        .module-icon.overview svg { color: #1D4ED8; }
+        .module-icon.basics { background: linear-gradient(135deg, #EFF6FF, #DBEAFE); }
+        .module-icon.basics svg { color: #3B82F6; }
+        .module-icon.supervised { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+        .module-icon.supervised svg { color: #8B5CF6; }
+        .module-icon.deep { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+        .module-icon.deep svg { color: #EC4899; }
+        .module-icon.viz { background: linear-gradient(135deg, #CCFBF1, #99F6E4); }
+        .module-icon.viz svg { color: #14B8A6; }
+        .module-icon.gnn { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .module-icon.gnn svg { color: #D97706; }
+        .module-icon.pca { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+        .module-icon.pca svg { color: #059669; }
+
+        .module-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1E293B;
+        }
+
+        .module-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .module-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tech-tag {
+            padding: 3px 8px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        
+        .flow-connector {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0;
+        }
+
+        .connector-line {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(180deg, #3B82F6, #8B5CF6);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid #8B5CF6;
+        }
+
+        
+        .api-section {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .api-section h2 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .api-section h2 svg {
+            width: 24px;
+            height: 24px;
+            color: #3B82F6;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .api-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .api-endpoint {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 13px;
+            color: #A5B4FC;
+            margin-bottom: 6px;
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #3B82F6;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .api-desc {
+            font-size: 13px;
+            color: #94A3B8;
+        }
+
+        
+        .data-flow-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .data-flow-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .data-flow-title svg {
+            width: 24px;
+            height: 24px;
+            color: #3B82F6;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .flow-node {
+            padding: 16px 24px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .flow-node.input {
+            background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+            border: 2px solid #3B82F6;
+        }
+
+        .flow-node.process {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            border: 2px solid #3B82F6;
+        }
+
+        .flow-node.output {
+            background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+            border: 2px solid #8B5CF6;
+        }
+
+        .flow-node-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 4px;
+        }
+
+        .flow-node-desc {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: #94A3B8;
+            padding: 0 8px;
+        }
+
+        
+        .llm-section {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border: 2px solid #F59E0B;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .llm-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .llm-title svg {
+            width: 24px;
+            height: 24px;
+            color: #D97706;
+        }
+
+        .llm-providers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .llm-provider {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #F59E0B;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .provider-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+        }
+
+        .provider-badge {
+            padding: 2px 8px;
+            background: #FEF3C7;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #B45309;
+        }
+
+        .provider-badge.free {
+            background: #D1FAE5;
+            color: #047857;
+        }
+
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+
+        .legend-label {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                height: auto;
+                padding: 16px 0;
+                gap: 16px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            body {
+                padding-top: 120px;
+            }
+
+            .container {
+                padding: 24px 16px;
+            }
+
+            .phase-header, .phase-content {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <div class="header-inner">
+            <a href="./index.html" class="logo-section">
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="./ai_logic_flow.html" class="active-ai">AI</a></li>
+                    <li><a href="./tmc_logic_flow.html">TMC</a></li>
+                    <li><a href="./redox_logic_flow.html">Redox</a></li>
+                    <li><a href="./virus_logic_flow.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="main-title">
+            <h1>AI Section Logic Flow</h1>
+            <p>Machine Learning Education - Comprehensive modules covering ML basics, supervised learning, deep learning, and interactive visualizations for scientific applications</p>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon user">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Phase 1: User Entry & Navigation</h2>
+                    <p>Initial access point and module selection</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <div class="module-name">Main Entry (index.html)</div>
+                        </div>
+                        <div class="module-desc">
+                            Central hub with sidebar navigation to all AI/ML modules. Theme: Blue (#3B82F6). Shared CSS with TMC section for consistent styling.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">HTML5</span>
+                            <span class="tech-tag">CSS3</span>
+                            <span class="tech-tag">Vanilla JS</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </div>
+                            <div class="module-name">Sidebar Navigation</div>
+                        </div>
+                        <div class="module-desc">
+                            5 modules: Overview, Module 1 (ML Basics), Module 2 (Supervised), Module 3 (Deep Learning), Visualizations. Dynamic panel switching with smooth transitions.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Event Listeners</span>
+                            <span class="tech-tag">Panel Toggle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-connector">
+            <div class="connector-line"></div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon frontend">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Phase 2: Frontend Modules (5 Sub-modules)</h2>
+                    <p>Educational content and interactive visualizations</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon basics">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg>
+                            </div>
+                            <div class="module-name">Module 1: ML Basics</div>
+                        </div>
+                        <div class="module-desc">
+                            Introduction to machine learning fundamentals. Topics: ML types, workflow, math foundations, applications in chemistry. 6 sections, 2 hours, Beginner level.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">6 Sections</span>
+                            <span class="tech-tag">2 Hours</span>
+                            <span class="tech-tag">Beginner</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon supervised">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <div class="module-name">Module 2: Supervised Learning</div>
+                        </div>
+                        <div class="module-desc">
+                            Classification and regression algorithms. Topics: Logistic Regression, SVM, Decision Trees, Random Forests, XGBoost, evaluation metrics. 5 algorithms, 3 hours.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">5 Algorithms</span>
+                            <span class="tech-tag">3 Hours</span>
+                            <span class="tech-tag">Hands-On</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon deep">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                            </div>
+                            <div class="module-name">Module 3: Deep Learning</div>
+                        </div>
+                        <div class="module-desc">
+                            Neural networks and modern architectures. Topics: CNNs, RNNs, LSTMs, Transformers, GNNs. Applications in drug discovery and molecular property prediction. 6 architectures.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">6 Architectures</span>
+                            <span class="tech-tag">4 Hours</span>
+                            <span class="tech-tag">Intermediate</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon gnn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <circle cx="4" cy="8" r="2"></circle>
+                                    <circle cx="20" cy="8" r="2"></circle>
+                                    <circle cx="4" cy="16" r="2"></circle>
+                                    <circle cx="20" cy="16" r="2"></circle>
+                                    <line x1="6" y1="8" x2="9" y2="10"></line>
+                                    <line x1="18" y1="8" x2="15" y2="10"></line>
+                                    <line x1="6" y1="16" x2="9" y2="14"></line>
+                                    <line x1="18" y1="16" x2="15" y2="14"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">GNN Visualization</div>
+                        </div>
+                        <div class="module-desc">
+                            Interactive graph neural network visualization. Message passing, node embeddings, molecular graph representations. Real-time step-by-step algorithm visualization.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Interactive</span>
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Molecular Data</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon pca">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">PCA Visualization</div>
+                        </div>
+                        <div class="module-desc">
+                            Interactive dimensionality reduction visualization. Scree plots, variance explained, data projections. Chemistry applications with real molecular datasets.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Interactive</span>
+                            <span class="tech-tag">Plotly</span>
+                            <span class="tech-tag">Scree Plots</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-connector">
+            <div class="connector-line"></div>
+        </div>
+
+        
+        <div class="api-section">
+            <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path>
+                    <polygon points="12 15 17 21 7 21 12 15"></polygon>
+                </svg>
+                Backend API Endpoints (Flask Blueprint Routes)
+            </h2>
+            <div class="api-grid">
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/health</div>
+                    <div class="api-desc">Health check with system status and ML library availability info</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/pca/compute</div>
+                    <div class="api-desc">Compute PCA on molecular datasets, returns variance explained and projections</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/gnn/predict</div>
+                    <div class="api-desc">Graph neural network prediction for molecular property estimation</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/molecules</div>
+                    <div class="api-desc">Molecular structure data for visualization and ML training examples</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/llm/status</div>
+                    <div class="api-desc">Check if backend has configured LLM API key for AI features</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/llm/chat</div>
+                    <div class="api-desc">Generic LLM chat endpoint for educational AI assistance</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="data-flow-section">
+            <div class="data-flow-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="12" x2="2" y2="12"></line>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    <line x1="6" y1="16" x2="6.01" y2="16"></line>
+                    <line x1="10" y1="16" x2="10.01" y2="16"></line>
+                </svg>
+                Data Flow Architecture
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node input">
+                    <div class="flow-node-title">User Input</div>
+                    <div class="flow-node-desc">Module Selection</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">Frontend Module</div>
+                    <div class="flow-node-desc">Content Display</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">Interactive Viz</div>
+                    <div class="flow-node-desc">D3.js / Plotly</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">Flask Backend</div>
+                    <div class="flow-node-desc">API Handler</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node output">
+                    <div class="flow-node-title">Response</div>
+                    <div class="flow-node-desc">Visualization / Data</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="llm-section">
+            <div class="llm-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+                    <circle cx="7.5" cy="14.5" r="1.5"></circle>
+                    <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                </svg>
+                ML/AI Technologies Used
+            </div>
+            <div class="llm-providers">
+                <div class="llm-provider">
+                    <div class="provider-name">PyTorch</div>
+                    <div class="provider-badge">Deep Learning</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">TensorFlow</div>
+                    <div class="provider-badge">ML Framework</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Scikit-learn</div>
+                    <div class="provider-badge free">FREE</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">D3.js</div>
+                    <div class="provider-badge free">Visualization</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Plotly</div>
+                    <div class="provider-badge free">Charts</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">RDKit</div>
+                    <div class="provider-badge free">Chemistry</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">NumPy</div>
+                    <div class="provider-badge free">Numerical</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon ai">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Key Features & Content</h2>
+                    <p>What makes the AI section unique</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon basics">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Structured Learning Path</div>
+                        </div>
+                        <div class="module-desc">
+                            Progressive curriculum from basics to advanced topics. Each module builds on previous knowledge with clear prerequisites and learning objectives.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Beginner → Advanced</span>
+                            <span class="tech-tag">Prerequisites</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon viz">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Interactive Visualizations</div>
+                        </div>
+                        <div class="module-desc">
+                            Hands-on demos for GNN message passing and PCA dimensionality reduction. Real-time parameter adjustment with immediate visual feedback.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Plotly</span>
+                            <span class="tech-tag">Real-time</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon deep">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Chemistry Applications</div>
+                        </div>
+                        <div class="module-desc">
+                            Real-world examples from drug discovery and materials science. Molecular property prediction, reaction yield modeling, and compound activity classification.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Drug Discovery</span>
+                            <span class="tech-tag">Molecules</span>
+                            <span class="tech-tag">Materials</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon gnn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <circle cx="19" cy="5" r="2"></circle>
+                                    <circle cx="5" cy="5" r="2"></circle>
+                                    <circle cx="19" cy="19" r="2"></circle>
+                                    <circle cx="5" cy="19" r="2"></circle>
+                                    <line x1="12" y1="9" x2="12" y2="5"></line>
+                                    <line x1="9" y1="12" x2="5" y2="12"></line>
+                                    <line x1="15" y1="12" x2="19" y2="12"></line>
+                                    <line x1="12" y1="15" x2="12" y2="19"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Graph Neural Networks</div>
+                        </div>
+                        <div class="module-desc">
+                            Special focus on GNNs for molecular data. Message passing mechanisms, node aggregation, and molecular property prediction with real chemical datasets.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Message Passing</span>
+                            <span class="tech-tag">Node Embeddings</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon pca">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Assessment & Progress</div>
+                        </div>
+                        <div class="module-desc">
+                            Stats grid showing sections, hours, topics, and difficulty level for each module. Clear prerequisites and learning objectives with progress tracking.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Stats Grid</span>
+                            <span class="tech-tag">Progress</span>
+                            <span class="tech-tag">Levels</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon supervised">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Shared Styling</div>
+                        </div>
+                        <div class="module-desc">
+                            Uses TMC's shared.css for consistent look and feel across sections. Theme color blue (#3B82F6) distinguishes AI from purple TMC and green RAL themes.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Shared CSS</span>
+                            <span class="tech-tag">Theme: Blue</span>
+                            <span class="tech-tag">Consistency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <footer style="text-align: center; padding: 32px; color: #64748B; font-size: 14px;">
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+</body>
+</html>

@@ -6,7 +6,7 @@
     <title>Lecture 3: The Catalytic Cycle | TMC - GenAI Research</title>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Content Panel - Add padding to prevent touching outer container */
+        
         .content-panel {
             padding: 24px;
         }
@@ -49,7 +49,7 @@
             padding: 24px 0 0 0;
         }
 
-        /* Page-specific styles only */
+        
         .steps-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -218,7 +218,7 @@
 </head>
 <body class="theme-purple">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -330,7 +330,7 @@
                     </div>
                 </div>
 
-                <!-- Step 1 Detail -->
+                
                 <div class="step-detail" id="step-1">
                     <h3 style="color: var(--ai-primary);">Step 1: Oxidative Addition</h3>
                     <p>Oxidative addition is the process by which the metal catalyst "inserts" itself into a covalent bond of the substrate. For cross-coupling, this is typically the Carbon-Halogen (C-X) bond of an aryl or alkyl halide.</p>
@@ -356,7 +356,7 @@
                     </div>
                 </div>
 
-                <!-- Step 2 Detail -->
+                
                 <div class="step-detail" id="step-2">
                     <h3 style="color: var(--tmc-primary);">Step 2: Transmetalation</h3>
                     <p>Transmetalation is the exchange of ligands between two metal centers. The organic group from the nucleophilic coupling partner (R'-M') is transferred to the catalyst, while the halide (X) is displaced.</p>
@@ -384,7 +384,7 @@
                     </div>
                 </div>
 
-                <!-- Step 3 Detail -->
+                
                 <div class="step-detail" id="step-3">
                     <h3>Step 3: Reductive Elimination</h3>
                     <p>Reductive elimination is the final and crucial step where the two organic fragments (R and R') couple together and are released from the metal center, regenerating the active catalyst.</p>
@@ -513,7 +513,7 @@
     <footer><p>Powered by TMC AI Engine | AI in Chemistry Initiative</p></footer>
 
     <script>
-        // Sidebar Navigation
+        
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         const contentPanels = document.querySelectorAll('.content-panel');
         function showPanel(panelId) {
@@ -526,7 +526,7 @@
             item.addEventListener('click', () => showPanel(item.getAttribute('data-panel')));
         });
 
-        // Step Details
+        
         function showStep(stepNum) {
             document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.step-detail').forEach(d => d.classList.remove('active'));

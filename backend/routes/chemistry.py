@@ -1,11 +1,11 @@
 import io
 import base64
 import logging
-from typing import Optional
+from typing import Dict, Any, Optional
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
 
-from errors import APIError, NotFoundError
+from core.errors import APIError, NotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +132,7 @@ def generate_base64_mol(smiles: str) -> Optional[str]:
         logger.error(f"Error generating molecule: {e}")
         return None
 
+
 def generate_reaction_image(reaction_smarts: str, width: int = 600, height: int = 150) -> Optional[str]:
     if not RDKIT_AVAILABLE:
         return None
@@ -149,6 +150,7 @@ def generate_reaction_image(reaction_smarts: str, width: int = 600, height: int 
         logger.error(f"Error generating reaction: {e}")
         return None
 
+
 @chemistry_bp.route('/molecules')
 def get_molecules():
     data = {}
@@ -163,6 +165,7 @@ def get_molecules():
         'count': len(data),
         'rdkit_available': RDKIT_AVAILABLE
     })
+
 
 @chemistry_bp.route('/reactions')
 def get_reactions():
@@ -182,6 +185,7 @@ def get_reactions():
         'count': len(data),
         'rdkit_available': RDKIT_AVAILABLE
     })
+
 
 @chemistry_bp.route('/reaction/<reaction_key>')
 def get_single_reaction(reaction_key: str):

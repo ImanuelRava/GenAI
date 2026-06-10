@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 USER_AGENT = "GenAI-Research-Platform/1.0"
 HEADERS = {'User-Agent': USER_AGENT}
 
+
 def extract_doi_from_pdf(pdf_path) -> str:
     doi_pattern = r'10\.\d{4,9}/[-._;()/:A-Z0-9]+'
 
@@ -21,6 +22,7 @@ def extract_doi_from_pdf(pdf_path) -> str:
                     doi = match.group(0).strip()
                     return doi.rstrip('.;,)')
     raise ValueError("No DOI found in the PDF.")
+
 
 def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
     url = f"https://api.crossref.org/works/{doi}"
@@ -52,9 +54,11 @@ def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
         logger.error(f"Error fetching {doi}: {e}")
         raise RuntimeError(f"Error fetching {doi}: {e}")
 
+
 def get_referenced_dois(references: List) -> List[str]:
     if not references: return []
     return [ref['DOI'] for ref in references if ref and 'DOI' in ref]
+
 
 def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, Any]]:
     base_url = "https://api.openalex.org"

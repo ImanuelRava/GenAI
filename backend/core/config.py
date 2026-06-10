@@ -5,26 +5,43 @@ from pathlib import Path
 
 @dataclass
 class Config:
-    BASE_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent)
-    BACKEND_DIR: Path = field(default_factory=lambda: Path(__file__).parent)
+    # core/config.py is nested two levels inside the backend package:
+    #   <project_root>/backend/core/config.py
+    # So we go parent.parent.parent to reach the project root,
+    # and parent.parent to reach the backend directory.
+    BASE_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent.parent)
+    BACKEND_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent)
 
     UPLOAD_FOLDER: str = ""
-    ALLOWED_EXTENSIONS: Set[str] = field(default_factory=lambda: {'pdf'})
+    ALLOWED_EXTENSIONS: Set[str] = field(default_factory=lambda: {'pdf', 'xlsx', 'xls', 'csv'})
     MAX_FILE_SIZE: int = 16 * 1024 * 1024
+    NETWORK_PDF_EXTENSIONS: Set[str] = field(default_factory=lambda: {'pdf'})
+    NETWORK_EXCEL_EXTENSIONS: Set[str] = field(default_factory=lambda: {'xlsx', 'xls', 'csv'})
+    MAX_PDF_PAGES: int = 50
 
     CORS_ORIGINS: List[str] = field(default_factory=list)
 
     RATE_LIMIT_DEFAULT: str = "200 per day;50 per hour"
+    RATE_LIMIT_NETWORK: str = "10 per minute"
+    RATE_LIMIT_LLM: str = "20 per minute"
 
     LLM_TIMEOUT: int = 60
     LLM_MAX_TOKENS: int = 2000
     LLM_TEMPERATURE: float = 0.7
     MAX_PROMPT_LENGTH: int = 2000
 
+    CACHE_ENABLED: bool = True
+    CACHE_TTL_PAPER: int = 86400
+    CACHE_TTL_LLM: int = 3600
+    CACHE_MAX_SIZE: int = 500
+
     SECRET_KEY: str = ""
+    SESSION_COOKIE_SECURE: bool = True
 
     def __post_init__(self):
         self.UPLOAD_FOLDER = str(self.BACKEND_DIR / 'uploads')
+        # Ensure upload directory exists
+        os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
 
         cors_default = 'http://localhost:5000,http://127.0.0.1:5000,http://localhost:3000'
         cors_env = os.environ.get('CORS_ORIGINS', cors_default)
@@ -32,10 +49,21 @@ class Config:
 
         self.SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(32).hex())
 
+        redis_url = os.environ.get('REDIS_URL')
+        if redis_url:
+            self.CACHE_TYPE = 'redis'
+            self.CACHE_REDIS_URL = redis_url
+        else:
+            self.CACHE_TYPE = 'memory'
+
     @property
     def static_folder(self) -> str:
         return str(self.BASE_DIR)
 
+    @property
+    def database_path(self) -> str:
+        db_path = self.BACKEND_DIR / 'genai.db'
+        return str(db_path)
 
 config = Config()
 

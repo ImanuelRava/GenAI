@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citation Network | TMC - GenAI Research</title>
-    <!-- Cytoscape.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
-    <!-- Cytoscape FCose layout (for Force-directed layout) -->
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.min.js"></script>
-    <!-- SheetJS (For Excel Download) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Cytoscape.js: required for graph rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+    <!-- fcose layout plugin for Cytoscape -->
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.js"></script>
+    <!-- XLSX for downloading Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Define primary and accent colors for this page */
+        
         :root {
             --primary: #8b5cf6;
             --accent: #3b82f6;
         }
-        /* Content Panel - Add padding to prevent touching outer container */
+        
         .content-panel {
             padding: 24px;
         }
@@ -60,7 +62,7 @@
             padding: 24px 0 0 0;
         }
 
-        /* Page-specific styles */
+        
         html, body {
             height: 100%;
             overflow: hidden;
@@ -82,7 +84,7 @@
             overflow-y: auto;
         }
         
-        /* Graph Container */
+        
         .graph-container {
             flex: 1;
             position: relative;
@@ -103,7 +105,7 @@
             left: 0;
         }
         
-        /* Statistics Dashboard */
+        
         .stats-dashboard {
             position: absolute;
             top: 20px;
@@ -157,7 +159,7 @@
             text-transform: uppercase;
         }
         
-        /* Legend */
+        
         .legend {
             position: absolute;
             bottom: 80px;
@@ -200,7 +202,7 @@
             border: 2px solid;
         }
         
-        /* Toolbar */
+        
         .graph-toolbar {
             position: absolute;
             top: 20px;
@@ -236,7 +238,7 @@
             color: white;
         }
         
-        /* Search Box */
+        
         .search-box {
             position: absolute;
             top: 20px;
@@ -265,7 +267,7 @@
             color: var(--text-muted);
         }
         
-        /* Zoom Controls */
+        
         .zoom-controls {
             position: absolute;
             bottom: 20px;
@@ -341,7 +343,7 @@
             background: #374151;
         }
         
-        /* Info Panel (Right Sidebar) */
+        
         .info-panel {
             position: absolute;
             top: 0;
@@ -439,14 +441,14 @@
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            /* Solid color as primary - always visible */
+            
             color: var(--primary);
-            /* Ensure visibility */
+            
             display: block;
             min-height: 1.5rem;
         }
         
-        /* Gradient text effect only for browsers that fully support it */
+        
         @supports (-webkit-background-clip: text) and (background-clip: text) {
             .stat-value {
                 background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
@@ -462,7 +464,7 @@
             text-transform: uppercase;
         }
         
-        /* Connected Papers */
+        
         .connected-papers {
             margin-top: 20px;
         }
@@ -507,7 +509,7 @@
             color: var(--text-muted);
         }
         
-        /* Sidebar Sections */
+        
         .sidebar-section {
             border-bottom: 1px solid var(--border-color);
             padding: 16px;
@@ -533,7 +535,7 @@
             font-size: 1rem;
         }
         
-        /* Layout Selector */
+        
         .layout-selector {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -558,7 +560,7 @@
             border-color: var(--primary);
         }
         
-        /* Filter Controls */
+        
         .filter-control {
             margin-bottom: 12px;
         }
@@ -576,7 +578,7 @@
             color: var(--primary);
         }
         
-        /* Form Elements */
+        
         .form-group {
             margin-bottom: 12px;
         }
@@ -603,7 +605,7 @@
             transform: scale(1.1);
         }
         
-        /* File Drop */
+        
         .file-drop {
             border: 2px dashed var(--border-color);
             border-radius: var(--radius);
@@ -637,7 +639,7 @@
             font-weight: 500;
         }
         
-        /* Suggestion List */
+        
         .suggestion-list {
             max-height: 300px;
             overflow-y: auto;
@@ -678,7 +680,7 @@
             gap: 12px;
         }
         
-        /* Loader Overlay */
+        
         .loader-overlay {
             position: absolute;
             top: 0;
@@ -719,7 +721,7 @@
             color: var(--text-secondary);
         }
         
-        /* Empty State */
+        
         .empty-state {
             position: absolute;
             top: 50%;
@@ -746,7 +748,7 @@
             font-size: 0.9rem;
         }
         
-        /* Tooltip */
+        
         .node-tooltip {
             position: absolute;
             background: rgba(0, 0, 0, 0.85);
@@ -765,7 +767,7 @@
             opacity: 1;
         }
         
-        /* Responsive */
+        
         @media (max-width: 900px) {
             .info-panel {
                 width: 100%;
@@ -782,7 +784,7 @@
 </head>
 <body>
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -816,9 +818,9 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    
     <div class="main-wrapper">
-        <!-- Sidebar -->
+        
         <aside class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-section-title">
@@ -889,13 +891,13 @@
             </div>
         </aside>
 
-        <!-- Content Area -->
+        
         <main class="content-area">
-            <!-- Graph Container -->
+            
             <div class="graph-container">
                 <div id="cy"></div>
                 
-                <!-- Statistics Dashboard -->
+                
                 <div class="stats-dashboard" id="statsDashboard" style="display: none;">
                     <div class="stats-title">Network Statistics</div>
                     <div class="stats-grid">
@@ -918,7 +920,7 @@
                     </div>
                 </div>
                 
-                <!-- Search Box -->
+                
                 <div class="search-box" id="searchBox" style="display: none;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"/>
@@ -927,7 +929,7 @@
                     <input type="text" placeholder="Search papers..." id="searchInput" oninput="searchNodes(this.value)">
                 </div>
                 
-                <!-- Legend -->
+                
                 <div class="legend" id="legend" style="display: none;">
                     <div class="legend-item">
                         <div class="legend-color" style="background: #f59e0b;"></div>
@@ -947,7 +949,7 @@
                     </div>
                 </div>
                 
-                <!-- Toolbar -->
+                
                 <div class="graph-toolbar" id="graphToolbar" style="display: none;">
                     <button class="toolbar-btn" onclick="exportPNG()" title="Export PNG">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -996,7 +998,7 @@
                 </div>
             </div>
 
-            <!-- Loader -->
+            
             <div class="loader-overlay" id="loader">
                 <div class="loading-spinner"></div>
                 <div class="loader-progress">
@@ -1005,7 +1007,7 @@
                 <p class="loader-text" id="loaderText">Processing data...</p>
             </div>
 
-            <!-- Info Panel -->
+            
             <aside class="info-panel" id="infoPanel">
                 <div class="info-panel-header">
                     <h3>Paper Details</h3>
@@ -1040,7 +1042,7 @@
                     </div>
                     <a id="detail-link" href="#" target="_blank" class="btn btn-primary" style="display: none; margin-top: 12px; width: 100%;">View Paper (DOI)</a>
                     
-                    <!-- Connected Papers -->
+                    
                     <div class="connected-papers" id="connectedPapers" style="display: none;">
                         <div class="detail-label">Connected Papers</div>
                         <div id="connectedPapersList"></div>
@@ -1050,16 +1052,16 @@
         </main>
     </div>
 
-    <!-- Tooltip -->
+    
     <div class="node-tooltip" id="nodeTooltip"></div>
 
-    <!-- Footer -->
+    
     <footer>
         <p>Powered by TMC AI Engine | AI in Chemistry Initiative</p>
     </footer>
 
     <script>
-        // Register fcose layout with cytoscape
+        
         if (typeof cytoscape !== 'undefined' && typeof cytoscapeFcose !== 'undefined') {
             cytoscape.use(cytoscapeFcose);
             console.log('fcose layout registered successfully');
@@ -1067,7 +1069,7 @@
             console.warn('fcose library not loaded properly');
         }
 
-        // Global variables
+        
         let fullPaperData = [];
         let currentLayout = 'preset';
         let networkData = null;
@@ -1079,7 +1081,7 @@
             }
         }
 
-        // --- EXCEL DOWNLOAD FUNCTION ---
+        
         function downloadExcel() {
             if (!fullPaperData || fullPaperData.length === 0) {
                 alert("No data available to download.");
@@ -1092,7 +1094,7 @@
             XLSX.writeFile(wb, "Citation_Network_Data.xlsx");
         }
 
-        // --- PROGRESS UPDATE ---
+        
         function updateProgress(percent, text) {
             document.getElementById('loaderProgress').style.width = percent + '%';
             if (text) {
@@ -1121,7 +1123,7 @@
             dlBtn.style.display = 'none';
             zoomControls.style.display = 'none';
             
-            // Hide UI elements during loading
+            
             document.getElementById('statsDashboard').style.display = 'none';
             document.getElementById('searchBox').style.display = 'none';
             document.getElementById('legend').style.display = 'none';
@@ -1160,7 +1162,7 @@
                 initCytoscape(networkData);
                 updateStatistics(networkData);
 
-                // Update suggestions list
+                
                 list.innerHTML = '';
                 if (data.suggestions && data.suggestions.length > 0) {
                     data.suggestions.slice(0, 10).forEach((s, i) => {
@@ -1177,7 +1179,7 @@
                     list.innerHTML = '<p style="font-size:0.8rem; color: var(--text-muted);">No suggestions found.</p>';
                 }
 
-                // Show UI elements
+                
                 dlBtn.style.display = 'block';
                 zoomControls.style.display = 'flex';
                 document.getElementById('statsDashboard').style.display = 'block';
@@ -1210,21 +1212,21 @@
             return baseVal + (normalized * scale);
         }
 
-        // --- COLOR HELPER ---
+        
         function getNodeColor(node) {
             const isMain = node.data('is_main') === "True";
             const cites = parseInt(node.data('citations')) || 0;
             
-            if (isMain) return '#f59e0b'; // Gold for main paper
+            if (isMain) return '#f59e0b'; 
             
-            // Gradient from blue to green based on citations
+            
             const normalizedCites = Math.min(cites / Math.max(maxCites, 1), 1);
-            if (normalizedCites > 0.7) return '#10b981'; // Green for highly cited
-            if (normalizedCites > 0.4) return '#6366f1'; // Indigo for moderately cited
-            return '#3b82f6'; // Blue for normal
+            if (normalizedCites > 0.7) return '#10b981'; 
+            if (normalizedCites > 0.4) return '#6366f1'; 
+            return '#3b82f6'; 
         }
 
-        // --- NODE SIZE HELPER ---
+        
         function getNodeSize(node) {
             const isMain = node.data('is_main') === "True";
             const cites = parseInt(node.data('citations')) || 0;
@@ -1232,7 +1234,7 @@
             
             if (isMain) return 35 * sizeMultiplier;
             
-            // Logarithmic scale for size
+            
             const baseSize = 12;
             const citeBonus = Math.log10(Math.max(cites, 1) + 1) * 8;
             return Math.min(baseSize + citeBonus, 40) * sizeMultiplier;
@@ -1254,24 +1256,24 @@
             const edges = elements.edges;
             console.log(`Processing ${nodes.length} nodes and ${edges.length} edges`);
             
-            // Debug: log first node structure
+            
             if (nodes.length > 0) {
                 console.log("Sample node structure:", nodes[0]);
             }
 
-            // Helper function to get node property (handles different data structures)
+            
             function getNodeProp(node, prop) {
-                // Try direct property first
+                
                 if (node[prop] !== undefined) return node[prop];
-                // Try nested under 'data'
+                
                 if (node.data && node.data[prop] !== undefined) return node.data[prop];
-                // Try as lowercase
+                
                 const lowerProp = prop.toLowerCase();
                 if (node[lowerProp] !== undefined) return node[lowerProp];
                 return null;
             }
 
-            // Calculate ranges
+            
             minYear = Infinity;
             maxYear = -Infinity;
             maxCites = 0;
@@ -1286,11 +1288,11 @@
             
             console.log(`Year range: ${minYear} - ${maxYear}, Max citations: ${maxCites}`);
             
-            // Handle edge case where no valid year data
+            
             if (minYear === Infinity) minYear = 1900;
             if (maxYear === -Infinity) maxYear = 2025;
             
-            // Update year slider
+            
             document.getElementById('yearMinSlider').min = minYear;
             document.getElementById('yearMinSlider').max = maxYear;
             document.getElementById('yearMinSlider').value = minYear;
@@ -1308,21 +1310,21 @@
                     const year = parseInt(getNodeProp(node, 'year')) || minYear;
                     const cites = parseInt(getNodeProp(node, 'citations')) || 0;
                     
-                    // Debug: log raw node data for first 3 nodes
+                    
                     if (index < 3) {
                         console.log(`Node ${index} raw data:`, node);
                         console.log(`Node ${index} extracted - id:`, nodeId, 'title:', getNodeProp(node, 'title'), 'year:', year, 'cites:', cites, 'author:', getNodeProp(node, 'author'));
                     }
                     
-                    // Calculate scatter plot position (year on X, citations on Y)
+                    
                     let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
                     let rawY = PLOT_HEIGHT - ((cites / Math.max(maxCites, 1)) * PLOT_HEIGHT * 0.9) - 40;
                     
-                    // Add stable jitter to prevent overlap
+                    
                     const xPos = getStableJitter(String(nodeId), rawX, jitterX);
                     const yPos = getStableJitter(String(nodeId), rawY, jitterY);
                     
-                    // Build node data object with all properties
+                    
                     const nodeData = {
                         id: String(nodeId),
                         title: getNodeProp(node, 'title') || 'Unknown',
@@ -1331,7 +1333,7 @@
                         author: getNodeProp(node, 'author') || getNodeProp(node, 'authors') || 'Unknown',
                         doi: getNodeProp(node, 'doi') || '',
                         is_main: String(getNodeProp(node, 'is_main') || false),
-                        local_citations: 0  // Will be calculated later
+                        local_citations: 0  
                     };
                     
                     return { 
@@ -1449,7 +1451,7 @@
                     wheelSensitivity: 0.3
                 });
 
-                // Calculate local citations for all nodes after graph is created
+                
                 console.log('Calculating local citations for all nodes...');
                 window.cy.nodes().forEach(node => {
                     const localCites = node.indegree ? node.indegree() : 0;
@@ -1457,7 +1459,7 @@
                 });
                 console.log('Local citations calculated');
 
-                // Event handlers
+                
                 window.cy.on('tap', 'node', function(evt) { 
                     const node = evt.target; 
                     focusOnNode(node.id()); 
@@ -1470,7 +1472,7 @@
                     } 
                 });
                 
-                // Hover tooltip
+                
                 window.cy.on('mouseover', 'node', function(evt) {
                     const node = evt.target;
                     const data = node.data();
@@ -1486,7 +1488,7 @@
             }
         }
 
-        // --- TOOLTIP FUNCTIONS ---
+        
         function showTooltip(position, data) {
             const tooltip = document.getElementById('nodeTooltip');
             tooltip.innerHTML = `
@@ -1515,7 +1517,7 @@
             document.getElementById('nodeTooltip').classList.remove('visible');
         }
 
-        // --- STATISTICS ---
+        
         function updateStatistics(elements) {
             if (!elements || !elements.nodes) return;
             
@@ -1532,10 +1534,10 @@
             document.getElementById('statMaxCites').innerText = maxCite;
         }
 
-        // Store original positions for scatter layout
+        
         let originalPositions = {};
         
-        // --- LAYOUT FUNCTIONS ---
+        
         function setLayout(layoutName) {
             console.log('setLayout called with:', layoutName);
             if (!window.cy) {
@@ -1543,7 +1545,7 @@
                 return;
             }
             
-            // Update button states
+            
             document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById('layout-' + layoutName);
             if (activeBtn) {
@@ -1596,10 +1598,10 @@
                     };
                     break;
                 default:
-                    // Preset layout (Scatter) - restore original positions based on year/citations
+                    
                     console.log('Running preset (scatter) layout');
                     
-                    // Recalculate positions for scatter plot
+                    
                     const yearRange = (maxYear - minYear) === 0 ? 1 : (maxYear - minYear);
                     const container = document.getElementById('cy');
                     const PLOT_WIDTH = container.offsetWidth || 1200;
@@ -1612,20 +1614,20 @@
                         const cites = parseInt(node.data('citations')) || 0;
                         const nodeId = node.id();
                         
-                        // Calculate scatter plot position (year on X, citations on Y)
+                        
                         let rawX = ((year - minYear) / yearRange) * PLOT_WIDTH;
                         let rawY = PLOT_HEIGHT - ((cites / Math.max(maxCites, 1)) * PLOT_HEIGHT * 0.9) - 40;
                         
-                        // Add stable jitter
+                        
                         const xPos = getStableJitter(String(nodeId), rawX, jitterX);
                         const yPos = getStableJitter(String(nodeId), rawY, jitterY);
                         
                         node.position({ x: xPos, y: yPos });
                     });
                     
-                    // Fit to view
+                    
                     window.cy.fit(50);
-                    return; // Skip the layout.run() below
+                    return; 
             }
             
             try {
@@ -1636,7 +1638,7 @@
                 layout.run();
             } catch (e) {
                 console.error('Layout error:', e);
-                // Fallback to preset if fcose fails
+                
                 if (layoutName === 'fcose') {
                     console.log('Falling back to grid layout');
                     window.cy.layout({ name: 'grid', fit: true, animate: true }).run();
@@ -1644,7 +1646,7 @@
             }
         }
 
-        // --- FILTER FUNCTIONS ---
+        
         function filterByYear() {
             const minYearFilter = parseInt(document.getElementById('yearMinSlider').value);
             document.getElementById('yearMinValue').innerText = minYearFilter;
@@ -1669,7 +1671,7 @@
             });
         }
 
-        // --- SEARCH FUNCTION ---
+        
         function searchNodes(query) {
             if (!window.cy) return;
             
@@ -1695,7 +1697,7 @@
             });
         }
 
-        // --- HIGHLIGHT FUNCTIONS ---
+        
         function resetHighlight() {
             if (!window.cy) return;
             window.cy.nodes().removeClass('dimmed highlighted');
@@ -1705,18 +1707,18 @@
         function highlightConnected(node) {
             if (!window.cy) return;
             
-            // Dim all
+            
             window.cy.nodes().addClass('dimmed');
             window.cy.edges().addClass('dimmed');
             
-            // Highlight connected
+            
             const neighborhood = node.neighborhood();
             neighborhood.nodes().removeClass('dimmed').addClass('highlighted');
             neighborhood.edges().removeClass('dimmed').addClass('highlighted');
             node.removeClass('dimmed').addClass('highlighted');
         }
 
-        // --- ZOOM FUNCTIONS ---
+        
         const zoomSlider = document.getElementById('zoomSlider');
         const zoomLabel = document.getElementById('zoomLabel');
         
@@ -1762,7 +1764,7 @@
             }
         }
 
-        // --- EXPORT FUNCTIONS ---
+        
         function exportPNG() {
             if (!window.cy) return;
             
@@ -1778,7 +1780,7 @@
             link.click();
         }
 
-        // --- NODE FOCUS ---
+        
         function focusOnNode(nodeId) {
             console.log('focusOnNode called with nodeId:', nodeId);
             
@@ -1796,7 +1798,7 @@
                 return;
             }
             
-            // Log the node data
+            
             const nodeData = node.data();
             console.log('Node data:', nodeData);
             
@@ -1804,7 +1806,7 @@
             highlightConnected(node);
             showNodeDetails(nodeData);
             
-            // Animate to node
+            
             window.cy.animate({
                 center: { eles: node },
                 zoom: 1.5,
@@ -1825,54 +1827,54 @@
             });
         }
 
-        // --- INFO PANEL ---
+        
         function showNodeDetails(data) {
             console.log('showNodeDetails called with data:', data);
             console.log('Data type:', typeof data);
             console.log('Data keys:', data ? Object.keys(data) : 'no data');
             
-            // Ensure we have valid data
+            
             if (!data) {
                 console.error('No data provided to showNodeDetails');
                 alert('No node data available');
                 return;
             }
             
-            // Helper function to safely get string value
+            
             function safeString(val, defaultVal) {
                 if (val === null || val === undefined) return defaultVal;
                 return String(val);
             }
             
-            // Helper function to safely get number value
+            
             function safeNumber(val, defaultVal) {
                 const num = parseInt(val);
                 return isNaN(num) ? defaultVal : num;
             }
             
-            // Update title
+            
             const titleEl = document.getElementById('detail-title');
             titleEl.innerText = safeString(data.title, "No Title");
             titleEl.style.color = 'var(--text-main)';
             
-            // Update author
+            
             const authorEl = document.getElementById('detail-author');
             authorEl.innerText = safeString(data.author, "Unknown");
             authorEl.style.color = 'var(--text-main)';
             
-            // Handle citations
+            
             const citations = safeNumber(data.citations, 0);
             const citesElement = document.getElementById('detail-cites');
             citesElement.innerText = citations;
             citesElement.style.color = 'var(--primary)';
             
-            // Handle year
+            
             const year = safeNumber(data.year, 0);
             const yearElement = document.getElementById('detail-year');
             yearElement.innerText = year > 0 ? year : "N/A";
             yearElement.style.color = 'var(--primary)';
             
-            // Handle local citations
+            
             let localCitations = safeNumber(data.local_citations, 0);
             if (localCitations === 0 && window.cy && data.id) {
                 try {
@@ -1904,7 +1906,7 @@
                 doiLink.style.display = 'none';
             }
             
-            // Show connected papers
+            
             updateConnectedPapers(data.id);
             
             document.getElementById('infoPanel').classList.add('open');
@@ -1952,7 +1954,7 @@
             resetHighlight();
         }
         
-        // Test function - call from browser console: testInfoPanel()
+        
         function testInfoPanel() {
             console.log('Testing info panel with sample data...');
             const testData = {

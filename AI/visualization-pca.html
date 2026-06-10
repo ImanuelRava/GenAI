@@ -6,7 +6,7 @@
     <title>PCA Visualization | AI Education - GenAI Research</title>
     <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        /* Content Panel - Add padding to prevent touching outer container */
+        
         .content-panel {
             padding: 24px;
         }
@@ -49,40 +49,40 @@
             padding: 24px 0 0 0;
         }
 
-        /* Page-specific styles */
-        /* Playground Layout */
+        
+        
         .playground-wrapper { flex: 1 1 auto; display: flex; overflow: hidden; }
         
-        /* Control Panel */
+        
         .control-panel { width: 280px; background: var(--bg-main); border-right: 1px solid var(--border-color); padding: 20px; overflow-y: auto; flex-shrink: 0; }
         .control-section { margin-bottom: 24px; }
         .control-section h3 { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
         .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .control-row label { font-size: 0.85rem; color: var(--text-secondary); }
         
-        /* Toggle Buttons */
+        
         .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
         .toggle-btn { padding: 6px 12px; font-size: 0.8rem; border: 1px solid var(--border-color); background: var(--bg-main); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
         .toggle-btn:hover { background: var(--bg-gray); }
         .toggle-btn.active { background: var(--ai-primary); color: white; border-color: var(--ai-primary); }
         
-        /* Stats */
+        
         .stats-box { background: var(--bg-gray); border-radius: var(--radius); padding: 14px; border-left: 4px solid var(--ral-primary); }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; }
         .stat-row:last-child { margin-bottom: 0; }
         .stat-label { color: var(--text-muted); }
         .stat-value { font-weight: 600; color: var(--ral-primary); }
         
-        /* Select & Input */
+        
         select, input[type="number"] { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.85rem; background: var(--bg-main); width: 100px; }
         
-        /* Canvas Area */
+        
         .canvas-area { flex: 1; display: flex; flex-direction: column; position: relative; background: var(--bg-dark); }
         .canvas-container { flex: 1; position: relative; overflow: hidden; }
         #main-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: grab; }
         #main-canvas:active { cursor: grabbing; }
         
-        /* Info Panel */
+        
         .info-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(31, 41, 55, 0.95); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); }
         .legend-inline { display: flex; gap: 24px; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: white; }
@@ -90,10 +90,10 @@
         .legend-line { width: 24px; height: 3px; border-radius: 2px; }
         .info-text { font-size: 0.85rem; color: var(--text-muted); }
         
-        /* Tooltip */
+        
         .tooltip { position: fixed; background: rgba(0, 0, 0, 0.9); color: white; padding: 8px 12px; border-radius: var(--radius); font-size: 0.8rem; pointer-events: none; display: none; z-index: 1000; }
         
-        /* Button styles */
+        
         .btn-block { width: 100%; margin-bottom: 10px; }
         .btn-block:last-child { margin-bottom: 0; }
         
@@ -102,7 +102,7 @@
 </head>
 <body class="theme-blue">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -136,9 +136,9 @@
         </div>
     </header>
 
-    <!-- Playground -->
+    
     <div class="playground-wrapper">
-        <!-- Controls -->
+        
         <aside class="control-panel">
             <div class="control-section">
                 <h3>Dataset</h3>
@@ -200,7 +200,7 @@
             </div>
         </aside>
 
-        <!-- Canvas -->
+        
         <div class="canvas-area">
             <div class="canvas-container">
                 <canvas id="main-canvas"></canvas>
@@ -224,12 +224,12 @@
     </footer>
 
     <script>
-        // Canvas
+        
         const canvas = document.getElementById('main-canvas');
         const ctx = canvas.getContext('2d');
         const tooltip = document.getElementById('tooltip');
         
-        // State
+        
         let data = [];
         let originalData = [];
         let pc1 = { x: 1, y: 0 };
@@ -243,7 +243,7 @@
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
         
-        // Resize
+        
         function resize() {
             const container = canvas.parentElement;
             canvas.width = container.clientWidth;
@@ -255,7 +255,7 @@
         }
         window.addEventListener('resize', resize);
         
-        // Generate data
+        
         function generateData(type, numSamples, noise) {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -326,7 +326,7 @@
             }));
         }
         
-        // Compute PCA
+        
         function computePCA() {
             if (data.length === 0) return;
             
@@ -345,7 +345,7 @@
             covXY /= data.length;
             covYY /= data.length;
             
-            // Apply manual rotation to covariance
+            
             const cos = Math.cos(manualAngle);
             const sin = Math.sin(manualAngle);
             const rotCovXX = covXX * cos * cos + covYY * sin * sin - 2 * covXY * cos * sin;
@@ -390,7 +390,7 @@
             document.getElementById('stat-total').textContent = (variancePC1 + variancePC2).toFixed(1) + '%';
         }
         
-        // Draw
+        
         function draw() {
             if (!canvas.width || !canvas.height) return;
             
@@ -401,7 +401,7 @@
             const centerY = canvas.height / 2;
             const lineLen = Math.min(canvas.width, canvas.height) * 0.38;
             
-            // Grid
+            
             if (displayOptions.grid) {
                 ctx.strokeStyle = '#374151';
                 ctx.lineWidth = 1;
@@ -424,7 +424,7 @@
             const meanX = data.reduce((s, p) => s + p.x, 0) / data.length;
             const meanY = data.reduce((s, p) => s + p.y, 0) / data.length;
             
-            // Projection lines (clamped to PC1 axis bounds)
+            
             if (displayOptions.projection) {
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
                 ctx.lineWidth = 1;
@@ -432,7 +432,7 @@
                     const dx = p.x - meanX;
                     const dy = p.y - meanY;
                     const proj = dx * pc1.x + dy * pc1.y;
-                    // Clamp projection to lineLen bounds
+                    
                     const clampedProj = Math.max(-lineLen, Math.min(lineLen, proj));
                     const projX = meanX + clampedProj * pc1.x;
                     const projY = meanY + clampedProj * pc1.y;
@@ -442,12 +442,12 @@
                     ctx.stroke();
                 });
                 
-                // Projected points (clamped to PC1 axis bounds)
+                
                 data.forEach(p => {
                     const dx = p.x - meanX;
                     const dy = p.y - meanY;
                     const proj = dx * pc1.x + dy * pc1.y;
-                    // Clamp projection to lineLen bounds
+                    
                     const clampedProj = Math.max(-lineLen, Math.min(lineLen, proj));
                     const projX = meanX + clampedProj * pc1.x;
                     const projY = meanY + clampedProj * pc1.y;
@@ -458,7 +458,7 @@
                 });
             }
             
-            // PC1
+            
             if (displayOptions.pc1) {
                 ctx.strokeStyle = '#10b981';
                 ctx.lineWidth = 3;
@@ -484,7 +484,7 @@
                 ctx.fillText('PC1', endX + 10, endY + 4);
             }
             
-            // PC2
+            
             if (displayOptions.pc2) {
                 ctx.strokeStyle = '#f59e0b';
                 ctx.lineWidth = 3;
@@ -510,7 +510,7 @@
                 ctx.fillText('PC2', endX + 10, endY + 4);
             }
             
-            // Data points
+            
             const colors = ['#3b82f6', '#7c3aed', '#ef4444', '#10b981'];
             data.forEach(p => {
                 ctx.beginPath();
@@ -522,14 +522,14 @@
                 ctx.stroke();
             });
             
-            // Center
+            
             ctx.beginPath();
             ctx.arc(meanX, meanY, 4, 0, Math.PI * 2);
             ctx.fillStyle = '#fff';
             ctx.fill();
         }
         
-        // Event handlers
+        
         document.querySelectorAll('#dataset-btns .toggle-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('#dataset-btns .toggle-btn').forEach(b => b.classList.remove('active'));
@@ -592,7 +592,7 @@
             generateData(currentDataset, numSamples, noise);
         }
         
-        // Mouse interaction
+        
         canvas.addEventListener('mousedown', (e) => {
             isDragging = true;
             dragStart = { x: e.clientX, y: e.clientY };
@@ -602,7 +602,7 @@
         canvas.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 const dx = e.clientX - dragStart.x;
-                manualAngle -= dx * 0.008;  // Inverted: drag left = rotate left
+                manualAngle -= dx * 0.008;  
                 dragStart = { x: e.clientX, y: e.clientY };
                 computePCA();
             }
@@ -611,7 +611,7 @@
         canvas.addEventListener('mouseup', () => isDragging = false);
         canvas.addEventListener('mouseleave', () => isDragging = false);
         
-        // Initialize
+        
         resize();
         regenerateData();
     </script>

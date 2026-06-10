@@ -538,13 +538,27 @@
             }
         };
 
+        // Migration: remove any previously stored API keys from localStorage
+        (function migrateSettings() {
+            try {
+                const old = JSON.parse(localStorage.getItem('ralAiSettings') || '{}');
+                if (old.apiKey) {
+                    delete old.apiKey;
+                    localStorage.setItem('ralAiSettings', JSON.stringify(old));
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('ralAiSettings') || '{}');
-            return { provider: settings.provider || 'deepseek', apiKey: settings.apiKey || '', model: settings.model || '' };
+            // Provider and model are safe to persist; API key is NEVER stored
+            return { provider: settings.provider || 'deepseek', apiKey: '', model: settings.model || '' };
         }
 
         function saveSettings(settings) {
-            localStorage.setItem('ralAiSettings', JSON.stringify(settings));
+            // Save only provider & model preferences — NEVER store the API key
+            const safe = { provider: settings.provider, model: settings.model };
+            localStorage.setItem('ralAiSettings', JSON.stringify(safe));
         }
 
         const sidebarItems = document.querySelectorAll('.sidebar-item');
@@ -623,8 +637,9 @@
             const settings = loadSettings();
             const apiStatus = document.getElementById('apiStatus');
             const apiStatusText = document.getElementById('apiStatusText');
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
 
-            if (settings.apiKey) {
+            if (apiKey) {
                 apiStatus.classList.remove('disconnected');
                 apiStatus.classList.add('connected');
                 apiStatusText.innerHTML = `Connected to <strong>${PROVIDER_CONFIG[settings.provider]?.name || settings.provider}</strong>`;
@@ -666,7 +681,7 @@
         settingsBtn.addEventListener('click', () => {
             const settings = loadSettings();
             selectProviderCard(settings.provider);
-            apiKeyInput.value = settings.apiKey;
+            apiKeyInput.value = '';  // API key is never pre-filled from storage
             modelSelect.value = settings.model;
             settingsOverlay.classList.add('active');
         });
@@ -732,6 +747,7 @@
 
         async function sendMessage(message) {
             const settings = loadSettings();
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
 
             addMessage(message, true);
             addTypingIndicator();
@@ -743,7 +759,7 @@
                     body: JSON.stringify({
                         message: message,
                         provider: settings.provider || undefined,
-                        api_key: settings.apiKey || undefined,
+                        api_key: apiKey || undefined,
                         model: settings.model || undefined
                     })
                 });

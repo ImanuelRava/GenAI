@@ -8,11 +8,12 @@ import os
 import json
 import logging
 import re
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class CompoundInfo:
@@ -400,7 +401,7 @@ class NiCOBotDatabase:
     def get_cross_coupling_info(self) -> str:
         """Get general information about cross-coupling reactions."""
         return """
-### Cross-Coupling Reaction Types in Database:
+
 - Suzuki coupling: Organoboron + Organic halide (Pd/Ni catalyst)
 - Heck reaction: Aryl halide + Alkene (Pd catalyst)
 - Sonogashira coupling: Aryl halide + Alkyne (Pd/Cu catalyst)
@@ -409,14 +410,14 @@ class NiCOBotDatabase:
 - Negishi coupling: Organozinc + Organic halide (Pd/Ni catalyst)
 - Hiyama coupling: Organosilane + Organic halide (Pd catalyst)
 
-### Common Electrophile Leaving Groups:
+
 - Triflate (OTf): Excellent leaving group, very reactive
 - Tosylate (OTs): Good leaving group, stable
 - Mesylate (OMs): Good leaving group
 - Acetate (OAc): Moderate leaving group
 - Phenolates: Can be activated with Ni catalysts
 
-### Common Nucleophile Types:
+
 - Boronic acids/esters: Suzuki coupling
 - Grignard reagents: Kumada coupling
 - Organozinc compounds: Negishi coupling

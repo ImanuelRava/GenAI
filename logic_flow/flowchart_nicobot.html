@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NiCOBot Detailed Workflow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F0F4F8 0%, #E8EEF4 100%);
+            padding: 40px;
+            min-width: 1000px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: #1E3A5F;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #5A7A9A;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .phase {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .phase-header {
+            background: linear-gradient(90deg, #2563EB 0%, #3B82F6 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+        }
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+        .phase-title { font-size: 20px; font-weight: 600; }
+        .phase-content { padding: 24px; }
+        
+        .step-row {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .step-row:last-child { margin-bottom: 0; }
+        
+        .step-box {
+            flex: 1;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+        .step-box.highlight {
+            background: #EFF6FF;
+            border-color: #3B82F6;
+        }
+        .step-box.database {
+            background: #F0FDF4;
+            border-color: #22C55E;
+        }
+        .step-box.llm {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+        }
+        .step-box.output {
+            background: #FDF2F8;
+            border-color: #EC4899;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: #3B82F6;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .step-title {
+            font-weight: 600;
+            color: #1F2937;
+            font-size: 15px;
+        }
+        .step-desc {
+            color: #6B7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .code-snippet {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        .data-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: #F1F5F9;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .flow-item {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+        }
+        .flow-arrow { color: #94A3B8; font-size: 16px; }
+        
+        .db-files {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .db-file {
+            background: white;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+        }
+        .db-file-icon { 
+            width: 24px;
+            height: 24px;
+            margin: 0 auto 4px;
+        }
+        .db-file-icon svg { width: 100%; height: 100%; }
+        .db-file-name { font-weight: 500; color: #374151; }
+        
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .provider-box {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .provider-name { font-weight: 600; color: #374151; font-size: 12px; }
+        .provider-type { font-size: 10px; color: #6B7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NiCOBot Detailed Workflow</h1>
+        <p class="subtitle">Nickel-catalyzed Cross-coupling Reactions AI Assistant with RAG</p>
+        
+        <div class="flow-container">
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">1</div>
+                    <div class="phase-title">User Request & Validation</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box">
+                            <div class="step-header">
+                                <div class="step-num">1.1</div>
+                                <div class="step-title">User Sends Query</div>
+                            </div>
+                            <div class="step-desc">POST request to <code>/api/llm/chat</code> with message, provider, api_key, model parameters</div>
+                            <div class="code-snippet">
+{ "message": "What is Suzuki coupling mechanism?", "provider": "groq" }
+                            </div>
+                        </div>
+                        <div class="step-box highlight">
+                            <div class="step-header">
+                                <div class="step-num">1.2</div>
+                                <div class="step-title">Input Validation</div>
+                            </div>
+                            <div class="step-desc">
+                                • Sanitize input (max 4000 chars)<br>
+                                • Validate JSON structure<br>
+                                • Check for empty message
+                            </div>
+                            <div class="code-snippet">
+message = sanitize_input(message, max_length=config.MAX_PROMPT_LENGTH)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">2</div>
+                    <div class="phase-title">RAG Context Retrieval</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box highlight">
+                            <div class="step-header">
+                                <div class="step-num">2.1</div>
+                                <div class="step-title">Query Analysis</div>
+                            </div>
+                            <div class="step-desc">
+                                NiCOBotRAG.analyze_query() scores the query against keyword categories:
+                            </div>
+                            <div class="code-snippet">
+COMPOUND_KEYWORDS = ['smiles', 'electrophile', 'nucleophile', ...]
+PAPER_KEYWORDS = ['paper', 'doi', 'publication', ...]
+REACTION_KEYWORDS = ['suzuki', 'heck', 'kumada', ...]
+                            </div>
+                        </div>
+                        <div class="step-box database">
+                            <div class="step-header">
+                                <div class="step-num">2.2</div>
+                                <div class="step-title">Database Search</div>
+                            </div>
+                            <div class="step-desc">NiCOBotDatabase searches multiple indices:</div>
+                            <div class="db-files">
+                                <div class="db-file">
+                                    <div class="db-file-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M8 12h8M12 8v8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="db-file-name">Electrophiles</div>
+                                </div>
+                                <div class="db-file">
+                                    <div class="db-file-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2">
+                                            <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="db-file-name">Nucleophiles</div>
+                                </div>
+                                <div class="db-file">
+                                    <div class="db-file-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="db-file-name">Papers</div>
+                                </div>
+                                <div class="db-file">
+                                    <div class="db-file-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2">
+                                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                                            <polyline points="21 3 21 9 15 9"/>
+                                        </svg>
+                                    </div>
+                                    <div class="db-file-name">Reactions</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step-box database">
+                            <div class="step-header">
+                                <div class="step-num">2.3</div>
+                                <div class="step-title">Context Formatting</div>
+                            </div>
+                            <div class="step-desc">RAGContext object created with formatted context string for LLM prompt injection</div>
+                            <div class="code-snippet">
+context = RAGContext(
+    compounds=[...], papers=[...],
+    formatted_context="### Relevant Compounds:\n- ..."
+)
+                            </div>
+                        </div>
+                        <div class="step-box highlight">
+                            <div class="step-header">
+                                <div class="step-num">2.4</div>
+                                <div class="step-title">Prompt Enhancement</div>
+                            </div>
+                            <div class="step-desc">System prompt enhanced with retrieved database context</div>
+                            <div class="code-snippet">
+enhanced_prompt = f"{base_prompt}\n## Database Context\n{context.formatted_context}"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">3</div>
+                    <div class="phase-title">LLM Provider Selection & Call</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box llm">
+                            <div class="step-header">
+                                <div class="step-num">3.1</div>
+                                <div class="step-title">Provider Selection</div>
+                            </div>
+                            <div class="step-desc">LLMProviderFactory selects provider based on available API keys or user choice</div>
+                            <div class="provider-grid">
+                                <div class="provider-box">
+                                    <div class="provider-name">Groq</div>
+                                    <div class="provider-type">Free Tier</div>
+                                </div>
+                                <div class="provider-box">
+                                    <div class="provider-name">Gemini</div>
+                                    <div class="provider-type">Free Tier</div>
+                                </div>
+                                <div class="provider-box">
+                                    <div class="provider-name">Ollama</div>
+                                    <div class="provider-type">Local</div>
+                                </div>
+                                <div class="provider-box">
+                                    <div class="provider-name">DeepSeek</div>
+                                    <div class="provider-type">API</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-box llm">
+                            <div class="step-header">
+                                <div class="step-num">3.2</div>
+                                <div class="step-title">API Request</div>
+                            </div>
+                            <div class="step-desc">HTTP POST to provider's chat/completions endpoint with system prompt + user message</div>
+                            <div class="code-snippet">
+response = requests.post(
+    f"{base_url}/chat/completions",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"model": model, "messages": [...]}
+)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">4</div>
+                    <div class="phase-title">Response Generation</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box">
+                            <div class="step-header">
+                                <div class="step-num">4.1</div>
+                                <div class="step-title">Parse Response</div>
+                            </div>
+                            <div class="step-desc">Extract content from LLM API response</div>
+                            <div class="code-snippet">
+return data['choices'][0]['message']['content']
+                            </div>
+                        </div>
+                        <div class="step-box output">
+                            <div class="step-header">
+                                <div class="step-num">4.2</div>
+                                <div class="step-title">Return to Client</div>
+                            </div>
+                            <div class="step-desc">JSON response with LLM answer and metadata</div>
+                            <div class="code-snippet">
+{
+  "success": true,
+  "response": "Suzuki coupling is a palladium-catalyzed...",
+  "provider": "groq"
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase" style="margin-top: 20px;">
+                <div class="phase-header" style="background: linear-gradient(90deg, #059669 0%, #10B981 100%);">
+                    <div class="phase-number">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                    </div>
+                    <div class="phase-title">Complete Data Flow</div>
+                </div>
+                <div class="phase-content">
+                    <div class="data-flow">
+                        <div class="flow-item">User Query</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Query Analysis</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">DB Search</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Context Retrieval</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Prompt Enhancement</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">LLM Call</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Enhanced Response</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

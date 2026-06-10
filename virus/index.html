@@ -47,7 +47,7 @@
         .btn-group {
             padding: 24px 0 0 0;
         }
-        /* Image container */
+        
         .image-container {
             width: 100%;
             height: 300px;
@@ -76,7 +76,7 @@
             height: 48px;
             opacity: 0.5;
         }
-        /* SVG Interactive styles */
+        
         .svg-container {
             overflow: hidden;
             background: var(--bg-gray);
@@ -98,7 +98,7 @@
             stroke: var(--virus-primary);
             stroke-width: 2;
         }
-        /* Molecule viewer placeholder */
+        
         .molecule-viewer {
             background: var(--bg-gray);
             border-radius: var(--radius-lg);
@@ -222,7 +222,7 @@
         </aside>
 
         <main class="content-area">
-            <!-- Welcome Panel -->
+            
             <div id="welcome" class="content-panel active">
                 <div class="welcome-panel">
                     <div class="welcome-icon">
@@ -244,7 +244,7 @@
                 </div>
             </div>
 
-            <!-- General Information Panel -->
+            
             <div id="general" class="content-panel">
                 <div class="content-header">
                     <h2>General Information</h2>
@@ -300,7 +300,7 @@
                 </div>
             </div>
 
-            <!-- Viral Component Panel -->
+            
             <div id="viral-component" class="content-panel">
                 <div class="content-header">
                     <h2>Overview of Viral Components</h2>
@@ -312,10 +312,10 @@
 
                     <div class="svg-container">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1400 1074">
-                            <!-- Background Image -->
+                            
                             <image href="images/pdb_covid-genome-prots.png" style="width:1400px"/>
                             
-                            <!-- Interactive Protein Regions - Click to view 3D structure -->
+                            
                             <a href="https://www.rcsb.org/3d-view/6VWW/1" target="_blank" title="6VWW">
                                 <g><polygon class="shape" data-index="1" points="85.0902,749.858 82.4312,897.436 349.668,901.424 461.349,743.21 393.542,672.745"></polygon></g>
                             </a>
@@ -406,7 +406,7 @@
                 </div>
             </div>
 
-            <!-- JN.1 Variant Panel -->
+            
             <div id="jn1" class="content-panel">
                 <div class="content-header">
                     <h2>JN.1 Variant</h2>
@@ -449,7 +449,7 @@
                 </div>
             </div>
 
-            <!-- KP.2 Variant Panel -->
+            
             <div id="kp2" class="content-panel">
                 <div class="content-header">
                     <h2>KP.2 Variant</h2>
@@ -500,7 +500,7 @@
                 </div>
             </div>
 
-            <!-- Molecular View Panel -->
+            
             <div id="molecular" class="content-panel">
                 <div class="content-header">
                     <h2>Molecular View</h2>
@@ -565,20 +565,20 @@
     </footer>
 
     <script>
-        // Sidebar Navigation
+        
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         const contentPanels = document.querySelectorAll('.content-panel');
 
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
-                // Remove active class from all items
+                
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 contentPanels.forEach(p => p.classList.remove('active'));
 
-                // Add active class to clicked item
+                
                 item.classList.add('active');
 
-                // Show corresponding panel
+                
                 const panelId = item.getAttribute('data-panel');
                 document.getElementById(panelId).classList.add('active');
             });

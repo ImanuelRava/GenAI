@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAL-Bot Detailed Workflow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            padding: 40px;
+            min-width: 1000px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: #92400E;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #B45309;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .phase {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .phase-header {
+            background: linear-gradient(90deg, #D97706 0%, #F59E0B 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+        }
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+        .phase-title { font-size: 20px; font-weight: 600; }
+        .phase-content { padding: 24px; }
+        
+        .step-row {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .step-row:last-child { margin-bottom: 0; }
+        
+        .step-box {
+            flex: 1;
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .step-box.highlight { background: #FEF3C7; border-color: #F59E0B; }
+        .step-box.llm { background: #FFF7ED; border-color: #FB923C; }
+        .step-box.output { background: #ECFDF5; border-color: #10B981; }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: #D97706;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .step-title { font-weight: 600; color: #1F2937; font-size: 15px; }
+        .step-desc { color: #6B7280; font-size: 13px; line-height: 1.5; }
+        .code-snippet {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        .comparison-box {
+            background: #FEF3C7;
+            border: 2px dashed #F59E0B;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .comparison-title { font-weight: 600; color: #92400E; margin-bottom: 12px; font-size: 16px; }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .comparison-item { background: white; border-radius: 8px; padding: 14px; }
+        .comparison-label { font-weight: 600; color: #374151; font-size: 13px; margin-bottom: 6px; }
+        .comparison-value { color: #6B7280; font-size: 12px; line-height: 1.6; }
+        .comparison-value div { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+        .icon-check { color: #10B981; flex-shrink: 0; }
+        .icon-x { color: #EF4444; flex-shrink: 0; }
+        .no-rag-badge {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .data-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: #FEF3C7;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .flow-item {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            border: 1px solid #FCD34D;
+        }
+        .flow-item.disabled {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .flow-arrow { color: #D97706; font-size: 16px; }
+        .flow-x { color: #EF4444; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAL-Bot Detailed Workflow</h1>
+        <p class="subtitle">Redox-Active Ligands AI Assistant (Pure LLM - No RAG)</p>
+        
+        <div class="flow-container">
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">1</div>
+                    <div class="phase-title">User Request & Validation</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box">
+                            <div class="step-header">
+                                <div class="step-num">1.1</div>
+                                <div class="step-title">User Sends Query</div>
+                            </div>
+                            <div class="step-desc">POST request to <code>/api/llm/chat</code> endpoint for redox-active ligand questions</div>
+                            <div class="code-snippet">
+{ "message": "Explain redox-active ligands in catalysis", "provider": "gemini" }
+                            </div>
+                        </div>
+                        <div class="step-box highlight">
+                            <div class="step-header">
+                                <div class="step-num">1.2</div>
+                                <div class="step-title">Input Sanitization</div>
+                            </div>
+                            <div class="step-desc">
+                                • Sanitize input (max 4000 chars)<br>
+                                • Validate JSON structure<br>
+                                • No database lookup required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">2</div>
+                    <div class="phase-title">Direct LLM Processing</div>
+                </div>
+                <div class="phase-content">
+                    <div class="no-rag-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        No RAG / No Database Context
+                    </div>
+                    <div class="step-row">
+                        <div class="step-box llm">
+                            <div class="step-header">
+                                <div class="step-num">2.1</div>
+                                <div class="step-title">System Prompt Definition</div>
+                            </div>
+                            <div class="step-desc">Specialized system prompt for redox-active ligand chemistry:</div>
+                            <div class="code-snippet">
+system_prompt = """You are RAL-Bot, an expert in redox-active ligands.
+Provide information about:
+- Ligand design principles
+- Electron transfer mechanisms  
+- Catalytic applications of redox-active ligands"""
+                            </div>
+                        </div>
+                        <div class="step-box llm">
+                            <div class="step-header">
+                                <div class="step-num">2.2</div>
+                                <div class="step-title">Provider Selection</div>
+                            </div>
+                            <div class="step-desc">Same provider selection as NiCOBot:</div>
+                            <div class="code-snippet">
+# Priority order:
+1. Groq (GROQ_API_KEY)
+2. Gemini (GEMINI_API_KEY)
+3. HuggingFace (HF_API_KEY)
+4. Ollama (local)
+5. DeepSeek, OpenRouter, OpenAI, Anthropic
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step-box llm">
+                            <div class="step-header">
+                                <div class="step-num">2.3</div>
+                                <div class="step-title">LLM API Call</div>
+                            </div>
+                            <div class="step-desc">Direct call without context enhancement:</div>
+                            <div class="code-snippet">
+llm = LLMProviderFactory.create(provider)
+response = llm.chat(system_prompt, user_message)
+# No retrieve_context() or build_enhanced_prompt()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">3</div>
+                    <div class="phase-title">Response Generation</div>
+                </div>
+                <div class="phase-content">
+                    <div class="step-row">
+                        <div class="step-box">
+                            <div class="step-header">
+                                <div class="step-num">3.1</div>
+                                <div class="step-title">Parse Response</div>
+                            </div>
+                            <div class="step-desc">Extract content from LLM response</div>
+                            <div class="code-snippet">
+return data['choices'][0]['message']['content']
+                            </div>
+                        </div>
+                        <div class="step-box output">
+                            <div class="step-header">
+                                <div class="step-num">3.2</div>
+                                <div class="step-title">Return to Client</div>
+                            </div>
+                            <div class="step-desc">JSON response:</div>
+                            <div class="code-snippet">
+{
+  "success": true,
+  "response": "Redox-active ligands are molecules that...",
+  "provider": "gemini"
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="comparison-box">
+                <div class="comparison-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        <polyline points="21 3 21 9 15 9"/>
+                    </svg>
+                    RAL-Bot vs NiCOBot Comparison
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="comparison-label">RAL-Bot (Pure LLM)</div>
+                        <div class="comparison-value">
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Simple architecture</div>
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> No database dependency</div>
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Faster response time</div>
+                            <div><svg class="icon-x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> No domain-specific data</div>
+                            <div><svg class="icon-x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> May hallucinate specific compounds</div>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">NiCOBot (RAG)</div>
+                        <div class="comparison-value">
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Domain-specific knowledge</div>
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Grounded in real data</div>
+                            <div><svg class="icon-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Can cite specific compounds/papers</div>
+                            <div><svg class="icon-x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Database loading overhead</div>
+                            <div><svg class="icon-x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> More complex pipeline</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="phase" style="margin-top: 20px;">
+                <div class="phase-header" style="background: linear-gradient(90deg, #059669 0%, #10B981 100%);">
+                    <div class="phase-number">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                    </div>
+                    <div class="phase-title">Complete Data Flow</div>
+                </div>
+                <div class="phase-content">
+                    <div class="data-flow">
+                        <div class="flow-item">User Query</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item disabled">Database Search</div>
+                        <div class="flow-x">✗</div>
+                        <div class="flow-item">Direct LLM Call</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Response</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

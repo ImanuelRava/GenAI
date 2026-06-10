@@ -6,6 +6,7 @@ from .DOI import get_paper_details
 
 logger = logging.getLogger(__name__)
 
+
 def read_dois_from_excel(excel_file_like):
     try:
         df = pd.read_excel(excel_file_like)
@@ -13,6 +14,7 @@ def read_dois_from_excel(excel_file_like):
     except Exception as e:
         logger.error(f"Error reading Excel file: {e}")
         return []
+
 
 def fetch_all_details(dois, progress_callback=None):
     details, labels = {}, {}
@@ -37,6 +39,7 @@ def fetch_all_details(dois, progress_callback=None):
             continue
     return details, labels
 
+
 def create_adjacency_matrix(dois, details):
     n = len(dois)
     matrix = np.zeros((n, n), dtype=int)
@@ -49,6 +52,7 @@ def create_adjacency_matrix(dois, details):
                 if i != j and target_doi in ref_dois:
                     matrix[i][j] = 1
     return matrix
+
 
 def build_cross_reference_network(excel_file_like, progress_callback=None):
     dois = read_dois_from_excel(excel_file_like)

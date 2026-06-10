@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMC Section Logic Flow - GenAI Research Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ai-primary: #3b82f6;
+            --ai-light: #dbeafe;
+            --ai-dark: #1d4ed8;
+            --tmc-primary: #8b5cf6;
+            --tmc-light: #ede9fe;
+            --tmc-dark: #6d28d9;
+            --ral-primary: #10b981;
+            --ral-light: #d1fae5;
+            --ral-dark: #059669;
+            --virus-primary: #ef4444;
+            --virus-light: #fee2e2;
+            --virus-dark: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-dark: #0f172a;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #F5F3FF 50%, #F8FAFC 100%);
+            min-height: 100vh;
+            padding-top: 72px;
+        }
+
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-main);
+            background: var(--bg-main);
+        }
+
+        nav a.active-tmc {
+            color: var(--tmc-primary);
+            background: var(--tmc-light);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        
+        .main-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .main-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .main-title p {
+            font-size: 16px;
+            color: #64748B;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        
+        .phase-group {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            margin-bottom: 32px;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+
+        .phase-header {
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .phase-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phase-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .phase-icon.user { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+        .phase-icon.user svg { color: #7C3AED; }
+        .phase-icon.frontend { background: linear-gradient(135deg, #F5F3FF, #EDE9FE); }
+        .phase-icon.frontend svg { color: #8B5CF6; }
+        .phase-icon.backend { background: linear-gradient(135deg, #EFF6FF, #DBEAFE); }
+        .phase-icon.backend svg { color: #3B82F6; }
+        .phase-icon.ai { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .phase-icon.ai svg { color: #D97706; }
+
+        .phase-title {
+            flex: 1;
+        }
+
+        .phase-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 4px;
+        }
+
+        .phase-title p {
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .phase-content {
+            padding: 24px 32px;
+        }
+
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .module-card:hover {
+            border-color: #8B5CF6;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .module-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .module-icon.overview { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+        .module-icon.overview svg { color: #7C3AED; }
+        .module-icon.intro { background: linear-gradient(135deg, #ECFDF5, #D1FAE5); }
+        .module-icon.intro svg { color: #10B981; }
+        .module-icon.extract { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+        .module-icon.extract svg { color: #D97706; }
+        .module-icon.citation { background: linear-gradient(135deg, #FCE7F3, #FBCFE8); }
+        .module-icon.citation svg { color: #EC4899; }
+        .module-icon.chatbot { background: linear-gradient(135deg, #E0E7FF, #C7D2FE); }
+        .module-icon.chatbot svg { color: #6366F1; }
+        .module-icon.quiz { background: linear-gradient(135deg, #CCFBF1, #99F6E4); }
+        .module-icon.quiz svg { color: #14B8A6; }
+        .module-icon.kg { background: linear-gradient(135deg, #F3E8FF, #E9D5FF); }
+        .module-icon.kg svg { color: #A855F7; }
+
+        .module-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1E293B;
+        }
+
+        .module-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .module-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tech-tag {
+            padding: 3px 8px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        
+        .flow-connector {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0;
+        }
+
+        .connector-line {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(180deg, #8B5CF6, #3B82F6);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid #3B82F6;
+        }
+
+        
+        .api-section {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .api-section h2 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .api-section h2 svg {
+            width: 24px;
+            height: 24px;
+            color: #8B5CF6;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .api-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .api-endpoint {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 13px;
+            color: #A5B4FC;
+            margin-bottom: 6px;
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #8B5CF6;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .api-desc {
+            font-size: 13px;
+            color: #94A3B8;
+        }
+
+        
+        .data-flow-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .data-flow-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .data-flow-title svg {
+            width: 24px;
+            height: 24px;
+            color: #8B5CF6;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .flow-node {
+            padding: 16px 24px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .flow-node.input {
+            background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+            border: 2px solid #8B5CF6;
+        }
+
+        .flow-node.process {
+            background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+            border: 2px solid #8B5CF6;
+        }
+
+        .flow-node.output {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            border: 2px solid #3B82F6;
+        }
+
+        .flow-node-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 4px;
+        }
+
+        .flow-node-desc {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: #94A3B8;
+            padding: 0 8px;
+        }
+
+        
+        .llm-section {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border: 2px solid #F59E0B;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .llm-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .llm-title svg {
+            width: 24px;
+            height: 24px;
+            color: #D97706;
+        }
+
+        .llm-providers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .llm-provider {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #F59E0B;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .provider-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+        }
+
+        .provider-badge {
+            padding: 2px 8px;
+            background: #FEF3C7;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #B45309;
+        }
+
+        .provider-badge.free {
+            background: #D1FAE5;
+            color: #047857;
+        }
+
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+
+        .legend-label {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                height: auto;
+                padding: 16px 0;
+                gap: 16px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            body {
+                padding-top: 120px;
+            }
+
+            .container {
+                padding: 24px 16px;
+            }
+
+            .phase-header, .phase-content {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <div class="header-inner">
+            <a href="./index.html" class="logo-section">
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="./ai_logic_flow.html">AI</a></li>
+                    <li><a href="./tmc_logic_flow.html" class="active-tmc">TMC</a></li>
+                    <li><a href="./redox_logic_flow.html">Redox</a></li>
+                    <li><a href="./virus_logic_flow.html">Virus</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="main-title">
+            <h1>TMC Section Logic Flow</h1>
+            <p>Transition Metal Catalysis - The most complex section integrating learning modules, AI extraction, interactive visualizations, and assessment tools</p>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon user">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Phase 1: User Entry & Navigation</h2>
+                    <p>Initial access point and module selection</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <div class="module-name">Main Entry (index.html)</div>
+                        </div>
+                        <div class="module-desc">
+                            Central hub with sidebar navigation to all TMC modules. Theme: Purple (#8B5CF6). Routes: Home, AI, TMC, Redox, Virus.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">HTML5</span>
+                            <span class="tech-tag">CSS3</span>
+                            <span class="tech-tag">Vanilla JS</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </div>
+                            <div class="module-name">Sidebar Navigation</div>
+                        </div>
+                        <div class="module-desc">
+                            7 modules: Overview, Introduction, Data Extraction, Citation Network, NiCOBot Live, Quiz, Knowledge Graph. Dynamic panel switching.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Event Listeners</span>
+                            <span class="tech-tag">Panel Toggle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-connector">
+            <div class="connector-line"></div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon frontend">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Phase 2: Frontend Modules (7 Sub-modules)</h2>
+                    <p>Interactive learning and analysis tools</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon intro">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Introduction Module</div>
+                        </div>
+                        <div class="module-desc">
+                            3 learning modules: Cross-Coupling Basics, Transition Metals, Catalytic Cycle. Links to lecture-1-basics, lecture-2-metal, lecture-3-mechanism.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Course Structure</span>
+                            <span class="tech-tag">Module Cards</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon extract">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <circle cx="10" cy="13" r="2"></circle>
+                                    <path d="m20 17-1.09-1.09a2 2 0 0 0-2.82 0L10 22"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Data Extraction</div>
+                        </div>
+                        <div class="module-desc">
+                            AI-powered PDF/text extraction with 6 LLM providers. Vision mode for PDF images. Extracts: reactants, products, conditions, yields, SMILES, roles.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">PDF.js</span>
+                            <span class="tech-tag">Base64</span>
+                            <span class="tech-tag">Multi-provider</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon citation">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Citation Network</div>
+                        </div>
+                        <div class="module-desc">
+                            Interactive citation graph using Cytoscape.js. 4 layouts: Scatter, Force, Circle, Rings. Excel export via SheetJS. PDF/Excel input.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Cytoscape.js</span>
+                            <span class="tech-tag">fcose layout</span>
+                            <span class="tech-tag">SheetJS</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon chatbot">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 8V4H8"></path>
+                                    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                                    <path d="M2 14h2"></path>
+                                    <path d="M20 14h2"></path>
+                                    <path d="M15 13v2"></path>
+                                    <path d="M9 13v2"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">NiCOBot Live</div>
+                        </div>
+                        <div class="module-desc">
+                            AI chatbot for Ni-catalyzed cross-coupling. Quick action buttons. Settings modal for provider selection. localStorage for API keys.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Chat UI</span>
+                            <span class="tech-tag">Provider Cards</span>
+                            <span class="tech-tag">localStorage</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon quiz">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4"></path>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Chemistry Quiz</div>
+                        </div>
+                        <div class="module-desc">
+                            50 questions on cross-coupling. 3D molecular visualization with 3Dmol.js. RDKit reaction diagrams. Progress tracking, score calculation.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">3Dmol.js</span>
+                            <span class="tech-tag">RDKit API</span>
+                            <span class="tech-tag">Question Bank</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon kg">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <circle cx="19" cy="5" r="2"></circle>
+                                    <circle cx="5" cy="5" r="2"></circle>
+                                    <circle cx="19" cy="19" r="2"></circle>
+                                    <circle cx="5" cy="19" r="2"></circle>
+                                    <line x1="12" y1="9" x2="12" y2="5"></line>
+                                    <line x1="9" y1="12" x2="5" y2="12"></line>
+                                    <line x1="15" y1="12" x2="19" y2="12"></line>
+                                    <line x1="12" y1="15" x2="12" y2="19"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Knowledge Graph</div>
+                        </div>
+                        <div class="module-desc">
+                            AI-generated knowledge graphs with D3.js. Keyword or PDF input modes. Click nodes for AI explanations. 8 node types with color coding.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">D3.js v7</span>
+                            <span class="tech-tag">Force Layout</span>
+                            <span class="tech-tag">Node Details</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-connector">
+            <div class="connector-line"></div>
+        </div>
+
+        
+        <div class="api-section">
+            <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path>
+                    <polygon points="12 15 17 21 7 21 12 15"></polygon>
+                </svg>
+                Backend API Endpoints (Flask Blueprint Routes)
+            </h2>
+            <div class="api-grid">
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/extract</div>
+                    <div class="api-desc">Extract chemical data from PDF/text with LLM. Returns: reactions, compounds, SMILES, conditions</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/network</div>
+                    <div class="api-desc">Build citation network from PDF/Excel. Forward/Backward/Cross analysis modes</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/nicobot/chat</div>
+                    <div class="api-desc">NiCOBot chat endpoint. System prompt: Ni-catalyzed cross-coupling expert</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/nicobot/chat/async</div>
+                    <div class="api-desc">Async NiCOBot chat with HTTP-based LLM client</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/molecules</div>
+                    <div class="api-desc">Molecule data for quiz 3D visualization (3Dmol.js format)</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/reactions</div>
+                    <div class="api-desc">RDKit-generated reaction diagrams for quiz (base64 PNG)</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/knowledge-graph</div>
+                    <div class="api-desc">Generate knowledge graph from topic. LLM or mock data fallback</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">POST</span>/api/knowledge-graph/explain</div>
+                    <div class="api-desc">AI explanation for selected knowledge graph node</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/health</div>
+                    <div class="api-desc">Health check with RDKit availability and cache stats</div>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-endpoint"><span class="api-method">GET</span>/api/llm/status</div>
+                    <div class="api-desc">Check if backend has configured LLM API key</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="data-flow-section">
+            <div class="data-flow-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="12" x2="2" y2="12"></line>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    <line x1="6" y1="16" x2="6.01" y2="16"></line>
+                    <line x1="10" y1="16" x2="10.01" y2="16"></line>
+                </svg>
+                Data Flow Architecture
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node input">
+                    <div class="flow-node-title">User Input</div>
+                    <div class="flow-node-desc">PDF / Text / Keyword</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">Frontend Module</div>
+                    <div class="flow-node-desc">Validation & Processing</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">Flask Backend</div>
+                    <div class="flow-node-desc">Route Handler & Cache</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node process">
+                    <div class="flow-node-title">LLM Provider</div>
+                    <div class="flow-node-desc">AI Processing</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node output">
+                    <div class="flow-node-title">Response</div>
+                    <div class="flow-node-desc">JSON Data / Visualization</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="llm-section">
+            <div class="llm-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+                    <circle cx="7.5" cy="14.5" r="1.5"></circle>
+                    <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                </svg>
+                Supported LLM Providers (HTTP-based Client)
+            </div>
+            <div class="llm-providers">
+                <div class="llm-provider">
+                    <div class="provider-name">DeepSeek</div>
+                    <div class="provider-badge">Popular</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Groq</div>
+                    <div class="provider-badge free">FREE</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Google Gemini</div>
+                    <div class="provider-badge free">FREE</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">OpenAI</div>
+                    <div class="provider-badge">GPT-4o</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">OpenRouter</div>
+                    <div class="provider-badge">Multi-model</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Anthropic</div>
+                    <div class="provider-badge">Claude</div>
+                </div>
+                <div class="llm-provider">
+                    <div class="provider-name">Ollama</div>
+                    <div class="provider-badge free">LOCAL</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon ai">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Key Features & Integrations</h2>
+                    <p>What makes TMC the most complex section</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon extract">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 3h6v11l-3 3-3-3V3z"></path>
+                                    <path d="M5 21h14"></path>
+                                    <path d="M5 12h4"></path>
+                                    <path d="M15 12h4"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Chemical Intelligence</div>
+                        </div>
+                        <div class="module-desc">
+                            SMILES notation support, role classification (reactant, ligand, catalyst, product), color-coded badges, reaction scheme visualization.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">SMILES</span>
+                            <span class="tech-tag">RDKit</span>
+                            <span class="tech-tag">3Dmol.js</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon chatbot">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">BYO API Key System</div>
+                        </div>
+                        <div class="module-desc">
+                            User-provided API keys stored in localStorage. Provider-specific model selection. No server-side key storage for privacy.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">localStorage</span>
+                            <span class="tech-tag">Client-side</span>
+                            <span class="tech-tag">Privacy-first</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon citation">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                            </div>
+                            <div class="module-name">Async Support</div>
+                        </div>
+                        <div class="module-desc">
+                            Both sync and async endpoints for all LLM operations. Flask async routes with HTTP-based LLM client for better performance.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">async/await</span>
+                            <span class="tech-tag">HTTP Client</span>
+                            <span class="tech-tag">Rate Limiting</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon kg">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
+                            <div class="module-name">File Handling</div>
+                        </div>
+                        <div class="module-desc">
+                            PDF upload with text extraction, Excel export for citation data, drag-and-drop zones, file preview capabilities.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">PDF.js</span>
+                            <span class="tech-tag">SheetJS</span>
+                            <span class="tech-tag">Base64</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon intro">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Interactive Visualizations</div>
+                        </div>
+                        <div class="module-desc">
+                            Cytoscape.js for networks, D3.js for knowledge graphs, 3Dmol.js for molecules. Zoom, pan, click interactions.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Cytoscape</span>
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">3Dmol</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Performance Features</div>
+                        </div>
+                        <div class="module-desc">
+                            Rate limiting (20 req/min for chat, 10 req/min for KG), Flask-CORS, response caching, lazy loading, progress indicators.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Flask-Limiter</span>
+                            <span class="tech-tag">Memory Cache</span>
+                            <span class="tech-tag">CORS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon chatbot">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 8V4H8"></path>
+                        <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                        <path d="M2 14h2"></path>
+                        <path d="M20 14h2"></path>
+                        <path d="M15 13v2"></path>
+                        <path d="M9 13v2"></path>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>TMC-Bot (NiCOBot) Architecture</h2>
+                    <p>AI assistant for Nickel-catalyzed cross-coupling reactions</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon chatbot">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Frontend Chat UI</div>
+                        </div>
+                        <div class="module-desc">
+                            Chat container with message history, input area with send button, quick action buttons (Ni Catalysis, C-O Activation, Ni vs Pd), settings modal for provider selection.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Chat UI</span>
+                            <span class="tech-tag">localStorage</span>
+                            <span class="tech-tag">Quick Actions</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon backend">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                                </svg>
+                            </div>
+                            <div class="module-name">Backend Routes</div>
+                        </div>
+                        <div class="module-desc">
+                            POST /api/nicobot/chat (sync), POST /api/nicobot/chat/async, GET /api/llm/status. System prompt: Ni-catalyzed cross-coupling expertise.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Flask</span>
+                            <span class="tech-tag">Rate Limiting</span>
+                            <span class="tech-tag">Input Sanitization</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon ai">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">LLM Provider Factory</div>
+                        </div>
+                        <div class="module-desc">
+                            Factory pattern with BaseLLMProvider (ABC). Supports: DeepSeek, Groq (FREE), Gemini (FREE), OpenAI, Anthropic, OpenRouter, Ollama (LOCAL). Auto-detects available providers.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Factory Pattern</span>
+                            <span class="tech-tag">8 Providers</span>
+                            <span class="tech-tag">Async Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="margin-top: 24px; padding: 20px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
+                    <h4 style="font-size: 14px; font-weight: 600; color: #1E293B; margin-bottom: 16px;">Request Flow</h4>
+                    <div class="flow-diagram">
+                        <div class="flow-node input" style="min-width: 120px; padding: 12px 16px;">
+                            <div class="flow-node-title">Chat Input</div>
+                            <div class="flow-node-desc">User Message</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 120px; padding: 12px 16px;">
+                            <div class="flow-node-title">Settings</div>
+                            <div class="flow-node-desc">localStorage</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 120px; padding: 12px 16px;">
+                            <div class="flow-node-title">POST /chat</div>
+                            <div class="flow-node-desc">Flask Route</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 120px; padding: 12px 16px;">
+                            <div class="flow-node-title">LLM API</div>
+                            <div class="flow-node-desc">Provider</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node output" style="min-width: 120px; padding: 12px 16px;">
+                            <div class="flow-node-title">Response</div>
+                            <div class="flow-node-desc">AI Answer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase-group">
+            <div class="phase-header">
+                <div class="phase-icon extract">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <circle cx="10" cy="13" r="2"></circle>
+                        <path d="m20 17-1.09-1.09a2 2 0 0 0-2.82 0L10 22"></path>
+                    </svg>
+                </div>
+                <div class="phase-title">
+                    <h2>Data Extraction Architecture</h2>
+                    <p>Multimodal AI-powered chemistry data extraction</p>
+                </div>
+            </div>
+            <div class="phase-content">
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon extract">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path>
+                                    <path d="M14 2v6h6"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Input Modes</div>
+                        </div>
+                        <div class="module-desc">
+                            3 extraction modes: Text-based (paste text), Vision AI (PDF to images to LLM), ChemExtract AI (comprehensive multimodal, recommended).
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">Text</span>
+                            <span class="tech-tag">Vision</span>
+                            <span class="tech-tag">Multimodal</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon backend">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
+                            <div class="module-name">PDF Processing</div>
+                        </div>
+                        <div class="module-desc">
+                            PyMuPDF (fitz) for PDF-to-image conversion (DPI=150), pypdf/pdfplumber for text extraction with fallback chain.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">PyMuPDF</span>
+                            <span class="tech-tag">pypdf</span>
+                            <span class="tech-tag">pdfplumber</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon intro">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M12 2v4"></path>
+                                    <path d="M12 18v4"></path>
+                                    <path d="m4.93 4.93 2.83 2.83"></path>
+                                </svg>
+                            </div>
+                            <div class="module-name">Extracted Data</div>
+                        </div>
+                        <div class="module-desc">
+                            Chemical entities (name, SMILES, formula, role), reaction conditions (temp, time, solvent), yields, spectral data, tables, figures.
+                        </div>
+                        <div class="module-tech">
+                            <span class="tech-tag">SMILES</span>
+                            <span class="tech-tag">Reactions</span>
+                            <span class="tech-tag">JSON Output</span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="margin-top: 24px; padding: 20px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
+                    <h4 style="font-size: 14px; font-weight: 600; color: #1E293B; margin-bottom: 16px;">Extraction Pipeline</h4>
+                    <div class="flow-diagram">
+                        <div class="flow-node input" style="min-width: 100px; padding: 12px 14px;">
+                            <div class="flow-node-title">PDF/Text</div>
+                            <div class="flow-node-desc">Input</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 100px; padding: 12px 14px;">
+                            <div class="flow-node-title">PyMuPDF</div>
+                            <div class="flow-node-desc">Images</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 100px; padding: 12px 14px;">
+                            <div class="flow-node-title">LLM Vision</div>
+                            <div class="flow-node-desc">Analysis</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node process" style="min-width: 100px; padding: 12px 14px;">
+                            <div class="flow-node-title">JSON Parse</div>
+                            <div class="flow-node-desc">Extract</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node output" style="min-width: 100px; padding: 12px 14px;">
+                            <div class="flow-node-title">Structured</div>
+                            <div class="flow-node-desc">Data</div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="margin-top: 16px; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #F5F3FF;">
+                                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #8B5CF6; color: #1E293B;">Provider</th>
+                                <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #8B5CF6; color: #1E293B;">Vision Support</th>
+                                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #8B5CF6; color: #1E293B;">Default Model</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">DeepSeek</td><td style="padding: 8px 12px; text-align: center; border-bottom: 1px solid #E2E8F0;">Yes</td><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">deepseek-chat</td></tr>
+                            <tr><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">OpenAI</td><td style="padding: 8px 12px; text-align: center; border-bottom: 1px solid #E2E8F0;">Yes</td><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">gpt-4o-mini</td></tr>
+                            <tr><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">Gemini</td><td style="padding: 8px 12px; text-align: center; border-bottom: 1px solid #E2E8F0;">Yes</td><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">gemini-2.0-flash</td></tr>
+                            <tr><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">Anthropic</td><td style="padding: 8px 12px; text-align: center; border-bottom: 1px solid #E2E8F0;">Yes</td><td style="padding: 8px 12px; border-bottom: 1px solid #E2E8F0;">claude-3-5-sonnet</td></tr>
+                            <tr><td style="padding: 8px 12px;">Groq / Ollama</td><td style="padding: 8px 12px; text-align: center;">No</td><td style="padding: 8px 12px;">Text only</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

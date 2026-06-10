@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Extraction | TMC — GenAI Research</title>
     <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* ================================================
-           CSS VARIABLES & RESET
-           ================================================ */
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+
         :root {
             --primary: #8b5cf6;
             --primary-dark: #7c3aed;
@@ -27,63 +27,48 @@
             --danger: #ef4444;
             --danger-light: #fee2e2;
             --bg-body: #f0f2f5;
-            --bg-white: #ffffff;
             --bg-sidebar: #0f172a;
             --bg-sidebar-hover: #1e293b;
             --bg-sidebar-active: rgba(139, 92, 246, 0.15);
             --bg-card: #ffffff;
             --bg-input: #f8fafc;
             --bg-code: #f1f5f9;
-            --text-main: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
             --text-sidebar: #cbd5e1;
             --text-sidebar-muted: #64748b;
             --text-sidebar-active: #a78bfa;
-            --border-color: #e2e8f0;
             --border-sidebar: #1e293b;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-            --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
-            --radius-sm: 6px;
+            
             --radius: 10px;
+            --radius-sm: 6px;
             --radius-lg: 14px;
             --radius-xl: 20px;
             --radius-full: 9999px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --shadow-xl: 0 12px 40px rgba(0,0,0,0.16);
             --sidebar-width: 260px;
             --header-height: 72px;
             --transition: 0.25s ease;
         }
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html { height: auto; min-height: 100vh; scroll-behavior: smooth; }
-
+        
         body {
-            min-height: 100vh;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.6;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            padding-top: 0;
+            background: var(--bg-body);
         }
 
-        /* ================================================
-           MAIN LAYOUT
-           ================================================ */
+        
         .app-layout {
             display: flex;
             flex: 1;
             padding-top: var(--header-height);
         }
 
-        /* ================================================
-           DARK SIDEBAR
-           ================================================ */
+        
         .sidebar {
             width: var(--sidebar-width);
             background: var(--bg-sidebar);
@@ -128,7 +113,7 @@
             line-height: 1.65;
         }
 
-        /* Info box in sidebar */
+        
         .sidebar-info-box {
             background: rgba(139, 92, 246, 0.08);
             border: 1px solid rgba(139, 92, 246, 0.15);
@@ -149,7 +134,7 @@
             margin: 0;
         }
 
-        /* Step flow */
+        
         .step-flow { display: flex; flex-direction: column; gap: 6px; }
         .step-flow-item {
             display: flex;
@@ -173,7 +158,7 @@
         .step-flow-arrow { display: flex; justify-content: center; padding: 1px 0; }
         .step-flow-arrow svg { width: 14px; height: 14px; color: var(--text-sidebar-muted); }
 
-        /* Data list */
+        
         .data-list { display: flex; flex-direction: column; gap: 6px; }
         .data-list-item {
             display: flex; align-items: flex-start; gap: 10px;
@@ -188,7 +173,7 @@
         .data-list-content h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-sidebar); margin: 0; }
         .data-list-content p { font-size: 0.7rem; color: var(--text-sidebar-muted); margin: 2px 0 0 0; }
 
-        /* Pipeline comparison */
+        
         .pipeline-compare { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
         .pipeline-card {
             background: var(--bg-sidebar-hover);
@@ -210,9 +195,7 @@
         .pipeline-badge.fast { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .pipeline-badge.advanced { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
 
-        /* ================================================
-           MAIN CONTENT
-           ================================================ */
+        
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -220,7 +203,7 @@
             padding: 32px;
         }
 
-        /* Page header */
+        
         .page-header {
             margin-bottom: 28px;
         }
@@ -244,9 +227,7 @@
         .page-header h1 .header-icon svg { width: 22px; height: 22px; color: white; }
         .page-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-        /* ================================================
-           CARD BASE
-           ================================================ */
+        
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -273,9 +254,7 @@
 
         .section-gap { margin-bottom: 24px; }
 
-        /* ================================================
-           PROVIDER PILLS
-           ================================================ */
+        
         .provider-pills {
             display: flex; flex-wrap: wrap; gap: 8px;
         }
@@ -291,6 +270,8 @@
             color: var(--text-secondary);
             transition: all var(--transition);
             position: relative;
+            pointer-events: auto !important;
+            z-index: 1;
         }
         .provider-pill:hover {
             border-color: var(--primary);
@@ -316,9 +297,7 @@
         }
         .provider-pill.active .pill-desc { opacity: 0.85; }
 
-        /* ================================================
-           API KEY INPUT
-           ================================================ */
+        
         .api-key-card {
             margin-top: 16px;
             padding: 16px 20px;
@@ -367,7 +346,7 @@
         .api-key-hint a { color: var(--primary); text-decoration: none; font-weight: 500; }
         .api-key-hint a:hover { text-decoration: underline; }
 
-        /* Model select */
+        
         .model-row { margin-top: 16px; }
         .model-row label {
             display: block; font-size: 0.82rem; color: var(--text-muted);
@@ -386,9 +365,7 @@
         }
         .model-row select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 
-        /* ================================================
-           EXTRACTION MODE CARDS (2)
-           ================================================ */
+        
         .mode-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -404,6 +381,8 @@
             cursor: pointer;
             transition: all var(--transition);
             overflow: hidden;
+            pointer-events: auto !important;
+            z-index: 1;
         }
         .mode-card:hover {
             border-color: var(--primary-light);
@@ -460,9 +439,7 @@
             box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
         }
 
-        /* ================================================
-           INPUT PANELS
-           ================================================ */
+        
         .input-panel { display: none; margin-top: 16px; animation: fadeSlideIn 0.3s ease; }
         .input-panel.active { display: block; }
 
@@ -471,30 +448,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Text input */
-        .text-input-wrapper textarea {
-            width: 100%;
-            min-height: 140px;
-            padding: 14px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            font-size: 0.9rem;
-            font-family: inherit;
-            line-height: 1.6;
-            resize: vertical;
-            background: var(--bg-input);
-            transition: all var(--transition);
-            color: var(--text-main);
-        }
-        .text-input-wrapper textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-            background: var(--bg-white);
-        }
-        .text-input-wrapper textarea::placeholder { color: var(--text-light); }
-
-        /* File upload */
+        
         .file-drop-zone {
             border: 2px dashed var(--border-color);
             border-radius: var(--radius-lg);
@@ -524,28 +478,7 @@
         .file-drop-zone .drop-text { font-size: 0.88rem; color: var(--text-muted); }
         .file-drop-zone .drop-text strong { color: var(--primary); font-weight: 600; }
 
-        /* PDF Options */
-        .pdf-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-        .pdf-option-card {
-            display: flex; align-items: flex-start; gap: 12px;
-            padding: 14px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius);
-            background: var(--bg-input);
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-        .pdf-option-card:hover { border-color: var(--primary-light); background: var(--primary-lighter); }
-        .pdf-option-card input[type="checkbox"] {
-            width: 18px; height: 18px; margin-top: 1px; accent-color: var(--primary);
-            cursor: pointer; flex-shrink: 0;
-        }
-        .pdf-option-card .option-info h4 {
-            font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 2px;
-        }
-        .pdf-option-card .option-info p { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
-
-        /* ReactionLens options */
+        
         .reactionlens-options {
             display: flex; flex-direction: column; gap: 12px;
             margin-top: 16px;
@@ -558,42 +491,8 @@
             font-size: 0.85rem; font-weight: 700; color: var(--primary-dark);
             margin-bottom: 14px;
         }
-        .rl-toggle-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px;
-            background: var(--bg-white);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-        }
-        .rl-toggle-row label {
-            font-size: 0.82rem; font-weight: 500; color: var(--text-main);
-            cursor: pointer;
-        }
-        .toggle-switch {
-            position: relative; width: 42px; height: 22px;
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-switch .slider {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--border-color);
-            border-radius: 22px;
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-        .toggle-switch .slider::before {
-            content: '';
-            position: absolute;
-            width: 18px; height: 18px;
-            left: 2px; bottom: 2px;
-            background: white;
-            border-radius: 50%;
-            transition: all var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-        .toggle-switch input:checked + .slider { background: var(--primary); }
-        .toggle-switch input:checked + .slider::before { transform: translateX(20px); }
 
-        /* Slider */
+        
         .rl-slider-row {
             display: flex; align-items: center; gap: 14px;
             padding: 10px 14px;
@@ -615,45 +514,25 @@
             min-width: 30px; text-align: center;
         }
 
-        /* ReactionLens text input */
-        .rl-text-input {
-            margin-top: 14px;
-        }
-        .rl-text-input textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 14px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 0.88rem;
-            font-family: inherit;
-            resize: vertical;
-            background: var(--bg-input);
-            transition: all var(--transition);
-        }
-        .rl-text-input textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-        }
-
-        /* ================================================
-           ACTION BUTTONS
-           ================================================ */
         .action-bar {
-            display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
         }
         .btn-extract {
-            flex: 1; min-width: 200px;
             padding: 14px 28px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: var(--radius);
-            font-size: 0.95rem; font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             box-shadow: 0 4px 14px var(--primary-glow);
         }
         .btn-extract:hover:not(:disabled) {
@@ -676,7 +555,7 @@
         .btn-clear:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
         .btn-clear svg { width: 16px; height: 16px; }
 
-        /* Loading spinner */
+        
         .spinner {
             display: inline-block; width: 18px; height: 18px;
             border: 2.5px solid rgba(255,255,255,0.3);
@@ -686,9 +565,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ================================================
-           STATUS MESSAGE
-           ================================================ */
+        
         .status-msg {
             padding: 14px 18px;
             border-radius: var(--radius);
@@ -707,9 +584,7 @@
         .status-msg.info { background: var(--info-light); color: #1d4ed8; border: 1px solid #bfdbfe; }
         .status-msg.warning { background: var(--warning-light); color: #b45309; border: 1px solid #fde68a; }
 
-        /* ================================================
-           RESULTS SECTION
-           ================================================ */
+        
         .results-card {
             margin-top: 24px;
             border: 2px solid var(--border-color);
@@ -746,7 +621,7 @@
         .results-card.has-data .export-btn:hover { color: var(--success-dark); }
         .export-btn svg { width: 14px; height: 14px; }
 
-        /* Result tabs */
+        
         .result-tabs {
             display: flex; gap: 2px; padding: 8px 24px 0;
             background: var(--bg-input);
@@ -781,11 +656,11 @@
         }
         .result-tab.active .tab-count { background: var(--primary-light); color: var(--primary); }
 
-        /* Tab content */
+        
         .tab-content { display: none; padding: 24px; animation: fadeSlideIn 0.3s ease; }
         .tab-content.active { display: block; }
 
-        /* Empty state */
+        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -799,7 +674,7 @@
         }
         .empty-state p { font-size: 0.95rem; }
 
-        /* Overview summary cards */
+        
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -826,7 +701,7 @@
             text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;
         }
 
-        /* Reaction cards */
+        
         .reaction-card {
             padding: 18px 20px;
             background: var(--bg-card);
@@ -899,7 +774,7 @@
         .yield-badge.medium { background: var(--warning-light); color: #b45309; }
         .yield-badge.low { background: var(--danger-light); color: #b91c1c; }
 
-        /* Compound grid */
+        
         .compound-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -944,7 +819,7 @@
         .role-badge.substrate { background: #e0e7ff; color: #4338ca; }
         .role-badge.additive { background: #ecfccb; color: #4d7c0f; }
 
-        /* Conditions table */
+        
         .conditions-table {
             width: 100%;
             border-collapse: separate;
@@ -971,7 +846,7 @@
         .conditions-table tr:last-child td { border-bottom: none; }
         .conditions-table tr:hover td { background: var(--primary-lighter); }
 
-        /* JSON viewer */
+        
         .json-viewer {
             background: #0f172a;
             color: #e2e8f0;
@@ -991,7 +866,7 @@
         .json-viewer .json-boolean { color: #c084fc; }
         .json-viewer .json-null { color: #94a3b8; }
 
-        /* PDF Preview */
+        
         .pdf-preview {
             margin-top: 14px;
             background: var(--bg-card);
@@ -1037,9 +912,7 @@
             margin: 0;
         }
 
-        /* ================================================
-           RESPONSIVE
-           ================================================ */
+        
         @media (max-width: 768px) {
             :root { --sidebar-width: 0px; }
             .sidebar { display: none; }
@@ -1056,7 +929,7 @@
 </head>
 <body class="theme-purple">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -1089,9 +962,9 @@
         </div>
     </header>
 
-    <!-- App Layout -->
+    
     <div class="app-layout">
-        <!-- Dark Sidebar -->
+        
         <aside class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-section-title">
@@ -1184,15 +1057,15 @@
                             ReactionLens
                             <span class="pipeline-badge advanced">Advanced</span>
                         </h4>
-                        <p>Multimodal + Segmentation + Entity Resolution. Slower but more accurate.</p>
+                        <p>Text-driven: extracts text from paper, screens paragraphs for reactions and conditions, then outputs structured data.</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        
         <main class="main-content">
-            <!-- Page Header -->
+            
             <div class="page-header">
                 <h1>
                     <span class="header-icon">
@@ -1203,7 +1076,7 @@
                 <p>Extract structured chemical reaction data using AI-powered LLM analysis of text and PDFs</p>
             </div>
 
-            <!-- Provider & API Key Card -->
+            
             <div class="card section-gap">
                 <div class="card-body">
                     <h2 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:14px; display:flex; align-items:center; gap:8px;">
@@ -1211,27 +1084,27 @@
                         LLM Provider
                     </h2>
                     <div class="provider-pills" id="providerSelector">
-                        <button class="provider-pill active" data-provider="deepseek">
+                        <button type="button" class="provider-pill active" data-provider="deepseek" onclick="selectProvider('deepseek')">
                             <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             DeepSeek
                         </button>
-                        <button class="provider-pill" data-provider="openai">
+                        <button type="button" class="provider-pill" data-provider="openai" onclick="selectProvider('openai')">
                             <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             OpenAI
                         </button>
-                        <button class="provider-pill" data-provider="gemini">
+                        <button type="button" class="provider-pill" data-provider="gemini" onclick="selectProvider('gemini')">
                             <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             Gemini
                         </button>
-                        <button class="provider-pill" data-provider="groq">Groq</button>
-                        <button class="provider-pill" data-provider="ollama">Ollama</button>
-                        <button class="provider-pill" data-provider="anthropic">
+                        <button type="button" class="provider-pill" data-provider="groq" onclick="selectProvider('groq')">Groq</button>
+                        <button type="button" class="provider-pill" data-provider="ollama" onclick="selectProvider('ollama')">Ollama</button>
+                        <button type="button" class="provider-pill" data-provider="anthropic" onclick="selectProvider('anthropic')">
                             <span class="vision-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                             Anthropic
                         </button>
                     </div>
 
-                    <!-- API Key -->
+                    
                     <div class="api-key-card" id="apiKeySection">
                         <label>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
@@ -1239,14 +1112,14 @@
                         </label>
                         <div class="api-key-row">
                             <input type="password" id="apiKeyInput" placeholder="Enter your API key...">
-                            <button class="toggle-vis-btn" id="toggleVisibility" title="Toggle visibility">
+                            <button type="button" class="toggle-vis-btn" id="toggleVisibility" title="Toggle visibility">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
                         <p class="api-key-hint" id="apiKeyHint">Get your DeepSeek API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a></p>
                     </div>
 
-                    <!-- Model Select -->
+                    
                     <div class="model-row">
                         <label for="modelSelect">Model (optional — leave empty for default)</label>
                         <select id="modelSelect">
@@ -1281,7 +1154,7 @@
                 </div>
             </div>
 
-            <!-- Extraction Mode Card -->
+            
             <div class="card section-gap">
                 <div class="card-body">
                     <h2 style="font-size:0.92rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
@@ -1289,33 +1162,33 @@
                         Extraction Mode
                     </h2>
                     <div class="mode-cards" id="modeSelector">
-                        <div class="mode-card active" data-mode="chemextract">
+                        <div class="mode-card active" data-mode="chemextract" role="button" tabindex="0" onclick="selectMode('chemextract')" onkeydown="if(event.key==='Enter')selectMode('chemextract')">
                             <div class="mode-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
                             <h3>ChemExtract</h3>
                             <p class="mode-desc">Fast text + vision extraction pipeline</p>
                             <p class="mode-sub">Extracts reactions, compounds, conditions from PDF text and images. Outputs SMILES reaction schemes (e.g. CC(=O)O.CCO>>CC(=O)OCC). Best for quick extraction from well-structured papers.</p>
                         </div>
-                        <div class="mode-card" data-mode="reactionlens">
+                        <div class="mode-card" data-mode="reactionlens" role="button" tabindex="0" onclick="selectMode('reactionlens')" onkeydown="if(event.key==='Enter')selectMode('reactionlens')">
                             <span class="new-badge">New</span>
                             <div class="mode-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
                             <h3>ReactionLens</h3>
-                            <p class="mode-desc">Advanced multimodal mining pipeline</p>
-                            <p class="mode-sub">Classifies pages, segments figures, resolves entities via PubChem, and merges results across passes. Higher accuracy but slower. Best for complex papers with many reaction schemes.</p>
+                            <p class="mode-desc">Text-driven paragraph screening</p>
+                            <p class="mode-sub">Extracts text from the paper, segments into paragraphs, then screens each one for chemical reactions (conditions, reagents, yields, etc.). Outputs the same ChemExtract-compatible format with reactions, compounds, SMILES, R-group tables, and conditions.</p>
                         </div>
                     </div>
 
-                    <!-- Shared PDF Upload Area (always visible) -->
+                    
                     <div class="input-panel active" id="pdfInputPanel">
                         <div class="file-drop-zone" id="dropZone">
                             <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                             <p class="drop-text">Drag &amp; drop PDF here or <strong>click to browse</strong></p>
                             <input type="file" id="fileInput" accept=".pdf" style="display:none;">
                         </div>
-                        <!-- PDF Preview -->
+                        
                         <div class="pdf-preview" id="pdfPreview">
                             <div class="pdf-preview-header">
                                 <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> <span id="pdfPreviewTitle">PDF Preview</span></span>
-                                <button class="pdf-preview-toggle" id="togglePdfPreview">Collapse</button>
+                                <button type="button" class="pdf-preview-toggle" id="togglePdfPreview">Collapse</button>
                             </div>
                             <div class="pdf-preview-body" id="pdfPreviewBody">
                                 <pre id="pdfPreviewText"></pre>
@@ -1323,48 +1196,44 @@
                         </div>
                     </div>
 
-                    <!-- ReactionLens Advanced Options (shown only when ReactionLens mode selected) -->
+                    
                     <div class="input-panel" id="reactionlensPanel">
                         <div class="reactionlens-options">
-                            <h4>ReactionLens Pipeline Options</h4>
-                            <div class="rl-toggle-row">
-                                <label>Enable Filtering</label>
-                                <label class="toggle-switch"><input type="checkbox" id="rlFilter" checked><span class="slider"></span></label>
-                            </div>
-                            <div class="rl-toggle-row">
-                                <label>Enable Segmentation</label>
-                                <label class="toggle-switch"><input type="checkbox" id="rlSegmentation" checked><span class="slider"></span></label>
-                            </div>
-                            <div class="rl-toggle-row">
-                                <label>Enable Entity Resolution</label>
-                                <label class="toggle-switch"><input type="checkbox" id="rlEntityResolution" checked><span class="slider"></span></label>
-                            </div>
+                            <h4>ReactionLens Options</h4>
                             <div class="rl-slider-row">
+                                <label>Min Paragraph Length</label>
+                                <input type="range" id="rlMinParaLength" min="40" max="300" value="80" step="10">
+                                <span class="slider-value" id="rlMinParaLengthValue">80</span>
+                            </div>
+                            <div class="rl-slider-row" style="margin-top:10px;">
                                 <label>Max Pages</label>
                                 <input type="range" id="rlMaxPages" min="1" max="50" value="15">
                                 <span class="slider-value" id="rlMaxPagesValue">15</span>
                             </div>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:12px; padding:0 4px;">
+                                ReactionLens extracts text from the paper, splits it into paragraphs, then screens each paragraph for chemical reactions (conditions, reagents, yields, etc.). Paragraphs shorter than the minimum length are skipped to avoid headers and page numbers.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
+                    
                     <div class="action-bar">
-                        <button class="btn-extract" id="extractBtn">
+                        <button type="button" class="btn-extract" id="extractBtn">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                             Extract Data
                         </button>
-                        <button class="btn-clear" id="clearBtn">
+                        <button type="button" class="btn-clear" id="clearBtn">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                             Clear
                         </button>
                     </div>
 
-                    <!-- Status Message -->
+                    
                     <div class="status-msg" id="statusMessage"></div>
                 </div>
             </div>
 
-            <!-- Results Card -->
+            
             <div class="card results-card" id="resultsCard">
                 <div class="card-header">
                     <h2>
@@ -1372,30 +1241,30 @@
                         Extraction Results
                     </h2>
                     <div class="header-actions" id="exportActions" style="display:none;">
-                        <button class="export-btn" id="exportJsonBtn" title="Export JSON">
+                        <button type="button" class="export-btn" id="exportJsonBtn" title="Export JSON">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             JSON
                         </button>
-                        <button class="export-btn" id="exportSchemesBtn" title="Export SMILES Schemes">
+                        <button type="button" class="export-btn" id="exportSchemesBtn" title="Export SMILES Schemes">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
                             Schemes
                         </button>
-                        <button class="export-btn" id="copyClipboardBtn" title="Copy to Clipboard">
+                        <button type="button" class="export-btn" id="copyClipboardBtn" title="Copy to Clipboard">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                             Copy
                         </button>
-                        <button class="export-btn" id="downloadTxtBtn" title="Download as .txt">
+                        <button type="button" class="export-btn" id="downloadTxtBtn" title="Download as .txt">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             .txt
                         </button>
                     </div>
                 </div>
                 <div class="result-tabs" id="resultTabs">
-                    <button class="result-tab active" data-tab="overview">Overview</button>
-                    <button class="result-tab" data-tab="reactions">Reactions <span class="tab-count" id="rxnCount">0</span></button>
-                    <button class="result-tab" data-tab="compounds">Compounds <span class="tab-count" id="cmpCount">0</span></button>
-                    <button class="result-tab" data-tab="conditions">Conditions</button>
-                    <button class="result-tab" data-tab="rawjson">Raw JSON</button>
+                    <button type="button" class="result-tab active" data-tab="overview">Overview</button>
+                    <button type="button" class="result-tab" data-tab="reactions">Reactions <span class="tab-count" id="rxnCount">0</span></button>
+                    <button type="button" class="result-tab" data-tab="compounds">Compounds <span class="tab-count" id="cmpCount">0</span></button>
+                    <button type="button" class="result-tab" data-tab="conditions">Conditions</button>
+                    <button type="button" class="result-tab" data-tab="rawjson">Raw JSON</button>
                 </div>
                 <div class="tab-content active" id="tab-overview">
                     <div class="empty-state">
@@ -1412,12 +1281,12 @@
     </div>
 
     <script>
-    // ==================================================================
-    // CONFIGURATION
-    // ==================================================================
-    const API_BASE_URL = 'http://localhost:5000';
+    
+    
+    
+    var API_BASE_URL = 'http://localhost:5000';
 
-    const PROVIDER_INFO = {
+    var PROVIDER_INFO = {
         deepseek: { name: 'DeepSeek', keyUrl: 'https://platform.deepseek.com/', needsKey: true },
         openai:   { name: 'OpenAI',   keyUrl: 'https://platform.openai.com/api-keys', needsKey: true },
         gemini:   { name: 'Gemini',   keyUrl: 'https://aistudio.google.com/app/apikey', needsKey: true },
@@ -1426,29 +1295,136 @@
         anthropic:{ name: 'Anthropic', keyUrl: 'https://console.anthropic.com/settings/keys', needsKey: true }
     };
 
-    const VISION_PROVIDERS = ['deepseek', 'openai', 'gemini', 'anthropic'];
+    var VISION_PROVIDERS = ['deepseek', 'openai', 'gemini', 'anthropic'];
 
-    // ==================================================================
-    // STATE
-    // ==================================================================
-    let selectedProvider = 'deepseek';
-    let selectedModel = '';
-    let extractionMode = 'chemextract';
-    let extractedData = null;
-    let pdfText = '';
-    let uploadedPdfFile = null;
+    
+    
+    
+    var selectedProvider = 'deepseek';
+    var selectedModel = '';
+    var extractionMode = 'chemextract';
+    var extractedData = null;
+    var pdfText = '';
+    var uploadedPdfFile = null;
 
-    // ==================================================================
-    // DOM ELEMENTS
-    // ==================================================================
+    
+    
+    
+    function selectProvider(provider) {
+        
+        if (window._selectProviderLock) return;
+        window._selectProviderLock = true;
+        setTimeout(function() { window._selectProviderLock = false; }, 50);
+
+        selectedProvider = provider;
+        var ps = document.getElementById('providerSelector');
+        if (!ps) return;
+        var pills = ps.querySelectorAll('.provider-pill');
+        for (var i = 0; i < pills.length; i++) {
+            var p = pills[i];
+            p.classList.remove('active');
+            p.style.background = '';
+            p.style.borderColor = '';
+            p.style.color = '';
+            p.style.boxShadow = '';
+        }
+        var pill = ps.querySelector('[data-provider="' + provider + '"]');
+        if (pill) {
+            pill.classList.add('active');
+            
+            pill.style.background = '#8b5cf6';
+            pill.style.borderColor = '#8b5cf6';
+            pill.style.color = 'white';
+            pill.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.25)';
+        }
+        updateApiKeySectionGlobal();
+        updateVisionOptionsGlobal();
+    }
+
+    function selectMode(mode) {
+        
+        if (window._selectModeLock) return;
+        window._selectModeLock = true;
+        setTimeout(function() { window._selectModeLock = false; }, 50);
+
+        extractionMode = mode;
+        var ms = document.getElementById('modeSelector');
+        if (!ms) return;
+        var cards = ms.querySelectorAll('.mode-card');
+        for (var i = 0; i < cards.length; i++) {
+            var c = cards[i];
+            c.classList.remove('active');
+            c.style.borderColor = '';
+            c.style.background = '';
+            c.style.boxShadow = '';
+        }
+        var card = ms.querySelector('[data-mode="' + mode + '"]');
+        if (card) {
+            card.classList.add('active');
+            
+            card.style.borderColor = '#8b5cf6';
+            card.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+            card.style.boxShadow = '0 6px 24px rgba(139, 92, 246, 0.25)';
+        }
+        updateInputPanelsGlobal();
+    }
+
+    
+    window.selectProvider = selectProvider;
+    window.selectMode = selectMode;
+
+    function updateApiKeySectionGlobal() {
+        var aks = document.getElementById('apiKeySection');
+        var akh = document.getElementById('apiKeyHint');
+        var info = PROVIDER_INFO[selectedProvider];
+        if (!aks || !akh || !info) return;
+        if (info.needsKey) {
+            aks.style.display = 'block';
+            akh.innerHTML = 'Get your ' + info.name + ' API key at <a href="' + info.keyUrl + '" target="_blank">' + info.keyUrl + '</a>';
+        } else {
+            aks.style.display = 'none';
+        }
+    }
+
+    function updateVisionOptionsGlobal() {
+        var ms = document.getElementById('modelSelect');
+        if (!ms) return;
+        ms.querySelectorAll('optgroup').forEach(function(og) {
+            if (og.dataset.provider === selectedProvider) {
+                og.style.display = '';
+                og.removeAttribute('disabled');
+                og.querySelectorAll('option').forEach(function(opt) { opt.disabled = false; });
+            } else {
+                og.style.display = 'none';
+                og.setAttribute('disabled', '');
+                og.querySelectorAll('option').forEach(function(opt) { opt.disabled = true; });
+            }
+        });
+        selectedModel = '';
+        ms.value = '';
+    }
+
+    function updateInputPanelsGlobal() {
+        var pip = document.getElementById('pdfInputPanel');
+        var rlp = document.getElementById('reactionlensPanel');
+        if (pip) pip.classList.add('active');
+        if (rlp) {
+            if (extractionMode === 'reactionlens') {
+                rlp.classList.add('active');
+            } else {
+                rlp.classList.remove('active');
+            }
+        }
+    }
+
+    
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
     const $ = id => document.getElementById(id);
-    const providerSelector = $('providerSelector');
     const modelSelect = $('modelSelect');
-    const apiKeySection = $('apiKeySection');
     const apiKeyInput = $('apiKeyInput');
-    const apiKeyHint = $('apiKeyHint');
     const toggleVisibility = $('toggleVisibility');
-    const modeSelector = $('modeSelector');
     const pdfInputPanel = $('pdfInputPanel');
     const reactionlensPanel = $('reactionlensPanel');
     const dropZone = $('dropZone');
@@ -1466,76 +1442,41 @@
     const resultTabs = $('resultTabs');
     const rlMaxPages = $('rlMaxPages');
     const rlMaxPagesValue = $('rlMaxPagesValue');
+    const rlMinParaLength = $('rlMinParaLength');
+    const rlMinParaLengthValue = $('rlMinParaLengthValue');
     let pdfPreviewExpanded = true;
 
-    // ==================================================================
-    // PROVIDER SELECTION
-    // ==================================================================
-    providerSelector.addEventListener('click', e => {
-        const pill = e.target.closest('.provider-pill');
-        if (!pill) return;
-        providerSelector.querySelectorAll('.provider-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        selectedProvider = pill.dataset.provider;
-        updateApiKeySection();
-        updateVisionOptions();
-    });
+    
+    selectProvider('deepseek');
+    selectMode('chemextract');
 
-    function updateApiKeySection() {
-        const info = PROVIDER_INFO[selectedProvider];
-        if (info.needsKey) {
-            apiKeySection.style.display = 'block';
-            apiKeyHint.innerHTML = `Get your ${info.name} API key at <a href="${info.keyUrl}" target="_blank">${info.keyUrl}</a>`;
-        } else {
-            apiKeySection.style.display = 'none';
-        }
-    }
-
-    function updateVisionOptions() {
-        // Both modes require a vision-capable provider
-    }
-
-    // ==================================================================
-    // TOGGLE API KEY VISIBILITY
-    // ==================================================================
+    
+    
+    
     toggleVisibility.addEventListener('click', () => {
         apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
     });
 
-    // ==================================================================
-    // MODEL SELECTION
-    // ==================================================================
+    
+    
+    
     modelSelect.addEventListener('change', () => { selectedModel = modelSelect.value; });
 
-    // ==================================================================
-    // MODE SELECTION
-    // ==================================================================
-    modeSelector.addEventListener('click', e => {
-        const card = e.target.closest('.mode-card');
-        if (!card) return;
-        modeSelector.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        extractionMode = card.dataset.mode;
-        updateInputPanels();
-    });
-
-    function updateInputPanels() {
-        // PDF panel always visible (shared upload)
-        pdfInputPanel.classList.add('active');
-        // ReactionLens options only when that mode is selected
-        reactionlensPanel.classList.toggle('active', extractionMode === 'reactionlens');
-    }
-
-    // ==================================================================
-    // MAX PAGES SLIDER
-    // ==================================================================
+    
+    
+    
     rlMaxPages.addEventListener('input', () => {
         rlMaxPagesValue.textContent = rlMaxPages.value;
     });
+    if (rlMinParaLength) {
+        rlMinParaLength.addEventListener('input', () => {
+            rlMinParaLengthValue.textContent = rlMinParaLength.value;
+        });
+    }
 
-    // ==================================================================
-    // FILE UPLOAD
-    // ==================================================================
+    
+    
+    
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
@@ -1579,16 +1520,16 @@
         }
     }
 
-    // PDF preview toggle
+    
     togglePdfPreview.addEventListener('click', () => {
         pdfPreviewExpanded = !pdfPreviewExpanded;
         pdfPreviewBody.style.display = pdfPreviewExpanded ? 'block' : 'none';
         togglePdfPreview.textContent = pdfPreviewExpanded ? 'Collapse' : 'Expand';
     });
 
-    // ==================================================================
-    // TAB SWITCHING
-    // ==================================================================
+    
+    
+    
     resultTabs.addEventListener('click', e => {
         const tab = e.target.closest('.result-tab');
         if (!tab) return;
@@ -1598,9 +1539,9 @@
         $('tab-' + tab.dataset.tab).classList.add('active');
     });
 
-    // ==================================================================
-    // STATUS MESSAGES
-    // ==================================================================
+    
+    
+    
     function showStatus(msg, type = 'info') {
         const icons = {
             error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
@@ -1612,29 +1553,37 @@
         statusMessage.className = `status-msg visible ${type}`;
     }
 
-    // ==================================================================
-    // EXTRACTION
-    // ==================================================================
+    
+    
+    
     extractBtn.addEventListener('click', async () => {
         const apiKey = apiKeyInput.value.trim();
         const info = PROVIDER_INFO[selectedProvider];
 
-        // Validation
+        
         if (info.needsKey && !apiKey) { showStatus('Please enter your API key.', 'error'); return; }
         if (!uploadedPdfFile) { showStatus('Please upload a PDF file.', 'error'); return; }
 
-        if (!VISION_PROVIDERS.includes(selectedProvider)) {
-            showStatus('Both ChemExtract and ReactionLens require a vision-capable provider (DeepSeek, OpenAI, Gemini, or Anthropic).', 'error');
-            return;
+        if (extractionMode === 'reactionlens') {
+            
+            if (info.needsKey && !apiKey) { showStatus('Please enter your API key.', 'error'); extractBtn.disabled = false; extractBtn.innerHTML = origBtnHTML; return; }
+        } else {
+            
+            if (!VISION_PROVIDERS.includes(selectedProvider)) {
+                showStatus('ChemExtract requires a vision-capable provider (DeepSeek, OpenAI, Gemini, or Anthropic). ReactionLens works with any provider.', 'error');
+                extractBtn.disabled = false; extractBtn.innerHTML = origBtnHTML;
+                return;
+            }
         }
 
+        var origBtnHTML = extractBtn.innerHTML;
         extractBtn.disabled = true;
         extractBtn.innerHTML = '<span class="spinner"></span> Extracting...';
 
         try {
             let data;
             if (extractionMode === 'reactionlens') {
-                showStatus('Running ReactionLens pipeline...', 'info');
+                showStatus('Running ReactionLens text extraction...', 'info');
                 data = await extractWithReactionLens(uploadedPdfFile, apiKey);
             } else {
                 showStatus('Running ChemExtract AI...', 'info');
@@ -1652,55 +1601,52 @@
             showStatus('Error during extraction: ' + err.message, 'error');
         } finally {
             extractBtn.disabled = false;
-            extractBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Extract Data';
+            extractBtn.innerHTML = origBtnHTML;
         }
     });
 
-    // ==================================================================
-    // API CALLS
-    // ==================================================================
+    
+    
+    
     async function extractWithChemExtract(pdfFile, apiKey) {
         const formData = new FormData();
         formData.append('file', pdfFile);
         formData.append('provider', selectedProvider);
         formData.append('api_key', apiKey);
         if (selectedModel) formData.append('model', selectedModel);
-        formData.append('max_pages', '20');
-        formData.append('extract_figures', 'true');
+        formData.append('max_pages', '50');
+        formData.append('extract_images', 'true');
         formData.append('extract_text', 'true');
         const res = await fetch(`${API_BASE_URL}/api/extract/pdf/chemextract`, { method: 'POST', body: formData });
         return res.json();
     }
 
     async function extractWithReactionLens(pdfFile, apiKey) {
-        const useFilter = $('rlFilter').checked;
-        const useSegmentation = $('rlSegmentation').checked;
-        const useEntityResolution = $('rlEntityResolution').checked;
-        const maxPages = $('rlMaxPages').value;
+        var maxPages = $('rlMaxPages').value;
+        var minParaLength = $('rlMinParaLength') ? $('rlMinParaLength').value : '80';
 
-        const formData = new FormData();
+        var formData = new FormData();
         formData.append('file', pdfFile);
         formData.append('provider', selectedProvider);
         formData.append('api_key', apiKey);
         if (selectedModel) formData.append('model', selectedModel);
         formData.append('max_pages', maxPages);
-        formData.append('enable_filtering', String(useFilter));
-        formData.append('enable_segmentation', String(useSegmentation));
-        formData.append('enable_entity_resolution', String(useEntityResolution));
-        const res = await fetch(`${API_BASE_URL}/api/extract/pdf/reactionlens`, { method: 'POST', body: formData });
+        formData.append('min_paragraph_length', minParaLength);
+
+        var res = await fetch(API_BASE_URL + '/api/extract/pdf/reactionlens', { method: 'POST', body: formData });
         return res.json();
     }
 
-    // ==================================================================
-    // FORMAT SCHEMES
-    // ==================================================================
+    
+    
+    
     async function fetchSchemes() {
         if (!extractedData) return null;
         try {
             const res = await fetch(`${API_BASE_URL}/api/extract/format/schemes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: extractedData })
+                body: JSON.stringify({ reactions: extractedData.reactions || [], compounds: extractedData.compounds || [] })
             });
             return await res.json();
         } catch (e) {
@@ -1708,26 +1654,26 @@
         }
     }
 
-    // ==================================================================
-    // HELPER UTILITIES
-    // ==================================================================
+    
+    
+    
     function isValidSmiles(s) {
         if (!s || typeof s !== 'string') return false;
-        // Real SMILES contains organic subset chars: C, N, O, S, P, F, Cl, Br, I, c, n, o, s, p, [, ], (, ), =, #, +, -, @, %, digits, *, ., :
-        // Reject if it looks like a plain name (has spaces, or starts with uppercase letter followed by lowercase name-like text without brackets)
+        
+        
         const trimmed = s.trim();
         if (trimmed.length < 2) return false;
-        // Reject names with spaces
+        
         if (/\s/.test(trimmed)) return false;
-        // Reject pure name-like strings (e.g. "ArCH2Cl", "RC(O)Cl" — these are pseudo-SMILES with R/Ar placeholders)
+        
         if (/\b[A-Z][a-z]?\b/.test(trimmed) && !/[\[\(]/.test(trimmed) && /[A-Za-z]{2,}/.test(trimmed)) {
-            // Check if it contains actual SMILES patterns
+            
             const hasSmilesChars = /[C=NOSPFIBrcnosp#@\+\-\[\]\(\)\\\/]/.test(trimmed);
             const hasPlaceholder = /\b[A-Z][a-z]?\b/.test(trimmed) && !/Cl|Br|Si|Se|As|Te|Ge|Sn|Pb|Bi|Na|Li|K|Ca|Mg|Al|Zn|Fe|Cu|Ni|Co|Mn|Cr|Mo|W|V|Ti|Ru|Rh|Pd|Ag|Cd|Hg|Au|Pt|Ba|Sr|Cs|Rb/.test(trimmed);
             if (hasPlaceholder && !/\[.*\]/.test(trimmed)) return false;
         }
-        // Reject strings with generic R/Ar/X/Y placeholders outside of brackets
-        if (/^[A-Za-z][a-z]?(CH|C[=]/.test(trimmed) && /[^a-zA-Z][AR][^a-z]/.test(trimmed)) return false;
+        
+        if (/^[A-Za-z][a-z]?(CH|C[=])/.test(trimmed) && /[^a-zA-Z][AR][^a-z]/.test(trimmed)) return false;
         return true;
     }
 
@@ -1750,18 +1696,18 @@
         return `<span class="yield-badge ${cls}">${yieldStr}${yieldStr.includes('%') ? '' : '%'}</span>`;
     }
 
-    // ==================================================================
-    // DISPLAY RESULTS
-    // ==================================================================
+    
+    
+    
     function displayResults(data) {
         console.log('displayResults:', data);
         resultsCard.classList.add('has-data');
         exportActions.style.display = 'flex';
 
-        // Determine format
+        
         const isChemExtract = !!(data.reactions || data.compounds || data.tables || data.figures);
 
-        // Flatten data for easier tab rendering
+        
         let reactions = [], compounds = [], conditions = [];
 
         if (isChemExtract) {
@@ -1771,7 +1717,7 @@
                 reactions.forEach(r => { if (r.conditions) conditions.push({ reaction: r, conditions: r.conditions }); });
             }
         } else {
-            // Legacy format
+            
             if (data.reactants) data.reactants.forEach(r => compounds.push(typeof r === 'object' ? { ...r, role: r.role || 'reactant' } : { name: r, role: 'reactant' }));
             if (data.products) data.products.forEach(p => compounds.push(typeof p === 'object' ? { ...p, role: p.role || 'product' } : { name: p, role: 'product' }));
             if (data.catalysts) data.catalysts.forEach(c => compounds.push(typeof c === 'object' ? { ...c, role: c.role || 'catalyst' } : { name: c, role: 'catalyst' }));
@@ -1800,11 +1746,11 @@
             }
         }
 
-        // Update tab counts
+        
         $('rxnCount').textContent = reactions.length;
         $('cmpCount').textContent = compounds.length;
 
-        // ---- OVERVIEW TAB ----
+        
         let overviewHtml = '<div class="summary-grid">';
         overviewHtml += `<div class="summary-card"><div class="summary-num">${reactions.length}</div><div class="summary-label">Reactions</div></div>`;
         overviewHtml += `<div class="summary-card"><div class="summary-num">${compounds.length}</div><div class="summary-label">Compounds</div></div>`;
@@ -1812,7 +1758,7 @@
         overviewHtml += `<div class="summary-card"><div class="summary-num">${conditions.length || Object.keys(data.conditions || {}).length || 0}</div><div class="summary-label">Conditions</div></div>`;
         overviewHtml += '</div>';
 
-        // Quick reaction list
+        
         if (reactions.length > 0) {
             overviewHtml += '<h3 style="font-size:0.9rem;font-weight:700;color:var(--text-main);margin-bottom:12px;">Quick Glance</h3>';
             reactions.slice(0, 5).forEach((r, i) => {
@@ -1832,7 +1778,7 @@
         }
         $('tab-overview').innerHTML = overviewHtml;
 
-        // ---- REACTIONS TAB ----
+        
         let rxnHtml = '';
         if (reactions.length === 0) {
             rxnHtml = '<div class="empty-state"><p>No reactions found.</p></div>';
@@ -1841,7 +1787,7 @@
                 rxnHtml += '<div class="reaction-card">';
                 rxnHtml += `<div class="rxn-entry">Reaction ${i + 1}</div>`;
 
-                // Scheme — only show if we have real SMILES (not names/placeholders)
+                
                 const rSmilesList = (r.reactants || []).map(x => getSmiles(x)).filter(s => s && isValidSmiles(s));
                 const pSmilesList = (r.products || []).map(x => getSmiles(x)).filter(s => s && isValidSmiles(s));
                 const rSmiles = rSmilesList.join('.');
@@ -1850,7 +1796,7 @@
                     rxnHtml += `<div class="rxn-scheme">${rSmiles} &gt;&gt; ${pSmiles}</div>`;
                 }
 
-                // Reactants
+                
                 if (r.reactants && r.reactants.length > 0) {
                     rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Reactants</div><div class="rxn-tags">';
                     r.reactants.forEach(x => {
@@ -1860,7 +1806,7 @@
                     rxnHtml += '</div></div>';
                 }
 
-                // Products
+                
                 if (r.products && r.products.length > 0) {
                     rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Products</div><div class="rxn-tags">';
                     r.products.forEach(x => {
@@ -1870,10 +1816,10 @@
                     rxnHtml += '</div></div>';
                 }
 
-                // Catalyst / Ligands
+                
                 if (r.catalyst) rxnHtml += `<div class="rxn-section"><div class="rxn-section-title">Catalyst</div><div class="rxn-tags"><span class="rxn-tag catalyst">${r.catalyst}</span></div></div>`;
 
-                // Conditions
+                
                 const conds = r.conditions;
                 if (conds && (typeof conds === 'object' ? Object.keys(conds).length > 0 : conds)) {
                     rxnHtml += '<div class="rxn-section"><div class="rxn-section-title">Conditions</div><div class="rxn-conditions">';
@@ -1887,12 +1833,12 @@
                     rxnHtml += '</div></div>';
                 }
 
-                // Yield
+                
                 if (r.yield) {
                     rxnHtml += `<div style="margin-top:10px;display:flex;align-items:center;gap:8px;"><span style="font-size:0.78rem;font-weight:600;color:var(--text-muted);">YIELD</span> ${yieldBadge(r.yield)}</div>`;
                 }
 
-                // Description
+                
                 if (r.description) {
                     rxnHtml += `<p style="margin-top:10px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">${r.description}</p>`;
                 }
@@ -1902,7 +1848,7 @@
         }
         $('tab-reactions').innerHTML = rxnHtml;
 
-        // ---- COMPOUNDS TAB ----
+        
         let cmpHtml = '';
         if (compounds.length === 0) {
             cmpHtml = '<div class="empty-state"><p>No compounds found.</p></div>';
@@ -1930,7 +1876,7 @@
         }
         $('tab-compounds').innerHTML = cmpHtml;
 
-        // ---- CONDITIONS TAB ----
+        
         let condHtml = '';
         if (reactions.length === 0 && (!data.conditions || Object.keys(data.conditions).length === 0)) {
             condHtml = '<div class="empty-state"><p>No condition data found.</p></div>';
@@ -1964,16 +1910,16 @@
         }
         $('tab-conditions').innerHTML = condHtml;
 
-        // ---- RAW JSON TAB ----
+        
         $('tab-rawjson').innerHTML = `<div class="json-viewer">${syntaxHighlightJSON(data)}</div>`;
 
-        // Scroll to results
+        
         resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ==================================================================
-    // JSON SYNTAX HIGHLIGHT
-    // ==================================================================
+    
+    
+    
     function syntaxHighlightJSON(obj) {
         const json = JSON.stringify(obj, null, 2);
         return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -1984,9 +1930,9 @@
             .replace(/: (null)/g, ': <span class="json-null">$1</span>');
     }
 
-    // ==================================================================
-    // EXPORT FUNCTIONS
-    // ==================================================================
+    
+    
+    
     $('exportJsonBtn').addEventListener('click', () => {
         if (!extractedData) return;
         const blob = new Blob([JSON.stringify(extractedData, null, 2)], { type: 'application/json' });
@@ -2000,7 +1946,7 @@
             const blob = new Blob([JSON.stringify(schemes.data || schemes, null, 2)], { type: 'application/json' });
             downloadBlob(blob, 'reaction-schemes.json');
         } else {
-            // Fallback: build from extracted data
+            
             let smiData = '';
             const rxns = extractedData.reactions || [];
             rxns.forEach((r, i) => {
@@ -2041,9 +1987,9 @@
         showStatus(`Downloaded ${filename}`, 'success');
     }
 
-    // ==================================================================
-    // CLEAR
-    // ==================================================================
+    
+    
+    
     clearBtn.addEventListener('click', () => {
         pdfText = '';
         extractedData = null;
@@ -2068,6 +2014,7 @@
         document.querySelectorAll('.tab-content').forEach((tc, i) => tc.classList.toggle('active', i === 0));
         statusMessage.className = 'status-msg';
     });
+    }); 
     </script>
 </body>
 </html>

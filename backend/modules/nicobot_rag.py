@@ -3,6 +3,7 @@ NiCOBot RAG (Retrieval Augmented Generation) Service
 Integrates database context with LLM for enhanced responses.
 """
 
+import os
 import logging
 import re
 from typing import Optional, Dict, Any, List
@@ -216,7 +217,7 @@ Keep responses concise but informative. Use proper chemical nomenclature."""
         if context.formatted_context:
             enhanced_prompt = f"""{base_prompt}
 
-## Database Context
+
 The following information has been retrieved from the NiCOBot chemical database and should be used to enhance your response:
 
 {context.formatted_context}

@@ -7,12 +7,9 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* ========================================
-           KNOWLEDGE GRAPH STYLES
-           Clean, minimal design matching design system
-           ======================================== */
         
-        /* Content Panel */
+        
+        
         .content-panel {
             padding: 24px;
         }
@@ -39,9 +36,7 @@
             padding: 24px 0 0 0;
         }
 
-        /* ========================================
-           GRAPH AREA
-           ======================================== */
+        
         .graph-area {
             flex: 1;
             background: var(--bg-main);
@@ -57,9 +52,7 @@
             z-index: 1;
         }
 
-        /* ========================================
-           NODE STYLES
-           ======================================== */
+        
         .node {
             cursor: pointer;
             transition: filter 0.2s ease;
@@ -86,9 +79,7 @@
             pointer-events: none;
         }
 
-        /* ========================================
-           EDGE STYLES
-           ======================================== */
+        
         .edge {
             stroke: var(--border-color);
             stroke-width: 1.5px;
@@ -112,9 +103,7 @@
             font-weight: 500;
         }
 
-        /* ========================================
-           GRAPH CONTROLS
-           ======================================== */
+        
         .graph-controls {
             position: absolute;
             bottom: 24px;
@@ -155,9 +144,7 @@
             color: var(--section-primary);
         }
 
-        /* ========================================
-           MINIMAP
-           ======================================== */
+        
         .minimap-container {
             position: absolute;
             bottom: 24px;
@@ -193,9 +180,7 @@
             rx: 4;
         }
 
-        /* ========================================
-           NODE SEARCH
-           ======================================== */
+        
         .search-container {
             position: absolute;
             top: 24px;
@@ -299,9 +284,7 @@
             text-transform: capitalize;
         }
 
-        /* ========================================
-           GRAPH STATS
-           ======================================== */
+        
         .graph-stats {
             position: absolute;
             top: 24px;
@@ -335,9 +318,7 @@
             color: var(--section-primary);
         }
 
-        /* ========================================
-           LOADING OVERLAY
-           ======================================== */
+        
         .loading-overlay {
             position: absolute;
             top: 0;
@@ -400,9 +381,7 @@
             100% { width: 0%; margin-left: 100%; }
         }
 
-        /* ========================================
-           EMPTY STATE
-           ======================================== */
+        
         .empty-state {
             position: absolute;
             top: 0;
@@ -483,9 +462,7 @@
             color: var(--text-muted);
         }
 
-        /* ========================================
-           SIDEBAR LEFT
-           ======================================== */
+        
         .sidebar-left {
             width: 360px;
             background: var(--bg-white);
@@ -518,7 +495,7 @@
             color: var(--text-main);
         }
 
-        /* Sidebar sections */
+        
         .sidebar-section {
             padding: 16px 20px;
         }
@@ -541,7 +518,7 @@
             color: var(--section-primary);
         }
 
-        /* API Config */
+        
         .api-config-section {
             background: var(--bg-gray);
             border-radius: 10px;
@@ -607,7 +584,7 @@
             text-decoration: underline;
         }
 
-        /* Mode tabs */
+        
         .mode-tabs {
             display: flex;
             gap: 4px;
@@ -643,7 +620,7 @@
             color: var(--text-secondary);
         }
 
-        /* Quick actions */
+        
         .quick-actions {
             display: flex;
             flex-wrap: wrap;
@@ -668,7 +645,7 @@
             color: var(--section-primary);
         }
 
-        /* Action buttons */
+        
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -734,7 +711,7 @@
             color: var(--section-primary);
         }
 
-        /* Legend */
+        
         .legend {
             background: var(--bg-gray);
             border-radius: 10px;
@@ -765,7 +742,7 @@
             border-radius: 50%;
         }
 
-        /* Node Details Section */
+        
         .node-details-section {
             padding-top: 16px;
         }
@@ -837,7 +814,7 @@
             line-height: 1.5;
         }
 
-        /* File upload */
+        
         .btn-upload {
             display: flex;
             align-items: center;
@@ -874,9 +851,7 @@
             margin-top: 6px;
         }
 
-        /* ========================================
-           TOOLTIP
-           ======================================== */
+        
         .node-tooltip {
             position: absolute;
             padding: 10px 14px;
@@ -909,9 +884,7 @@
             text-transform: capitalize;
         }
 
-        /* ========================================
-           RESPONSIVE ADJUSTMENTS
-           ======================================== */
+        
         @media (max-width: 1200px) {
             .minimap-container {
                 width: 150px;
@@ -943,7 +916,7 @@
 </head>
 <body class="theme-purple">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -977,16 +950,16 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    
     <div class="main-wrapper">
-        <!-- Left Sidebar -->
+        
         <aside class="sidebar-left">
             <div class="sidebar-header">
                 <span class="sidebar-title">AI Feature</span>
                 <div class="sidebar-subtitle">Knowledge Graph Generator</div>
             </div>
 
-            <!-- API Configuration -->
+            
             <div class="sidebar-section">
                 <label class="section-label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1022,7 +995,7 @@
                 </div>
             </div>
 
-            <!-- Mode Selection -->
+            
             <div class="sidebar-section">
                 <label class="section-label">Input Mode</label>
                 <div class="mode-tabs">
@@ -1043,13 +1016,13 @@
                 </div>
             </div>
 
-            <!-- Keyword Input -->
+            
             <div class="sidebar-section" id="keywordSection">
                 <label class="section-label">Topic / Keyword</label>
                 <input type="text" class="text-input" id="topicInput" placeholder="e.g., Suzuki coupling, Heck reaction...">
             </div>
 
-            <!-- PDF Upload -->
+            
             <div class="sidebar-section" id="pdfSection" style="display: none;">
                 <label class="section-label">Upload PDF Document</label>
                 <div class="file-upload-wrapper">
@@ -1066,7 +1039,7 @@
                 </div>
             </div>
 
-            <!-- Quick Topics -->
+            
             <div class="sidebar-section" id="quickTopics">
                 <label class="section-label">Quick Topics</label>
                 <div class="quick-actions">
@@ -1078,7 +1051,7 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            
             <div class="sidebar-section">
                 <div class="action-buttons">
                     <button class="btn-generate" id="generateBtn" onclick="generateGraph()">
@@ -1097,7 +1070,7 @@
                 </div>
             </div>
 
-            <!-- Legend -->
+            
             <div class="sidebar-section">
                 <div class="legend">
                     <div class="legend-title">Node Types</div>
@@ -1112,7 +1085,7 @@
                 </div>
             </div>
 
-            <!-- Node Details (shown when node selected) -->
+            
             <div class="sidebar-section node-details-section" id="nodeDetailsSection" style="display: none;">
                 <label class="section-label">Selected Node</label>
                 <div class="node-info-card">
@@ -1136,9 +1109,9 @@
             </div>
         </aside>
 
-        <!-- Graph Area -->
+        
         <div class="graph-area" id="graphArea">
-            <!-- Search Container -->
+            
             <div class="search-container">
                 <div class="search-wrapper">
                     <div class="search-icon">
@@ -1152,7 +1125,7 @@
                 <div class="search-results" id="searchResults"></div>
             </div>
 
-            <!-- Graph Stats -->
+            
             <div class="graph-stats" id="graphStats" style="display: none;">
                 <div class="stat-pill">
                     <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1172,7 +1145,7 @@
                 </div>
             </div>
 
-            <!-- Graph Controls -->
+            
             <div class="graph-controls">
                 <button class="control-btn" onclick="zoomIn()" title="Zoom In">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1202,7 +1175,7 @@
                 </button>
             </div>
 
-            <!-- Minimap -->
+            
             <div class="minimap-container" id="minimapContainer" style="display: none;">
                 <div class="minimap-header">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1213,7 +1186,7 @@
                 <svg id="minimap-svg" width="100%" height="calc(100% - 28px)"></svg>
             </div>
 
-            <!-- Empty State -->
+            
             <div class="empty-state" id="emptyState">
                 <div class="empty-state-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1261,7 +1234,7 @@
                 </div>
             </div>
 
-            <!-- Loading Overlay -->
+            
             <div class="loading-overlay" id="loadingOverlay" style="display: none;">
                 <div class="loading-spinner"></div>
                 <div class="loading-text">Generating Knowledge Graph</div>
@@ -1271,10 +1244,10 @@
                 </div>
             </div>
 
-            <!-- Graph SVG -->
+            
             <svg id="graph-svg" style="display: none;"></svg>
 
-            <!-- Tooltip -->
+            
             <div class="node-tooltip" id="nodeTooltip">
                 <div class="tooltip-title"></div>
                 <div class="tooltip-type"></div>

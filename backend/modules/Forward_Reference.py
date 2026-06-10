@@ -1,7 +1,9 @@
 import networkx as nx
 import uuid
 from datetime import datetime
+import pandas as pd
 from .DOI import extract_doi_from_pdf, get_paper_details, get_forward_citations
+
 
 def build_forward_network(pdf_path, progress_callback=None):
     try:

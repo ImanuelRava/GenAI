@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Network Detailed Workflow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+            padding: 40px;
+            min-width: 1100px;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: #5B21B6;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7C3AED;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .type-selector {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .type-btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .type-btn.forward { background: #DBEAFE; color: #1D4ED8; }
+        .type-btn.backward { background: #DCFCE7; color: #15803D; }
+        .type-btn.cross { background: #FEF3C7; color: #B45309; }
+        .type-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .type-btn svg { width: 18px; height: 18px; }
+        
+        .phase {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .phase-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .phase-header.upload { background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%); }
+        .phase-header.extract { background: linear-gradient(90deg, #8B5CF6 0%, #A855F7 100%); }
+        .phase-header.build { background: linear-gradient(90deg, #A855F7 0%, #C026D3 100%); }
+        .phase-header.analyze { background: linear-gradient(90deg, #C026D3 0%, #DB2777 100%); }
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+        .phase-title { font-size: 20px; font-weight: 600; }
+        .phase-content { padding: 24px; }
+        
+        .step-row {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .step-row:last-child { margin-bottom: 0; }
+        
+        .step-box {
+            flex: 1;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .step-box.highlight { background: #EDE9FE; border-color: #8B5CF6; }
+        .step-box.forward { background: #DBEAFE; border-color: #3B82F6; }
+        .step-box.backward { background: #DCFCE7; border-color: #22C55E; }
+        .step-box.cross { background: #FEF3C7; border-color: #F59E0B; }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: #7C3AED;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .step-title { font-weight: 600; color: #1F2937; font-size: 15px; }
+        .step-desc { color: #6B7280; font-size: 13px; line-height: 1.5; }
+        .code-snippet {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .analysis-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .analysis-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .analysis-header {
+            padding: 12px 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .analysis-header svg { width: 18px; height: 18px; }
+        .analysis-header.forward { background: #3B82F6; }
+        .analysis-header.backward { background: #22C55E; }
+        .analysis-header.cross { background: #F59E0B; }
+        .analysis-body { padding: 14px; }
+        .analysis-desc { font-size: 12px; color: #6B7280; line-height: 1.5; }
+        .analysis-flow { margin-top: 10px; font-size: 11px; color: #374151; line-height: 1.6; }
+        
+        .data-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: #EDE9FE;
+            border-radius: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .flow-item {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            border: 1px solid #C4B5FD;
+        }
+        .flow-arrow { color: #7C3AED; font-size: 16px; }
+        
+        .api-section {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .api-title { font-weight: 600; color: #374151; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .api-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .api-item {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .api-item-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .api-endpoint {
+            background: #1E293B;
+            color: #10B981;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        .api-desc {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Citation Network Detailed Workflow</h1>
+        <p class="subtitle">Academic Paper Citation Analysis System</p>
+        
+        
+        <div class="type-selector">
+            <div class="type-btn forward">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                    <path d="M12 18v-6"/>
+                    <path d="M9 15l3 3 3-3"/>
+                </svg>
+                Forward Reference
+            </div>
+            <div class="type-btn backward">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                    <path d="M12 12v6"/>
+                    <path d="M15 15l-3-3-3 3"/>
+                </svg>
+                Backward Reference
+            </div>
+            <div class="type-btn cross">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v12M6 12h12"/>
+                </svg>
+                Cross Reference
+            </div>
+        </div>
+
+        
+        <div class="phase">
+            <div class="phase-header upload">
+                <div class="phase-number">1</div>
+                <div class="phase-title">PDF Upload & Validation</div>
+            </div>
+            <div class="phase-content">
+                <div class="step-row">
+                    <div class="step-box">
+                        <div class="step-header">
+                            <div class="step-num">1.1</div>
+                            <div class="step-title">File Upload</div>
+                        </div>
+                        <div class="step-desc">POST to <code>/api/network</code> with PDF file and analysis type</div>
+                        <div class="code-snippet">
+POST /api/network
+Content-Type: multipart/form-data
+file: paper.pdf
+type: forward | backward | cross
+                        </div>
+                    </div>
+                    <div class="step-box highlight">
+                        <div class="step-header">
+                            <div class="step-num">1.2</div>
+                            <div class="step-title">File Validation</div>
+                        </div>
+                        <div class="step-desc">
+                            • Check file extension (.pdf, .txt, .csv)<br>
+                            • Sanitize filename<br>
+                            • Save to upload folder with UUID prefix
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase">
+            <div class="phase-header extract">
+                <div class="phase-number">2</div>
+                <div class="phase-title">DOI Extraction & Paper Details</div>
+            </div>
+            <div class="phase-content">
+                <div class="step-row">
+                    <div class="step-box highlight">
+                        <div class="step-header">
+                            <div class="step-num">2.1</div>
+                            <div class="step-title">Extract DOI from PDF</div>
+                        </div>
+                        <div class="step-desc">DOI module extracts the Digital Object Identifier from the PDF's first page</div>
+                        <div class="code-snippet">
+from modules.DOI import extract_doi_from_pdf
+main_doi = extract_doi_from_pdf(pdf_path)
+# Example: "10.1021/jacs.0c12345"
+                        </div>
+                    </div>
+                    <div class="step-box highlight">
+                        <div class="step-header">
+                            <div class="step-num">2.2</div>
+                            <div class="step-title">Fetch Paper Details</div>
+                        </div>
+                        <div class="step-desc">Query OpenAlex and Crossref APIs for comprehensive paper metadata</div>
+                        <div class="code-snippet">
+author, year, citations, refs, title = get_paper_details(main_doi)
+# Returns: author, publication year, citation count, references, title
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase">
+            <div class="phase-header build">
+                <div class="phase-number">3</div>
+                <div class="phase-title">Network Building (3 Types)</div>
+            </div>
+            <div class="phase-content">
+                <div class="analysis-types">
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header forward">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                                <path d="M12 18v-6"/>
+                                <path d="M9 15l3 3 3-3"/>
+                            </svg>
+                            Forward Reference
+                        </div>
+                        <div class="analysis-body">
+                            <div class="analysis-desc">Find papers that <strong>cited this paper</strong></div>
+                            <div class="analysis-flow">
+                                1. Query OpenAlex for citing papers<br>
+                                2. Use Crossref for DOI validation<br>
+                                3. Add citing papers as nodes<br>
+                                4. Create edges: citing → main
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header backward">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                                <path d="M12 12v6"/>
+                                <path d="M15 15l-3-3-3 3"/>
+                            </svg>
+                            Backward Reference
+                        </div>
+                        <div class="analysis-body">
+                            <div class="analysis-desc">Find papers <strong>this paper cited</strong></div>
+                            <div class="analysis-flow">
+                                1. Extract references from paper<br>
+                                2. Crossref DOI lookup<br>
+                                3. OpenAlex for metadata<br>
+                                4. Create edges: main → reference
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header cross">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v12M6 12h12"/>
+                            </svg>
+                            Cross Reference
+                        </div>
+                        <div class="analysis-body">
+                            <div class="analysis-desc">Find <strong>interconnections</strong> between papers</div>
+                            <div class="analysis-flow">
+                                1. Load both cited & citing papers<br>
+                                2. Build bidirectional edges<br>
+                                3. Identify highly connected nodes<br>
+                                4. Generate network statistics
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-row" style="margin-top: 16px;">
+                    <div class="step-box forward">
+                        <div class="step-header">
+                            <div class="step-num">3.1</div>
+                            <div class="step-title">Forward: Build Citing Network</div>
+                        </div>
+                        <div class="step-desc">
+                            <code>build_forward_network()</code> queries OpenAlex & Crossref
+                        </div>
+                        <div class="code-snippet">
+citing_papers = get_forward_citations(main_doi)
+for paper in citing_papers:
+    G.add_node(doi, author=..., year=..., citations=...)
+    G.add_edge(citing_doi, main_doi)  # Arrow points TO main paper
+                        </div>
+                    </div>
+                    <div class="step-box backward">
+                        <div class="step-header">
+                            <div class="step-num">3.2</div>
+                            <div class="step-title">Backward: Build Reference Network</div>
+                        </div>
+                        <div class="step-desc">
+                            <code>build_reference_network()</code> uses Crossref for DOI resolution
+                        </div>
+                        <div class="code-snippet">
+ref_dois = get_referenced_dois(main_refs)
+for doi in ref_dois:
+    author, year, cites, _, title = get_paper_details(doi)
+    G.add_node(doi, ...)
+    G.add_edge(main_doi, doi)  # Arrow points FROM main paper
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase">
+            <div class="phase-header analyze">
+                <div class="phase-number">4</div>
+                <div class="phase-title">Network Analysis & Suggestions</div>
+            </div>
+            <div class="phase-content">
+                <div class="step-row">
+                    <div class="step-box">
+                        <div class="step-header">
+                            <div class="step-num">4.1</div>
+                            <div class="step-title">Generate Statistics</div>
+                        </div>
+                        <div class="step-desc">Calculate network metrics and filter top 30 nodes by citation count</div>
+                        <div class="code-snippet">
+stats = {
+    'nodes': G.number_of_nodes(),
+    'edges': G.number_of_edges()
+}
+# Filter top 30 by global citation count
+sorted_nodes = sorted(all_papers, key=lambda x: x['citations'], reverse=True)[:30]
+                        </div>
+                    </div>
+                    <div class="step-box highlight">
+                        <div class="step-header">
+                            <div class="step-num">4.2</div>
+                            <div class="step-title">Generate Suggestions</div>
+                        </div>
+                        <div class="step-desc">Identify high-impact and locally-cited papers</div>
+                        <div class="code-snippet">
+suggestions = [
+    {"source": "Recent High Impact Citing Paper", ...},
+    {"source": "High Local Citation Paper", ...},
+    {"source": "Top Global Impact Reference", ...}
+]
+                        </div>
+                    </div>
+                </div>
+                <div class="step-row">
+                    <div class="step-box">
+                        <div class="step-header">
+                            <div class="step-num">4.3</div>
+                            <div class="step-title">Format Output</div>
+                        </div>
+                        <div class="step-desc">Return nodes, edges, suggestions, and paper list as JSON</div>
+                        <div class="code-snippet">
+return jsonify({
+    'elements': {'nodes': [...], 'edges': [...]},
+    'suggestions': [...],
+    'all_papers': [...],
+    'stats': {'nodes': 30, 'edges': 45}
+})
+                        </div>
+                    </div>
+                    <div class="api-section">
+                        <div class="api-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                            External APIs Used
+                        </div>
+                        <div class="api-grid">
+                            <div class="api-item">
+                                <div class="api-item-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v12M6 12h12"/>
+                                    </svg>
+                                    OpenAlex
+                                </div>
+                                <div class="api-endpoint">api.openalex.org/works/{doi}</div>
+                                <div class="api-desc">Free access to paper metadata, citations, references, and author info</div>
+                            </div>
+                            <div class="api-item">
+                                <div class="api-item-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                    </svg>
+                                    Crossref
+                                </div>
+                                <div class="api-endpoint">api.crossref.org/works/{doi}</div>
+                                <div class="api-desc">DOI registration & resolution, citation data, reference matching</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="phase" style="margin-top: 20px;">
+            <div class="phase-header" style="background: linear-gradient(90deg, #059669 0%, #10B981 100%);">
+                <div class="phase-number">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M18 20V10M12 20V4M6 20v-6"/>
+                    </svg>
+                </div>
+                <div class="phase-title">Complete Data Flow</div>
+            </div>
+            <div class="phase-content">
+                <div class="data-flow">
+                    <div class="flow-item">PDF Upload</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">DOI Extraction</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">OpenAlex API</div>
+                    <div class="flow-arrow">+</div>
+                    <div class="flow-item">Crossref API</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">NetworkX Graph</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">Suggestions</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">JSON Response</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

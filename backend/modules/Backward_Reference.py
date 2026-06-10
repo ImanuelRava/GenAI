@@ -1,6 +1,10 @@
 import networkx as nx
 import time
+import logging
 from .DOI import extract_doi_from_pdf, get_paper_details, get_referenced_dois
+
+logger = logging.getLogger(__name__)
+
 
 def build_reference_network(pdf_path, progress_callback=None):
     try:
@@ -57,6 +61,7 @@ def build_reference_network(pdf_path, progress_callback=None):
             time.sleep(0.3)
         except Exception:
             continue
+
     all_papers_list = []
     for n in G.nodes():
         data = G.nodes[n]
@@ -77,7 +82,6 @@ def build_reference_network(pdf_path, progress_callback=None):
         top_30_ids.insert(0, main_doi)
 
     G_viz = G.subgraph(top_30_ids).copy()
-
 
     valid_refs_top_30 = [r for r in valid_refs if r in top_30_ids]
 

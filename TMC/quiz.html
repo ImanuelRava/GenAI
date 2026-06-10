@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chemistry Quiz | TMC - GenAI Research</title>
-    <!-- 3Dmol.js for chemical structure visualization -->
+    
     <script src="https://3dmol.org/build/3Dmol-min.js"></script>
     <link rel="stylesheet" href="css/shared.css">
     <style>
-        /* Content Panel - Add padding to prevent touching outer container */
+        
         .content-panel {
             padding: 24px;
         }
@@ -51,8 +51,8 @@
             padding: 24px 0 0 0;
         }
 
-        /* Page-specific styles */
-        /* Quiz specific styles */
+        
+        
         .viewer-container { width: 100%; height: 240px; background: var(--bg-gray); border: 1px solid var(--border-color); border-radius: var(--radius); margin: 20px 0; position: relative; overflow: hidden; }
         .viewer-container.hidden { display: none; }
         .viewer-container canvas { position: absolute !important; top: 0; left: 0; }
@@ -99,7 +99,7 @@
 </head>
 <body class="theme-purple">
 
-    <!-- Header -->
+    
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
@@ -133,9 +133,9 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    
     <div class="main-wrapper">
-        <!-- Sidebar -->
+        
         <aside class="sidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">Quiz</span>
@@ -158,9 +158,9 @@
             </div>
         </aside>
 
-        <!-- Content Area -->
+        
         <main class="content-area">
-            <!-- Quiz Panel -->
+            
             <div id="quizPanel" class="quiz-panel active">
                 <div class="quiz-header">
                     <h2 id="questionNumber">Question 1</h2>
@@ -186,7 +186,7 @@
                 </div>
             </div>
 
-            <!-- Score Panel -->
+            
             <div id="scorePanel" class="score-panel">
                 <h2 style="margin-bottom: 16px; font-size: 1.5rem;">Assessment Complete</h2>
                 <div class="score-circle" id="scoreCircle">0%</div>
@@ -199,7 +199,7 @@
         </main>
     </div>
 
-    <!-- Footer -->
+    
     <footer>
         <p>Powered by TMC AI Engine | RDKit Molecular Visualization</p>
     </footer>
