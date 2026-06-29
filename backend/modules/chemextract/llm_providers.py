@@ -1,11 +1,38 @@
-import json
-import logging
-import time
-import asyncio
-from typing import Dict, Optional, List
+"""
+ChemExtract LLM provider shims (delegating to ``llm.client.LLMClient``).
 
-import requests
-import aiohttp
+This file preserves the original public function signatures used by
+``chemextract/extractor.py`` and ``chemextract/standalone.py``:
+
+  - ``call_vision_llm(base64_image, provider, model, api_key, system_prompt, user_message)``
+  - ``call_vision_llm_async(...)``
+  - ``_call_text_provider(provider, model, api_key, text)``
+  - ``_call_text_provider_async(...)``
+  - ``_call_gemini_text(text, model, api_key)``
+  - ``_call_gemini_text_async(...)``
+  - ``_call_anthropic_text(text, model, api_key)``
+  - ``_call_anthropic_text_async(...)``
+  - ``_retry_on_failure(func, *args, **kwargs)``
+  - ``_retry_on_failure_async(func, *args, **kwargs)``
+
+All HTTP work is delegated to ``llm.client.LLMClient``, which is shared
+with the chat providers and the ReactionLens pipeline. The retry helpers
+delegate to ``llm.client.retry_with_backoff[_async]``.
+
+Pre-consolidation: ~523 LOC with 16 near-identical functions
+(8 vision + 8 text, each duplicated for sync/async).
+Post-consolidation: ~150 LOC of thin shims.
+"""
+
+import logging
+from typing import Optional, Dict
+
+from llm.client import (
+    LLMClient,
+    VISION_CAPABLE_PROVIDERS,
+    retry_with_backoff,
+    retry_with_backoff_async,
+)
 
 from .config import (
     MAX_OUTPUT_TOKENS, MAX_RETRIES, RETRY_DELAY,
@@ -17,35 +44,36 @@ from .json_utils import _parse_json_response
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# Re-exported retry helpers (backwards compat with chemextract/__init__.py)
+# ---------------------------------------------------------------------------
+
 def _retry_on_failure(func, *args, max_retries=MAX_RETRIES, **kwargs):
-    """Retry a function call on failure with exponential backoff."""
-    for attempt in range(max_retries + 1):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            if attempt < max_retries:
-                wait = RETRY_DELAY * (attempt + 1)
-                logger.warning(f"[ChemExtract] Call failed (attempt {attempt+1}/{max_retries+1}): {e}. Retrying in {wait}s...")
-                time.sleep(wait)
-            else:
-                logger.error(f"[ChemExtract] Call failed after {max_retries+1} attempts: {e}")
-                raise
+    """Retry a sync function on failure with linear back-off.
+
+    Delegates to llm.client.retry_with_backoff to keep retry logic in one place.
+    """
+    return retry_with_backoff(
+        func, *args,
+        max_retries=max_retries,
+        retry_delay=RETRY_DELAY,
+        **kwargs,
+    )
 
 
 async def _retry_on_failure_async(func, *args, max_retries=MAX_RETRIES, **kwargs):
-    """Async retry wrapper with exponential backoff."""
-    for attempt in range(max_retries + 1):
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            if attempt < max_retries:
-                wait = RETRY_DELAY * (attempt + 1)
-                logger.warning(f"[ChemExtract] Async call failed (attempt {attempt+1}/{max_retries+1}): {e}. Retrying in {wait}s...")
-                await asyncio.sleep(wait)
-            else:
-                logger.error(f"[ChemExtract] Async call failed after {max_retries+1} attempts: {e}")
-                raise
+    """Async retry wrapper. Delegates to llm.client.retry_with_backoff_async."""
+    return await retry_with_backoff_async(
+        func, *args,
+        max_retries=max_retries,
+        retry_delay=RETRY_DELAY,
+        **kwargs,
+    )
 
+
+# ---------------------------------------------------------------------------
+# Vision LLM calls
+# ---------------------------------------------------------------------------
 
 def call_vision_llm(
     base64_image: str,
@@ -53,22 +81,51 @@ def call_vision_llm(
     model: str,
     api_key: str,
     system_prompt: str,
-    user_message: str
+    user_message: str,
 ) -> Optional[Dict]:
-    """Call a vision-capable LLM via HTTP to extract data from an image."""
+    """Call a vision-capable LLM and return parsed JSON, or None on failure.
+
+    Returns the parsed JSON dict (not the raw text) to preserve the original
+    function's contract — callers in extractor.py expect a dict.
+    """
     try:
-        if provider == 'deepseek':
-            return _call_deepseek_vision(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'openai':
-            return _call_openai_vision(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'gemini':
-            return _call_gemini_vision(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'anthropic':
-            return _call_anthropic_vision(base64_image, model, api_key, system_prompt, user_message)
-        else:
+        if provider not in VISION_CAPABLE_PROVIDERS:
             logger.error(f"[ChemExtract] Unsupported vision provider: {provider}")
             return None
-    except Exception as e:
+
+        client = LLMClient(provider=provider, api_key=api_key, model=model, timeout=300)
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_message},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{base64_image}"},
+                    },
+                ],
+            },
+        ]
+
+        def _do_call():
+            text = client.vision(
+                messages,
+                temperature=EXTRACTION_TEMPERATURE,
+                max_tokens=MAX_OUTPUT_TOKENS,
+                response_format={"type": "json_object"},
+                seed=EXTRACTION_SEED,
+            )
+            if text is None:
+                return None
+            return _parse_json_response(text)
+
+        return _retry_on_failure(_do_call)
+    except (ValueError, KeyError, TypeError, RuntimeError) as e:
+        # JSON parse errors, unexpected response shapes, or retry-exhausted
+        # RuntimeError from _retry_on_failure. VisionNotSupportedError is
+        # raised before the try block, so it propagates correctly.
         logger.error(f"[ChemExtract] Vision LLM call failed: {e}")
         return None
 
@@ -79,445 +136,195 @@ async def call_vision_llm_async(
     model: str,
     api_key: str,
     system_prompt: str,
-    user_message: str
+    user_message: str,
 ) -> Optional[Dict]:
-    """Async call to a vision-capable LLM via HTTP."""
+    """Async vision LLM call. See ``call_vision_llm``."""
     try:
-        if provider == 'deepseek':
-            return await _call_deepseek_vision_async(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'openai':
-            return await _call_openai_vision_async(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'gemini':
-            return await _call_gemini_vision_async(base64_image, model, api_key, system_prompt, user_message)
-        elif provider == 'anthropic':
-            return await _call_anthropic_vision_async(base64_image, model, api_key, system_prompt, user_message)
-        else:
+        if provider not in VISION_CAPABLE_PROVIDERS:
             logger.error(f"[ChemExtract] Unsupported vision provider: {provider}")
             return None
-    except Exception as e:
+
+        client = LLMClient(provider=provider, api_key=api_key, model=model, timeout=300)
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_message},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{base64_image}"},
+                    },
+                ],
+            },
+        ]
+
+        async def _do_call():
+            text = await client.vision_async(
+                messages,
+                temperature=EXTRACTION_TEMPERATURE,
+                max_tokens=MAX_OUTPUT_TOKENS,
+                response_format={"type": "json_object"},
+                seed=EXTRACTION_SEED,
+            )
+            if text is None:
+                return None
+            return _parse_json_response(text)
+
+        return await _retry_on_failure_async(_do_call)
+    except (ValueError, KeyError, TypeError, RuntimeError) as e:
         logger.error(f"[ChemExtract] Async vision LLM call failed: {e}")
         return None
-
-
-def _call_deepseek_vision(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [
-                {"type": "text", "text": user_message},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
-            ]},
-        ],
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "seed": EXTRACTION_SEED,
-        "response_format": {"type": "json_object"},
-    }
-    def _do_call():
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['choices'][0]['message']['content']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] DeepSeek API error: {response.status_code}")
-            return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] DeepSeek vision request error: {e}")
-            return None
-    return _retry_on_failure(_do_call)
-
-
-async def _call_deepseek_vision_async(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [
-                {"type": "text", "text": user_message},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
-            ]},
-        ],
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "seed": EXTRACTION_SEED,
-        "response_format": {"type": "json_object"},
-    }
-    async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['choices'][0]['message']['content']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] DeepSeek async vision error: {e}")
-            return None
-    return await _retry_on_failure_async(_do_call)
-
-
-def _call_openai_vision(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [
-                {"type": "text", "text": user_message},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}", "detail": "high"}}
-            ]},
-        ],
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "seed": EXTRACTION_SEED,
-        "response_format": {"type": "json_object"},
-    }
-    def _do_call():
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['choices'][0]['message']['content']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] OpenAI API error: {response.status_code}")
-            return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] OpenAI vision request error: {e}")
-            return None
-    return _retry_on_failure(_do_call)
-
-
-async def _call_openai_vision_async(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [
-                {"type": "text", "text": user_message},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}", "detail": "high"}}
-            ]},
-        ],
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "seed": EXTRACTION_SEED,
-        "response_format": {"type": "json_object"},
-    }
-    async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['choices'][0]['message']['content']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] OpenAI async vision error: {e}")
-            return None
-    return await _retry_on_failure_async(_do_call)
-
-
-def _call_gemini_vision(base64_image, model, api_key, system_prompt, user_message):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [
-            {"text": f"{system_prompt}\n\n{user_message}"},
-            {"inline_data": {"mime_type": "image/png", "data": base64_image}}
-        ]}],
-        "generationConfig": {
-            "temperature": EXTRACTION_TEMPERATURE,
-            "maxOutputTokens": MAX_OUTPUT_TOKENS,
-            "seed": EXTRACTION_SEED,
-            "responseMimeType": "application/json",
-        }
-    }
-    def _do_call():
-        try:
-            response = requests.post(url, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['candidates'][0]['content']['parts'][0]['text']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] Gemini API error: {response.status_code}")
-            return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Gemini vision request error: {e}")
-            return None
-    return _retry_on_failure(_do_call)
-
-
-async def _call_gemini_vision_async(base64_image, model, api_key, system_prompt, user_message):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [
-            {"text": f"{system_prompt}\n\n{user_message}"},
-            {"inline_data": {"mime_type": "image/png", "data": base64_image}}
-        ]}],
-        "generationConfig": {
-            "temperature": EXTRACTION_TEMPERATURE,
-            "maxOutputTokens": MAX_OUTPUT_TOKENS,
-            "seed": EXTRACTION_SEED,
-            "responseMimeType": "application/json",
-        }
-    }
-    async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['candidates'][0]['content']['parts'][0]['text']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Gemini async vision error: {e}")
-            return None
-    return await _retry_on_failure_async(_do_call)
-
-
-def _call_anthropic_vision(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.anthropic.com/v1/messages"
-    headers = {
-        "x-api-key": api_key,
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-        "anthropic-beta": "prompt-caching-2024-07-31",
-    }
-    payload = {
-        "model": model,
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "system": system_prompt,
-        "messages": [{"role": "user", "content": [
-            {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": base64_image}},
-            {"type": "text", "text": user_message}
-        ]}]
-    }
-    def _do_call():
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['content'][0]['text']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] Anthropic API error: {response.status_code}")
-            return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Anthropic vision request error: {e}")
-            return None
-    return _retry_on_failure(_do_call)
-
-
-async def _call_anthropic_vision_async(base64_image, model, api_key, system_prompt, user_message):
-    url = "https://api.anthropic.com/v1/messages"
-    headers = {
-        "x-api-key": api_key,
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-        "anthropic-beta": "prompt-caching-2024-07-31",
-    }
-    payload = {
-        "model": model,
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "system": system_prompt,
-        "messages": [{"role": "user", "content": [
-            {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": base64_image}},
-            {"type": "text", "text": user_message}
-        ]}]
-    }
-    async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['content'][0]['text']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Anthropic async vision error: {e}")
-            return None
-    return await _retry_on_failure_async(_do_call)
 
 
 # ---------------------------------------------------------------------------
 # Text LLM calls
 # ---------------------------------------------------------------------------
 
-def _build_text_payload(provider, model, text):
-    user_content = f"Extract ALL chemical reactions and compounds from this text. List EVERY reaction as a separate entry:\n\n{text}"
-    return {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT_COMPREHENSIVE},
-            {"role": "user", "content": user_content},
-        ],
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "seed": EXTRACTION_SEED,
-        "response_format": {"type": "json_object"},
-    }
+def _build_text_messages(text: str):
+    """Build the standard ChemExtract text-extraction messages list."""
+    user_content = (
+        "Extract ALL chemical reactions and compounds from this text. "
+        "List EVERY reaction as a separate entry:\n\n" + text
+    )
+    return [
+        {"role": "system", "content": SYSTEM_PROMPT_COMPREHENSIVE},
+        {"role": "user", "content": user_content},
+    ]
 
 
-def _call_text_provider(provider, model, api_key, text):
-    urls = {
-        'deepseek': "https://api.deepseek.com/v1/chat/completions",
-        'openai': "https://api.openai.com/v1/chat/completions",
-    }
-    url = urls.get(provider, f"https://api.{provider}.com/v1/chat/completions")
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = _build_text_payload(provider, model, text)
+def _call_text_provider(
+    provider: str,
+    model: str,
+    api_key: str,
+    text: str,
+) -> Optional[Dict]:
+    """Text LLM call for OpenAI-compatible providers (deepseek, openai).
+
+    Delegates to LLMClient.chat with JSON-mode response_format.
+    """
+    client = LLMClient(provider=provider, api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     def _do_call():
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['choices'][0]['message']['content']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] {provider} API error: {response.status_code}")
+        result = client.chat(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            response_format={"type": "json_object"},
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] {provider} text request error: {e}")
-            return None
+        return _parse_json_response(result)
+
     return _retry_on_failure(_do_call)
 
 
-async def _call_text_provider_async(provider, model, api_key, text):
-    urls = {
-        'deepseek': "https://api.deepseek.com/v1/chat/completions",
-        'openai': "https://api.openai.com/v1/chat/completions",
-    }
-    url = urls.get(provider, f"https://api.{provider}.com/v1/chat/completions")
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = _build_text_payload(provider, model, text)
+async def _call_text_provider_async(
+    provider: str,
+    model: str,
+    api_key: str,
+    text: str,
+) -> Optional[Dict]:
+    """Async text LLM call for OpenAI-compatible providers."""
+    client = LLMClient(provider=provider, api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['choices'][0]['message']['content']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] {provider} async text error: {e}")
+        result = await client.chat_async(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            response_format={"type": "json_object"},
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
+        return _parse_json_response(result)
+
     return await _retry_on_failure_async(_do_call)
 
 
-def _call_gemini_text(text, model, api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    user_content = f"Extract ALL chemical reactions and compounds from this text. List EVERY reaction as a separate entry:\n\n{text}"
-    payload = {
-        "contents": [{"parts": [{"text": f"{SYSTEM_PROMPT_COMPREHENSIVE}\n\n{user_content}"}]}],
-        "generationConfig": {
-            "temperature": EXTRACTION_TEMPERATURE,
-            "maxOutputTokens": MAX_OUTPUT_TOKENS,
-            "seed": EXTRACTION_SEED,
-            "responseMimeType": "application/json",
-        }
-    }
+def _call_gemini_text(text: str, model: str, api_key: str) -> Optional[Dict]:
+    """Text LLM call for Gemini. Delegates to LLMClient.chat."""
+    client = LLMClient(provider='gemini', api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     def _do_call():
-        try:
-            response = requests.post(url, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['candidates'][0]['content']['parts'][0]['text']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] Gemini API error: {response.status_code}")
+        result = client.chat(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            response_format={"type": "json_object"},  # LLMClient translates to responseMimeType
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Gemini text request error: {e}")
-            return None
+        return _parse_json_response(result)
+
     return _retry_on_failure(_do_call)
 
 
-async def _call_gemini_text_async(text, model, api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    user_content = f"Extract ALL chemical reactions and compounds from this text. List EVERY reaction as a separate entry:\n\n{text}"
-    payload = {
-        "contents": [{"parts": [{"text": f"{SYSTEM_PROMPT_COMPREHENSIVE}\n\n{user_content}"}]}],
-        "generationConfig": {
-            "temperature": EXTRACTION_TEMPERATURE,
-            "maxOutputTokens": MAX_OUTPUT_TOKENS,
-            "seed": EXTRACTION_SEED,
-            "responseMimeType": "application/json",
-        }
-    }
+async def _call_gemini_text_async(text: str, model: str, api_key: str) -> Optional[Dict]:
+    """Async text LLM call for Gemini."""
+    client = LLMClient(provider='gemini', api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['candidates'][0]['content']['parts'][0]['text']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Gemini async text error: {e}")
+        result = await client.chat_async(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            response_format={"type": "json_object"},
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
+        return _parse_json_response(result)
+
     return await _retry_on_failure_async(_do_call)
 
 
-def _call_anthropic_text(text, model, api_key):
-    url = "https://api.anthropic.com/v1/messages"
-    headers = {
-        "x-api-key": api_key,
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-    }
-    user_content = f"Extract ALL chemical reactions and compounds from this text. List EVERY reaction as a separate entry:\n\n{text}"
-    payload = {
-        "model": model,
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "system": SYSTEM_PROMPT_COMPREHENSIVE,
-        "messages": [{"role": "user", "content": user_content}]
-    }
+def _call_anthropic_text(text: str, model: str, api_key: str) -> Optional[Dict]:
+    """Text LLM call for Anthropic. Delegates to LLMClient.chat.
+
+    Note: Anthropic doesn't support response_format natively, so JSON mode
+    is requested via the prompt (SYSTEM_PROMPT_COMPREHENSIVE instructs
+    JSON output) and the response is parsed with _parse_json_response.
+    """
+    client = LLMClient(provider='anthropic', api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     def _do_call():
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            if response.status_code == 200:
-                content = response.json()['content'][0]['text']
-                return _parse_json_response(content)
-            logger.error(f"[ChemExtract] Anthropic API error: {response.status_code}")
+        result = client.chat(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Anthropic text request error: {e}")
-            return None
+        return _parse_json_response(result)
+
     return _retry_on_failure(_do_call)
 
 
-async def _call_anthropic_text_async(text, model, api_key):
-    url = "https://api.anthropic.com/v1/messages"
-    headers = {
-        "x-api-key": api_key,
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-    }
-    user_content = f"Extract ALL chemical reactions and compounds from this text. List EVERY reaction as a separate entry:\n\n{text}"
-    payload = {
-        "model": model,
-        "max_tokens": MAX_OUTPUT_TOKENS,
-        "temperature": EXTRACTION_TEMPERATURE,
-        "system": SYSTEM_PROMPT_COMPREHENSIVE,
-        "messages": [{"role": "user", "content": user_content}]
-    }
+async def _call_anthropic_text_async(text: str, model: str, api_key: str) -> Optional[Dict]:
+    """Async text LLM call for Anthropic."""
+    client = LLMClient(provider='anthropic', api_key=api_key, model=model, timeout=300)
+    messages = _build_text_messages(text)
+
     async def _do_call():
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=300)) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        content = data['content'][0]['text']
-                        return _parse_json_response(content)
-                    return None
-        except Exception as e:
-            logger.error(f"[ChemExtract] Anthropic async text error: {e}")
+        result = await client.chat_async(
+            messages,
+            temperature=EXTRACTION_TEMPERATURE,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            seed=EXTRACTION_SEED,
+        )
+        if result is None:
             return None
+        return _parse_json_response(result)
+
     return await _retry_on_failure_async(_do_call)

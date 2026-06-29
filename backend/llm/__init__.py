@@ -11,6 +11,14 @@ from .helpers import (
     explain_concept,
     explain_concept_async,
 )
+from .client import (
+    LLMClient,
+    VISION_CAPABLE_PROVIDERS,
+    PROVIDER_DEFAULT_MODELS,
+    ALL_PROVIDERS,
+    UnsupportedProviderError,
+    VisionNotSupportedError,
+)
 from .prompts import (
     NICOBOT_SYSTEM_PROMPT,
     REDOX_SYSTEM_PROMPT,
@@ -20,6 +28,12 @@ from .prompts import (
 
 __all__ = [
     'LLMProviderFactory',
+    'LLMClient',
+    'VISION_CAPABLE_PROVIDERS',
+    'PROVIDER_DEFAULT_MODELS',
+    'ALL_PROVIDERS',
+    'UnsupportedProviderError',
+    'VisionNotSupportedError',
     'get_llm_response',
     'get_llm_response_async',
     'generate_knowledge_graph',

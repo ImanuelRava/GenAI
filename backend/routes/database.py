@@ -46,6 +46,8 @@ def database_status():
             'loaded': db._loaded,
             'statistics': stats
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Database status error: {e}")
         return jsonify({
@@ -81,6 +83,8 @@ def search_compounds():
             'count': len(results),
             'results': results
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Compound search error: {e}")
         raise APIError(f"Search error: {str(e)}", 500)
@@ -108,6 +112,8 @@ def search_papers():
             'count': len(results),
             'results': results
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Paper search error: {e}")
         raise APIError(f"Search error: {str(e)}", 500)
@@ -137,6 +143,8 @@ def get_compound(smiles: str):
         else:
             raise NotFoundError(f"Compound not found: {smiles}")
     except NotFoundError:
+        raise
+    except (KeyboardInterrupt, SystemExit):
         raise
     except Exception as e:
         logger.error(f"Get compound error: {e}")
@@ -170,6 +178,8 @@ def get_paper(doi: str):
             raise NotFoundError(f"Paper not found: {doi}")
     except NotFoundError:
         raise
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get paper error: {e}")
         raise APIError(f"Error: {str(e)}", 500)
@@ -200,6 +210,8 @@ def get_related_papers(doi: str):
                 for p in related
             ]
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get related papers error: {e}")
         raise APIError(f"Error: {str(e)}", 500)
@@ -219,6 +231,8 @@ def get_leaving_groups():
             'success': True,
             'leaving_groups': lgs
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get leaving groups error: {e}")
         raise APIError(f"Error: {str(e)}", 500)
@@ -239,6 +253,8 @@ def get_reactions():
             'count': len(reactions),
             'reactions': reactions
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get reactions error: {e}")
         raise APIError(f"Error: {str(e)}", 500)
@@ -270,6 +286,8 @@ def get_context():
                 'formatted_context': context.formatted_context
             }
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get context error: {e}")
         raise APIError(f"Error: {str(e)}", 500)
@@ -289,6 +307,8 @@ def get_statistics():
             'success': True,
             'statistics': stats
         })
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Get statistics error: {e}")
         raise APIError(f"Error: {str(e)}", 500)

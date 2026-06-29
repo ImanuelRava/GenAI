@@ -163,6 +163,8 @@ def analyze_network():
 
     except APIError:
         raise
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Network analysis error: {e}", exc_info=True)
         raise APIError('An internal error occurred during analysis', 500)

@@ -32,6 +32,8 @@ def register_redox_blueprint(app, limiter):
 
         except ValidationError as e:
             return jsonify({'success': False, 'error': str(e)}), 400
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"RAL chat error: {e}", exc_info=True)
             return jsonify({'success': False, 'error': f'Error: {str(e)}'}), 500
@@ -49,6 +51,8 @@ def register_redox_blueprint(app, limiter):
 
         except ValidationError as e:
             return jsonify({'success': False, 'error': str(e)}), 400
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"RAL async chat error: {e}", exc_info=True)
             return jsonify({'success': False, 'error': f'Error: {str(e)}'}), 500

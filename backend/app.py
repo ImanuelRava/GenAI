@@ -193,6 +193,16 @@ def redox_files(filename):
     return send_from_directory(os.path.join(config.static_folder, 'redox-ligands'), filename)
 
 
+@app.route('/technical-modules/')
+def technical_modules_index():
+    return send_from_directory(os.path.join(config.static_folder, 'technical-modules'), 'index.html')
+
+
+@app.route('/technical-modules/<path:filename>')
+def technical_modules_files(filename):
+    return send_from_directory(os.path.join(config.static_folder, 'technical-modules'), filename)
+
+
 # ---------------------------------------------------------------------------
 # Register route blueprints
 # ---------------------------------------------------------------------------
@@ -257,4 +267,18 @@ logging.info(f"[STARTUP] Registered API blueprints: {_db_msg}")
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # SECURITY: prefer `python wsgi.py` for local dev — this entry point is kept
+    # for backwards compatibility. Debug mode is gated behind FLASK_DEBUG=1 and
+    # is forced to 127.0.0.1 to avoid exposing the Werkzeug debugger (RCE risk).
+    is_replit = bool(os.environ.get('REPL_ID') or os.environ.get('REPL_SLUG'))
+    debug = os.environ.get('FLASK_DEBUG', '0') == '1'
+    default_host = '0.0.0.0' if is_replit else '127.0.0.1'
+    host = os.environ.get('FLASK_HOST', default_host)
+    default_port = os.environ.get('PORT', '5000') if is_replit else '5000'
+    port = int(os.environ.get('FLASK_PORT') or default_port)
+    if debug and host not in ('127.0.0.1', 'localhost'):
+        logging.warning(
+            "FLASK_DEBUG=1 with FLASK_HOST=%s — forcing 127.0.0.1 to avoid RCE.", host
+        )
+        host = '127.0.0.1'
+    app.run(debug=debug, host=host, port=port)

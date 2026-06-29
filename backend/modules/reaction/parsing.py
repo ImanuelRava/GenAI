@@ -199,7 +199,9 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
     try:
         from chemextract.pdf_processor import extract_text_from_pdf as _ce_extract
         return _ce_extract(file_path)
-    except Exception as e:
+    except (ImportError, OSError, ValueError, RuntimeError) as e:
+        # ImportError: chemextract not installed. OSError/ValueError/RuntimeError:
+        # PDF parse failures. Fall through to the next backend.
         logger.debug(f"[ReactionLens] ChemExtract text extraction not available: {e}")
 
     # Fallback implementations
@@ -214,7 +216,7 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
                     text += page_text + "\n\n"
             if text.strip():
                 return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             logger.warning(f"[ReactionLens] pypdf failed: {e}")
 
     if HAS_PDFPLUMBER:
@@ -227,7 +229,7 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
                     if page_text:
                         text += page_text + "\n\n"
             return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             logger.error(f"[ReactionLens] pdfplumber failed: {e}")
 
     if HAS_PYMUPDF:
@@ -238,7 +240,7 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
             for page in doc:
                 text += page.get_text() + "\n\n"
             return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             logger.error(f"[ReactionLens] PyMuPDF text extraction failed: {e}")
 
     raise ImportError("No PDF text extraction library available. Install pypdf, pdfplumber, or PyMuPDF.")

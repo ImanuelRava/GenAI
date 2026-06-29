@@ -7,16 +7,10 @@ via the messages parameter of get_llm_response / get_llm_response_async.
 
 import logging
 from flask import Blueprint, request, jsonify
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from core.errors import ValidationError
-from core.utils import sanitize_input
 
-from llm.prompts import NICOBOT_SYSTEM_PROMPT, EXPLAIN_SYSTEM_PROMPT
 from llm import get_llm_response, get_llm_response_async
-from llm.knowledge_graph import generate_mock_knowledge_graph
-from llm.helpers import generate_knowledge_graph, generate_knowledge_graph_async
 
 from .helpers import (
     extract_chat_params,
@@ -75,6 +69,8 @@ def register_nicobot_blueprint(app, limiter):
 
         except ValidationError as e:
             return jsonify({'success': False, 'error': str(e)}), 400
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"NiCOBot chat error: {e}", exc_info=True)
             return jsonify({'success': False, 'error': f'Error communicating with LLM: {str(e)}'}), 500
@@ -115,6 +111,8 @@ def register_nicobot_blueprint(app, limiter):
 
         except ValidationError as e:
             return jsonify({'success': False, 'error': str(e)}), 400
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"NiCOBot async chat error: {e}", exc_info=True)
             return jsonify({'success': False, 'error': f'Error communicating with LLM: {str(e)}'}), 500

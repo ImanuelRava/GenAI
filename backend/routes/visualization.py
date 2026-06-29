@@ -62,6 +62,8 @@ def api_gnn_graph():
         num_nodes = max(2, min(num_nodes, 50))
         data = _mod_gnn.generate_sample_graph(num_nodes)
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"GNN graph error: {e}")
         raise APIError(f"Error generating graph: {str(e)}", 500)
@@ -78,6 +80,8 @@ def api_gnn_message_passing():
         current_step = data.get('currentStep', 0)
         result = _mod_gnn.simulate_message_passing(nodes, edges, current_step)
         return jsonify({'success': True, 'data': result})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Message passing error: {e}")
         raise APIError(f"Error simulating message passing: {str(e)}", 500)
@@ -90,6 +94,8 @@ def api_gnn_molecule(molecule_type: str):
     try:
         data = _mod_gnn.get_molecule_data(molecule_type)
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Molecule data error: {e}")
         raise APIError(f"Error getting molecule data: {str(e)}", 500)
@@ -102,6 +108,8 @@ def api_gnn_embeddings():
     try:
         data = _mod_gnn.get_gnn_embedding_demo()
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"GNN embeddings error: {e}")
         raise APIError(f"Error getting embeddings: {str(e)}", 500)
@@ -119,12 +127,15 @@ def api_pca_data(data_type: str):
         n_samples = request.args.get('samples', 60, type=int)
         n_samples = max(10, min(n_samples, 500))
 
-        valid_data_types = ['clustered', 'linear', 'circular', 'structured']
+        # Must match the data_types handled by modules.pca_viz.generate_2d_data.
+        valid_data_types = ['clusters', 'clustered', 'linear', 'circular', 'structured']
         if data_type not in valid_data_types:
             data_type = 'structured'
 
         data = _mod_pca.generate_2d_data(data_type, n_samples)
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"PCA data error: {e}")
         raise APIError(f"Error generating PCA data: {str(e)}", 500)
@@ -139,12 +150,15 @@ def api_pca_scree():
         num_features = max(2, min(num_features, 100))
 
         data_type = request.args.get('type', 'structured')
-        valid_data_types = ['structured', 'random', 'linear']
+        # Must match the data_types handled by modules.pca_viz.generate_scree_data.
+        valid_data_types = ['structured', 'moderate', 'linear', 'random']
         if data_type not in valid_data_types:
             data_type = 'structured'
 
         data = _mod_pca.generate_scree_data(num_features, data_type)
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Scree data error: {e}")
         raise APIError(f"Error generating scree data: {str(e)}", 500)
@@ -157,6 +171,8 @@ def api_pca_chemistry(dataset: str):
     try:
         data = _mod_pca.get_chemistry_pca_data(dataset)
         return jsonify({'success': True, 'data': data})
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"Chemistry PCA error: {e}")
         raise APIError(f"Error getting chemistry PCA data: {str(e)}", 500)

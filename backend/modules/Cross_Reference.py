@@ -11,7 +11,9 @@ def read_dois_from_excel(excel_file_like):
     try:
         df = pd.read_excel(excel_file_like)
         return df.iloc[:, 0].dropna().tolist()
-    except Exception as e:
+    except (OSError, ValueError, KeyError) as e:
+        # OSError: file not found / permission denied. ValueError: not an
+        # Excel file / corrupt file. KeyError: empty DataFrame (no columns).
         logger.error(f"Error reading Excel file: {e}")
         return []
 
@@ -34,7 +36,9 @@ def fetch_all_details(dois, progress_callback=None):
                 "ref_count": ref_count,
                 "title": title
             }
-        except Exception as e:
+        except (ValueError, RuntimeError) as e:
+            # get_paper_details raises ValueError for DOI-not-found and
+            # RuntimeError for network/parse errors. Continue to next DOI.
             logger.error(f"Error fetching details for DOI {doi}: {e}")
             continue
     return details, labels

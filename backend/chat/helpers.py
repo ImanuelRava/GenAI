@@ -78,7 +78,10 @@ def build_nicobot_system_prompt(message: str, use_rag: bool,
                     f"{len(context.compounds)} compounds, {len(context.papers)} papers"
                 )
                 return system_prompt, database_context
-        except Exception as e:
+        except (ImportError, OSError, ValueError, KeyError, AttributeError) as e:
+            # ImportError: nicobot_rag module not available. OSError: data
+            # files missing. ValueError/KeyError/AttributeError: unexpected
+            # data structure. Fall back to base prompt — chat continues.
             logger.warning(f"[{log_prefix}] RAG error: {e}. Falling back to base prompt.")
 
     return NICOBOT_SYSTEM_PROMPT, None

@@ -3,7 +3,19 @@ from typing import Dict, List, Any, Tuple
 
 
 def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
+    """Generate 2D data for PCA visualization.
+
+    Recognized ``data_type`` values (matching ``routes/visualization.py``):
+      - ``'clusters'`` / ``'clustered'``: two Gaussian clusters
+      - ``'linear'``: points scattered around a linear trend
+      - ``'circular'``: points on a noisy ring
+      - ``'structured'`` / anything else: random Gaussian
+    """
     np.random.seed(42)
+
+    # Normalize aliases so callers can use singular or plural forms.
+    if data_type == 'clustered':
+        data_type = 'clusters'
 
     if data_type == 'clusters':
         n_per_cluster = n_samples // 2
@@ -24,7 +36,16 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
         Y = t * 0.7 + np.random.randn(n_samples) * 0.8
         labels = [0] * n_samples
 
+    elif data_type == 'circular':
+        # Points on a noisy ring of radius ~3.
+        angles = np.linspace(0, 2 * np.pi, n_samples, endpoint=False)
+        radius = 3.0 + np.random.randn(n_samples) * 0.3
+        X = radius * np.cos(angles)
+        Y = radius * np.sin(angles)
+        labels = [0] * n_samples
+
     else:
+        # 'structured' and any unknown type → random Gaussian blob.
         X = np.random.randn(n_samples) * 2
         Y = np.random.randn(n_samples) * 2
         labels = [0] * n_samples
@@ -105,6 +126,14 @@ def generate_2d_data(data_type: str, n_samples: int = 60) -> Dict[str, Any]:
 
 
 def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
+    """Generate scree-plot eigenvalue data.
+
+    Recognized ``data_type`` values (matching ``routes/visualization.py``):
+      - ``'structured'``: steep decay (top PC dominates)
+      - ``'moderate'``: gradual decay
+      - ``'linear'``: near-flat decay (all PCs roughly equal)
+      - ``'random'`` / anything else: shallow decay
+    """
     np.random.seed(42)
 
     if data_type == 'structured':
@@ -113,7 +142,12 @@ def generate_scree_data(num_features: int, data_type: str) -> Dict[str, Any]:
     elif data_type == 'moderate':
         base_eigenvalues = np.array([3.0, 2.5, 2.0, 1.5, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3])
 
+    elif data_type == 'linear':
+        # Near-flat decay — all PCs carry roughly equal variance.
+        base_eigenvalues = np.array([1.3, 1.25, 1.2, 1.15, 1.1, 1.05, 1.0, 0.95, 0.9, 0.85])
+
     else:
+        # 'random' and any unknown type → shallow decay.
         base_eigenvalues = np.array([1.3, 1.2, 1.1, 1.05, 1.0, 0.95, 0.9, 0.85, 0.8, 0.75])
 
     if num_features <= 10:

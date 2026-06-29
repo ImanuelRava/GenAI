@@ -20,7 +20,9 @@ def build_reference_network(pdf_path, progress_callback=None):
         main_author, main_year, main_citations, main_refs, main_title = get_paper_details(main_doi)
         G.add_node(main_doi, author=main_author or "Unknown", year=main_year or 0,
                    citations=main_citations, is_main=True, title=main_title)
-    except Exception as e:
+    except (ValueError, RuntimeError) as e:
+        # get_paper_details raises ValueError for DOI-not-found and
+        # RuntimeError for network/parse errors.
         if progress_callback: progress_callback(f"Error fetching main paper: {e}")
         return None, []
 
@@ -43,7 +45,9 @@ def build_reference_network(pdf_path, progress_callback=None):
             valid_refs.append(doi)
 
             time.sleep(0.3)
-        except Exception:
+        except (ValueError, RuntimeError):
+            # Skip references that can't be fetched (DOI not found, network
+            # error, parse error). These are expected for some references.
             continue
 
     cross_ref_limit = 20
@@ -59,7 +63,7 @@ def build_reference_network(pdf_path, progress_callback=None):
                 if c in valid_refs:
                     G.add_edge(doi, c)
             time.sleep(0.3)
-        except Exception:
+        except (ValueError, RuntimeError):
             continue
 
     all_papers_list = []

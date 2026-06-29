@@ -37,7 +37,9 @@ def _get_cached_result(pdf_path, model, provider, max_age_hours=24):
         logger.info(f"[ChemExtract] Loading cached result ({age_hours:.1f}h old)")
         with open(cache_file, "r") as f:
             return json.load(f)
-    except Exception as e:
+    except (OSError, json.JSONDecodeError, ValueError) as e:
+        # OSError: file permission / disk issues. json.JSONDecodeError:
+        # corrupt cache file. ValueError: unexpected JSON structure.
         logger.warning(f"[ChemExtract] Failed to load cache: {e}")
         return None
 
@@ -49,5 +51,7 @@ def _save_cached_result(result, pdf_path, model, provider):
         with open(cache_file, "w") as f:
             json.dump(result, f, indent=2, default=str)
         logger.info(f"[ChemExtract] Saved result to cache: {cache_file}")
-    except Exception as e:
+    except (OSError, TypeError, ValueError) as e:
+        # OSError: disk full / permission denied. TypeError: result contains
+        # non-serializable objects that json.dump can't handle with default=str.
         logger.warning(f"[ChemExtract] Failed to save cache: {e}")

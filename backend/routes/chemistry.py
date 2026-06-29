@@ -128,7 +128,9 @@ def generate_base64_mol(smiles: str) -> Optional[str]:
         AllChem.UFFOptimizeMolecule(mol)
         mol_block = Chem.MolToMolBlock(mol)
         return base64.b64encode(mol_block.encode('utf-8')).decode('utf-8')
-    except Exception as e:
+    except (ValueError, RuntimeError, AttributeError, KeyError) as e:
+        # ValueError: invalid SMILES. RuntimeError: 3D embedding / force-field
+        # optimization failure. AttributeError/KeyError: unexpected mol object.
         logger.error(f"Error generating molecule: {e}")
         return None
 
@@ -146,7 +148,10 @@ def generate_reaction_image(reaction_smarts: str, width: int = 600, height: int 
         buffer = io.BytesIO()
         img.save(buffer, format='PNG')
         return base64.b64encode(buffer.getvalue()).decode('utf-8')
-    except Exception as e:
+    except (ValueError, RuntimeError, AttributeError, KeyError, OSError) as e:
+        # ValueError: invalid SMARTS. RuntimeError: RDKit rendering failure.
+        # AttributeError/KeyError: unexpected rxn object. OSError: PIL image
+        # save failure (disk full, etc.).
         logger.error(f"Error generating reaction: {e}")
         return None
 

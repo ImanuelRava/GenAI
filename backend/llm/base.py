@@ -125,8 +125,13 @@ class BaseLLMProvider(ABC):
         except requests.exceptions.Timeout:
             logger.error("LLM request timed out")
             return None
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             logger.error(f"LLM request error: {e}")
+            return None
+        except (ValueError, KeyError, TypeError) as e:
+            # JSON decode errors (ValueError), unexpected response shapes
+            # (KeyError), or None where a dict was expected (TypeError).
+            logger.error(f"LLM response parse error: {e}")
             return None
 
     async def _make_request_async(
@@ -156,6 +161,6 @@ class BaseLLMProvider(ABC):
         except aiohttp.ClientError as e:
             logger.error(f"LLM async request error: {e}")
             return None
-        except Exception as e:
-            logger.error(f"LLM async request error: {e}")
+        except (ValueError, KeyError, TypeError) as e:
+            logger.error(f"LLM async response parse error: {e}")
             return None

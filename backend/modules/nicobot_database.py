@@ -82,27 +82,22 @@ class NiCOBotDatabase:
             logger.info(f"NiCOBot Database loaded: {len(self.electrophiles)} electrophiles, "
                        f"{len(self.nucleophiles)} nucleophiles, {len(self.papers)} papers")
             return True
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, KeyError, ValueError, TypeError) as e:
+            # OSError: missing/unreadable data files. json.JSONDecodeError:
+            # corrupt JSON. KeyError/ValueError/TypeError: unexpected JSON
+            # structure (missing required keys, wrong types).
             logger.error(f"Failed to load NiCOBot database: {e}")
             return False
 
     def _load_electrophiles(self):
-        """Load electrophile data."""
-        lvg_path = self.data_dir / 'E_LVG.json'
-        if lvg_path.exists():
-            with open(lvg_path) as f:
-                lvg_data = json.load(f)
+        """Load electrophile data.
 
-        major_path = self.data_dir / 'E_Major.json'
-        if major_path.exists():
-            with open(major_path) as f:
-                major_data = json.load(f)
-
-        type_path = self.data_dir / 'E_Type.json'
-        if type_path.exists():
-            with open(type_path) as f:
-                type_data = json.load(f)
-
+        Only ``E_LVG_name_smiles.json`` is used here — the ``E_LVG.json``,
+        ``E_Major.json`` and ``E_Type.json`` files contain aggregate
+        statistics that this class does not currently index (they were
+        previously loaded but the loaded variables were never referenced,
+        which was pure I/O waste).
+        """
         smiles_path = self.data_dir / 'E_LVG_name_smiles.json'
         if smiles_path.exists():
             with open(smiles_path) as f:
@@ -123,22 +118,12 @@ class NiCOBotDatabase:
                     )
 
     def _load_nucleophiles(self):
-        """Load nucleophile data."""
-        lvg_path = self.data_dir / 'Nu_LVG.json'
-        if lvg_path.exists():
-            with open(lvg_path) as f:
-                lvg_data = json.load(f)
+        """Load nucleophile data.
 
-        major_path = self.data_dir / 'Nu_Major.json'
-        if major_path.exists():
-            with open(major_path) as f:
-                major_data = json.load(f)
-
-        type_path = self.data_dir / 'Nu_Type.json'
-        if type_path.exists():
-            with open(type_path) as f:
-                type_data = json.load(f)
-
+        Only ``Nu_LVG_name_smiles.json`` is used here — see
+        :meth:`_load_electrophiles` for the rationale on why the other
+        Nu_*.json files are intentionally not loaded.
+        """
         smiles_path = self.data_dir / 'Nu_LVG_name_smiles.json'
         if smiles_path.exists():
             with open(smiles_path) as f:
@@ -190,7 +175,10 @@ class NiCOBotDatabase:
                             self.papers[doi].authors = row.get('last_author', '')
                             self.papers[doi].reaction_type = row.get('Reaction Type', '')
                             self.papers[doi].strength = row.get('Strength', '')
-            except Exception as e:
+            except (OSError, ValueError, KeyError) as e:
+                # OSError: file not readable. ValueError: malformed CSV.
+                # KeyError: missing expected column. Log and continue — the
+                # papers loaded from results_modify_add.json are still usable.
                 logger.warning(f"Could not load citation nodes: {e}")
 
     def _load_reactions(self):
@@ -401,6 +389,7 @@ class NiCOBotDatabase:
     def get_cross_coupling_info(self) -> str:
         """Get general information about cross-coupling reactions."""
         return """
+### Common Cross-Coupling Reactions
 
 - Suzuki coupling: Organoboron + Organic halide (Pd/Ni catalyst)
 - Heck reaction: Aryl halide + Alkene (Pd catalyst)
@@ -410,6 +399,7 @@ class NiCOBotDatabase:
 - Negishi coupling: Organozinc + Organic halide (Pd/Ni catalyst)
 - Hiyama coupling: Organosilane + Organic halide (Pd catalyst)
 
+### Common Leaving Groups
 
 - Triflate (OTf): Excellent leaving group, very reactive
 - Tosylate (OTs): Good leaving group, stable
@@ -417,6 +407,7 @@ class NiCOBotDatabase:
 - Acetate (OAc): Moderate leaving group
 - Phenolates: Can be activated with Ni catalysts
 
+### Common Nucleophiles
 
 - Boronic acids/esters: Suzuki coupling
 - Grignard reagents: Kumada coupling

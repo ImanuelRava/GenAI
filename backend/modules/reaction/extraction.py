@@ -130,7 +130,11 @@ def extract_with_reactionlens(
         logger.info(f"[ReactionLens] Screening paragraph {i + 1}/{len(paragraphs)} ({len(para['text'])} chars)...")
         try:
             result = rl_call_text(para["text"], provider, model, api_key, REACTION_DETECTION_PROMPT)
-        except Exception as e:
+        except (ValueError, KeyError, TypeError, RuntimeError, ConnectionError) as e:
+            # LLM call failures: JSON parse errors (ValueError), unexpected
+            # response shapes (KeyError/TypeError), retry-exhausted errors
+            # (RuntimeError), network errors (ConnectionError). Skip this
+            # paragraph and continue with the next.
             logger.warning(f"[ReactionLens] LLM call failed for paragraph {i + 1}: {e}")
             continue
         if result is None or not result.get("has_reactions", False):
@@ -189,7 +193,7 @@ async def extract_with_reactionlens_async(
     async def screen_paragraph(para):
         try:
             return await rl_call_text_async(para["text"], provider, model, api_key, REACTION_DETECTION_PROMPT)
-        except Exception as e:
+        except (ValueError, KeyError, TypeError, RuntimeError, ConnectionError) as e:
             logger.warning(f"[ReactionLens Async] LLM call failed for paragraph {para['index']}: {e}")
             return None
 
@@ -269,8 +273,11 @@ class ReactionLens:
         try:
             from chemextract.reaction_formatter import format_reaction_schemes
             return format_reaction_schemes(extraction_result)
-        except Exception:
-            pass
+        except (ImportError, ValueError, KeyError, TypeError) as e:
+            # ImportError: chemextract not installed. ValueError/KeyError/
+            # TypeError: unexpected extraction_result shape. Fall through to
+            # the manual formatting below.
+            logger.debug(f"[ReactionLens] format_reaction_schemes fallback: {e}")
         formatted = []
         for rxn in extraction_result.get("reactions", []):
             reactants = [r.get("smiles") or r.get("name", "?") for r in rxn.get("reactants", [])

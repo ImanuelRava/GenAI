@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Modules | GenAI Research</title>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
+    <style>
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/header.css">
+</head>
+<body class="theme-blue">
+
+    <header>
+        <div class="header-inner">
+            <a href="../index.html" class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../technical-modules/" class="active-tm">Technical Modules</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Technical Modules</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="citation">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="2"/>
+                        <circle cx="4" cy="6" r="2"/>
+                        <circle cx="20" cy="6" r="2"/>
+                        <circle cx="4" cy="18" r="2"/>
+                        <circle cx="20" cy="18" r="2"/>
+                        <line x1="10" y1="11" x2="6" y2="7.5"/>
+                        <line x1="14" y1="11" x2="18" y2="7.5"/>
+                    </svg>
+                    <span class="sidebar-item-text">Citation Network</span>
+                </li>
+                <li class="sidebar-item" data-panel="knowledge-graph">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="4" cy="8" r="2"/>
+                        <circle cx="20" cy="8" r="2"/>
+                        <circle cx="4" cy="16" r="2"/>
+                        <circle cx="20" cy="16" r="2"/>
+                        <line x1="6" y1="8" x2="9" y2="10"/>
+                        <line x1="18" y1="8" x2="15" y2="10"/>
+                        <line x1="6" y1="16" x2="9" y2="14"/>
+                        <line x1="18" y1="16" x2="15" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Knowledge Graph</span>
+                </li>
+                <li class="sidebar-item" data-panel="data-extraction">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                        <line x1="2" y1="20" x2="22" y2="20"/>
+                    </svg>
+                    <span class="sidebar-item-text">Data Extraction</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </div>
+                    <h1>Technical Modules</h1>
+                    <p class="welcome-subtitle">Advanced computational tools for chemistry research — citation analysis, AI knowledge graphs, and automated data extraction from scientific literature.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Modules</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">AI</div>
+                        <div class="stat-label">Powered</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8+</div>
+                        <div class="stat-label">LLM Providers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">PDF</div>
+                        <div class="stat-label">Supported</div>
+                    </div>
+                </div>
+
+                <h2>Available Modules</h2>
+                <p>These technical modules provide researchers with powerful tools for literature analysis, knowledge discovery, and data extraction. Each module is designed to accelerate specific aspects of computational chemistry research.</p>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="2"/>
+                                <circle cx="4" cy="6" r="2"/>
+                                <circle cx="20" cy="6" r="2"/>
+                                <circle cx="4" cy="18" r="2"/>
+                                <circle cx="20" cy="18" r="2"/>
+                                <line x1="10" y1="11" x2="6" y2="7.5"/>
+                                <line x1="14" y1="11" x2="18" y2="7.5"/>
+                            </svg>
+                        </div>
+                        <h3>Citation Network</h3>
+                        <p>Build interactive citation graphs from a single paper. Analyze forward citations (who cites this paper), backward references (what this paper cites), or cross-reference networks from a list of DOIs.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <circle cx="4" cy="8" r="2"/>
+                                <circle cx="20" cy="8" r="2"/>
+                                <circle cx="4" cy="16" r="2"/>
+                                <circle cx="20" cy="16" r="2"/>
+                                <line x1="6" y1="8" x2="9" y2="10"/>
+                                <line x1="18" y1="8" x2="15" y2="10"/>
+                                <line x1="6" y1="16" x2="9" y2="14"/>
+                                <line x1="18" y1="16" x2="15" y2="14"/>
+                            </svg>
+                        </div>
+                        <h3>Knowledge Graph</h3>
+                        <p>Generate AI-powered knowledge graphs for any chemistry topic. Enter a keyword or upload a PDF to visualize concepts, reactions, and their relationships in an interactive D3.js graph.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                                <line x1="2" y1="20" x2="22" y2="20"/>
+                            </svg>
+                        </div>
+                        <h3>Data Extraction</h3>
+                        <p>Extract chemical reactions, compounds, and conditions from scientific PDFs. Supports vision-based extraction (figures + schemes), text-based extraction (ChemExtract AI), and ReactionLens paragraph screening.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box blue">
+                    <h4>Bring Your Own API Key</h4>
+                    <p style="margin-bottom: 0;">All AI-powered modules support 8 LLM providers (DeepSeek, OpenAI, Anthropic, Gemini, Groq, HuggingFace, OpenRouter, Ollama). Configure your preferred provider and API key directly in each tool's interface — no server-side keys required.</p>
+                </div>
+            </div>
+
+            <div id="citation" class="content-panel">
+                <div class="content-header">
+                    <h2>Citation Network</h2>
+                    <p>Navigate the complex web of scientific publications through our interactive citation graph.</p>
+                </div>
+                <div class="content-body">
+                    <p>The citation network visualization enables researchers to explore the interconnected landscape of chemistry research. Identify seminal works, trace the evolution of ideas, and discover new connections between research areas.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Analysis Modes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Interactive</div>
+                            <div class="stat-label">Graph</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">PDF</div>
+                            <div class="stat-label">Input</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Excel</div>
+                            <div class="stat-label">Cross-Ref</div>
+                        </div>
+                    </div>
+
+                    <h3>Features</h3>
+                    <ul>
+                        <li><strong>Forward analysis</strong> — find papers that cite your uploaded paper</li>
+                        <li><strong>Backward analysis</strong> — find references cited by your uploaded paper</li>
+                        <li><strong>Cross-reference</strong> — build a network from a list of DOIs in an Excel file</li>
+                        <li>Interactive Cytoscape.js visualization with drag and zoom</li>
+                        <li>Suggested related papers based on citation impact and local relevance</li>
+                        <li>Powered by Crossref and OpenAlex APIs</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>How It Works</h4>
+                        <p style="margin-bottom: 0;">Upload a PDF and choose an analysis type. The tool extracts the DOI, queries Crossref for paper metadata and OpenAlex for forward citations, then builds an interactive network graph with suggested high-impact references.</p>
+                    </div>
+
+                    <a href="citation-tool.html" class="btn btn-primary">Explore Network</a>
+                </div>
+            </div>
+
+            <div id="knowledge-graph" class="content-panel">
+                <div class="content-header">
+                    <h2>Knowledge Graph</h2>
+                    <p>Explore AI-generated knowledge graphs for chemistry concepts.</p>
+                </div>
+                <div class="content-body">
+                    <p>Our interactive knowledge graph tool uses AI to automatically generate visual representations of chemical concepts, reactions, and their relationships. Simply enter a topic or upload a PDF to explore connections in transition metal catalysis and related chemistry.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">AI</div>
+                            <div class="stat-label">Powered</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Input Modes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">10+</div>
+                            <div class="stat-label">Node Types</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Interactive</div>
+                            <div class="stat-label">Visualization</div>
+                        </div>
+                    </div>
+
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Keyword-based graph generation — enter any chemistry topic</li>
+                        <li>PDF upload support — extract knowledge from papers</li>
+                        <li>Interactive D3.js visualization with drag and zoom</li>
+                        <li>Click nodes for AI-powered explanations</li>
+                        <li>Multiple LLM provider support (DeepSeek, OpenAI, Groq, Gemini, etc.)</li>
+                        <li>Customizable API key configuration</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>AI Integration</h4>
+                        <p style="margin-bottom: 0;">The knowledge graph leverages Large Language Models to generate accurate, context-aware relationships between chemical concepts. Configure your preferred API key for personalized results.</p>
+                    </div>
+
+                    <a href="knowledge-graph.html" class="btn btn-primary">Open Knowledge Graph</a>
+                </div>
+            </div>
+
+            <div id="data-extraction" class="content-panel">
+                <div class="content-header">
+                    <h2>Data Extraction</h2>
+                    <p>Automatically extract chemical reactions, compounds, and conditions from scientific literature PDFs.</p>
+                </div>
+                <div class="content-body">
+                    <p>We utilize AI-powered tools to automate the extraction of chemical information from scientific literature. The collected data is structured and can be stored in a searchable database.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Extraction Modes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Vision</div>
+                            <div class="stat-label">Capable</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">1000+</div>
+                            <div class="stat-label">Reactions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Auto</div>
+                            <div class="stat-label">Extraction</div>
+                        </div>
+                    </div>
+
+                    <h3>Capabilities</h3>
+                    <ul>
+                        <li><strong>Vision extraction</strong> — analyze embedded figures and scheme pages with vision LLMs</li>
+                        <li><strong>ChemExtract AI</strong> — comprehensive pipeline combining vision + text extraction</li>
+                        <li><strong>ReactionLens</strong> — text-driven paragraph screening for reaction data</li>
+                        <li><strong>Text extraction</strong> — raw PDF text extraction with cascading fallback (pypdf → pdfplumber → PyMuPDF)</li>
+                        <li>Named entity recognition for chemical compounds</li>
+                        <li>Reaction condition extraction (temperature, time, solvents)</li>
+                        <li>Yield and product identification</li>
+                        <li>R-group table assembly and SMILES formatting</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>Data Sources</h4>
+                        <p style="margin-bottom: 0;">We process publications from major chemistry journals including JACS, Angewandte Chemie, Organic Letters, and more. Results are cached on-disk by PDF content hash for fast repeat analysis.</p>
+                    </div>
+
+                    <a href="data-extraction.html" class="btn btn-primary">Access Data Tools</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const panels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const panelId = item.dataset.panel;
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    if (panel.id === panelId) {
+                        panel.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

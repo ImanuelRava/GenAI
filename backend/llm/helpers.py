@@ -57,7 +57,12 @@ def get_llm_response(
             return llm.chat_with_messages(messages, **chat_kwargs)
 
         return llm.chat(system_prompt, user_message, **chat_kwargs)
-    except Exception as e:
+    except (ValueError, KeyError, TypeError, ConnectionError) as e:
+        # Catch only the expected failure modes from LLM provider calls —
+        # network/HTTP errors are already caught inside llm.chat(), so this
+        # outer guard is for unexpected bugs in payload building or message
+        # extraction. Other exceptions (e.g. AttributeError from a malformed
+        # provider instance) should propagate so they're visible.
         logger.error(f"LLM Error: {e}")
         return None
 
@@ -101,7 +106,7 @@ async def get_llm_response_async(
             return await llm.chat_with_messages_async(messages, **chat_kwargs)
 
         return await llm.chat_async(system_prompt, user_message, **chat_kwargs)
-    except Exception as e:
+    except (ValueError, KeyError, TypeError, ConnectionError) as e:
         logger.error(f"LLM Async Error: {e}")
         return None
 

@@ -49,7 +49,8 @@ def api_llm_status():
         try:
             response = requests.get(f"{base_url}/api/tags", timeout=3)
             return response.status_code == 200
-        except Exception:
+        except requests.exceptions.RequestException:
+            # Connection refused, timeout, DNS failure — Ollama not running.
             return False
 
     providers_with_keys = []
@@ -146,6 +147,8 @@ def chat():
         else:
             raise LLMError("No response received from LLM")
 
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except Exception as e:
         logger.error(f"LLM chat error: {e}", exc_info=True)
         raise LLMError(f"Error communicating with LLM: {str(e)}")

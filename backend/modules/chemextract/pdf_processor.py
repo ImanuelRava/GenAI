@@ -81,9 +81,11 @@ def pdf_to_images(file_path: str, dpi: int = 150, max_pages: int = 50) -> List[T
             images.append((page_num + 1, base64_image))
         logger.info(f"[ChemExtract] Converted {len(images)} pages using PyMuPDF")
         return images
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
+        # PyMuPDF raises OSError on corrupt/encrypted PDFs, RuntimeError on
+        # rendering failures, ValueError on invalid page indices.
         logger.error(f"[ChemExtract] PyMuPDF failed: {e}")
-        raise Exception(f"Failed to convert PDF to images: {e}")
+        raise RuntimeError(f"Failed to convert PDF to images: {e}") from e
 
 
 def extract_images_from_pdf(file_path: str, dpi: int = 300) -> List[Tuple[int, bytes]]:
@@ -107,13 +109,15 @@ def extract_images_from_pdf(file_path: str, dpi: int = 300) -> List[Tuple[int, b
                     base_image = doc.extract_image(xref)
                     if base_image:
                         images.append((page_num * 1000 + img_idx, base_image["image"]))
-                except Exception:
+                except (KeyError, ValueError, OSError):
+                    # Single-image extraction failures (corrupt xref, missing
+                    # 'image' key, IO error) should not abort the whole loop.
                     pass
         logger.info(f"[ChemExtract] Extracted {len(images)} embedded images from PDF")
         return images
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.error(f"[ChemExtract] Image extraction failed: {e}")
-        raise Exception(f"Failed to extract images from PDF: {e}")
+        raise RuntimeError(f"Failed to extract images from PDF: {e}") from e
 
 
 # ---------------------------------------------------------------------------
@@ -127,7 +131,10 @@ def _image_dimensions(raw_bytes: bytes) -> Optional[Tuple[int, int]]:
     try:
         img = Image.open(io.BytesIO(raw_bytes))
         return img.size
-    except Exception:
+    except (OSError, ValueError) as e:
+        # PIL raises UnidentifiedImageError (subclass of OSError) on corrupt
+        # images, ValueError on truncated data.
+        logger.debug(f"[ChemExtract] Could not read image dimensions: {e}")
         return None
 
 
@@ -217,7 +224,10 @@ def extract_figures_from_pdf(
                         "base64": b64,
                         "size_bytes": len(raw),
                     })
-                except Exception as e:
+                except (KeyError, ValueError, OSError, RuntimeError) as e:
+                    # Single-figure extraction failures (corrupt xref, missing
+                    # 'image' key, PIL parse error, IO error) should not abort
+                    # the whole loop — skip the figure and continue.
                     logger.debug(f"[ChemExtract] Skipped image xref={xref} on page {page_num+1}: {e}")
             if len(figures) >= max_images:
                 break
@@ -226,9 +236,9 @@ def extract_figures_from_pdf(
             f"(filtered from {len(seen_xrefs)} total images across {len(doc)} pages)"
         )
         return figures
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.error(f"[ChemExtract] Figure extraction failed: {e}")
-        raise Exception(f"Failed to extract figures from PDF: {e}")
+        raise RuntimeError(f"Failed to extract figures from PDF: {e}") from e
 
 
 # ---------------------------------------------------------------------------
@@ -268,7 +278,9 @@ def detect_scheme_pages(file_path: str, max_pages: int = 50) -> List[int]:
             # If many drawings and relatively few text blocks, likely a scheme page
             if n_drawings > 10 and n_text_blocks < 5:
                 scheme_pages.add(page_num + 1)
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
+        # PyMuPDF raises OSError on corrupt PDFs, RuntimeError on rendering
+        # failures. We log and return whatever pages were detected so far.
         logger.error(f"[ChemExtract] Scheme page detection failed: {e}")
 
     result = sorted(scheme_pages)
@@ -318,9 +330,9 @@ def render_scheme_pages(
             })
         logger.info(f"[ChemExtract] Rendered {len(rendered)} scheme pages at {dpi} DPI")
         return rendered
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.error(f"[ChemExtract] Scheme page rendering failed: {e}")
-        raise Exception(f"Failed to render scheme pages: {e}")
+        raise RuntimeError(f"Failed to render scheme pages: {e}") from e
 
 
 # ---------------------------------------------------------------------------
@@ -348,13 +360,16 @@ def extract_all_visual_content(
     if include_embedded:
         try:
             embedded = extract_figures_from_pdf(file_path, max_images=MAX_EMBEDDED_IMAGES)
-        except Exception as e:
+        except (ImportError, OSError, RuntimeError, ValueError) as e:
+            # ImportError: PyMuPDF not installed. OSError/RuntimeError/
+            # ValueError: PDF parse or rendering failure. Continue with empty
+            # embedded list — scheme-page rendering may still succeed.
             logger.warning(f"[ChemExtract] Embedded figure extraction failed, continuing: {e}")
 
     if include_scheme_pages:
         try:
             scheme_pages = render_scheme_pages(file_path, dpi=dpi, max_pages=max_pages)
-        except Exception as e:
+        except (ImportError, OSError, RuntimeError, ValueError) as e:
             logger.warning(f"[ChemExtract] Scheme page rendering failed, continuing: {e}")
 
     return embedded, scheme_pages
@@ -380,7 +395,9 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
                     text += page_text + "\n\n"
             if text.strip():
                 return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
+            # pypdf raises OSError on corrupt/encrypted PDFs, ValueError on
+            # parse failures. Continue to the next extractor in the cascade.
             logger.warning(f"[ChemExtract] pypdf failed: {e}")
 
     if HAS_PDFPLUMBER:
@@ -393,7 +410,7 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
                     if page_text:
                         text += page_text + "\n\n"
             return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             logger.error(f"[ChemExtract] pdfplumber failed: {e}")
 
     if HAS_PYMUPDF:
@@ -404,7 +421,7 @@ def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
             for page in doc:
                 text += page.get_text() + "\n\n"
             return text, metadata
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             logger.error(f"[ChemExtract] PyMuPDF text extraction failed: {e}")
 
     raise ImportError("No PDF text extraction library available. Install pypdf, pdfplumber, or PyMuPDF.")

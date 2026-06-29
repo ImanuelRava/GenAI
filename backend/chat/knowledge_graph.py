@@ -57,6 +57,8 @@ def register_knowledge_graph_blueprint(app, limiter):
                 'llm_used': llm_used,
             })
 
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"Knowledge Graph Error: {e}", exc_info=True)
             raise APIError(f"Error generating knowledge graph: {str(e)}", 500)
@@ -98,6 +100,8 @@ def register_knowledge_graph_blueprint(app, limiter):
                 'async': True,
             })
 
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             logger.error(f"Knowledge Graph Async Error: {e}", exc_info=True)
             raise APIError(f"Error generating knowledge graph: {str(e)}", 500)
@@ -129,6 +133,8 @@ def register_knowledge_graph_blueprint(app, limiter):
             return get_explanation(node_label, context)
 
         except APIError:
+            raise
+        except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
             logger.error(f"Explanation Error: {e}", exc_info=True)
@@ -165,6 +171,8 @@ def register_knowledge_graph_blueprint(app, limiter):
             return get_explanation(node_label, context, is_async=True)
 
         except APIError:
+            raise
+        except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
             logger.error(f"Explanation Async Error: {e}", exc_info=True)

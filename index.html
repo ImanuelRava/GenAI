@@ -6,6 +6,7 @@
     <title>GenAI Research | AI in Chemistry</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        
         .content-panel {
             padding: 24px;
         }
@@ -47,6 +48,7 @@
         .btn-group {
             padding: 24px 0 0 0;
         }
+
         :root {
             --ai-primary: #3b82f6;
             --ai-light: #dbeafe;
@@ -60,6 +62,9 @@
             --virus-primary: #ef4444;
             --virus-light: #fee2e2;
             --virus-dark: #dc2626;
+            --tm-primary: #0891b2;
+            --tm-light: #cffafe;
+            --tm-dark: #0e7490;
             --bg-main: #f8fafc;
             --bg-white: #ffffff;
             --bg-dark: #0f172a;
@@ -76,16 +81,19 @@
             --radius-lg: 20px;
             --radius-xl: 28px;
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         html {
             scroll-behavior: smooth;
             height: auto;
             min-height: 100vh;
         }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-main);
@@ -94,6 +102,8 @@
             overflow-x: hidden;
             min-height: 100vh;
         }
+
+        
         header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -105,6 +115,7 @@
             padding: 0 24px;
             border-bottom: 1px solid var(--border-color);
         }
+
         .header-inner {
             max-width: 1400px;
             margin: 0 auto;
@@ -113,25 +124,30 @@
             align-items: center;
             height: 72px;
         }
+
         .logo-section {
             display: flex;
             align-items: center;
             gap: 14px;
             text-decoration: none;
         }
+
         .logo-icon {
             width: 52px;
             height: 52px;
             position: relative;
         }
+
         .logo-icon svg {
             width: 100%;
             height: 100%;
         }
+
         .logo-text {
             display: flex;
             flex-direction: column;
         }
+
         .logo-title {
             font-size: 1.35rem;
             font-weight: 800;
@@ -141,6 +157,7 @@
             background-clip: text;
             letter-spacing: -0.5px;
         }
+
         .logo-subtitle {
             font-size: 0.7rem;
             color: var(--text-muted);
@@ -148,15 +165,18 @@
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
+
         nav {
             display: flex;
             align-items: center;
         }
+
         nav ul {
             display: flex;
             list-style: none;
             gap: 8px;
         }
+
         nav a {
             color: var(--text-secondary);
             text-decoration: none;
@@ -167,14 +187,18 @@
             transition: all 0.3s ease;
             position: relative;
         }
+
         nav a:hover {
             color: var(--text-main);
             background: var(--bg-main);
         }
+
         nav a.active {
             color: var(--ai-primary);
             background: var(--ai-light);
         }
+
+        
         .hero {
             min-height: 100vh;
             display: flex;
@@ -185,6 +209,7 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
             padding: 120px 24px 80px;
         }
+
         .hero-bg {
             position: absolute;
             top: 0;
@@ -194,6 +219,7 @@
             overflow: hidden;
             pointer-events: none;
         }
+
         .hero-orb {
             position: absolute;
             border-radius: 50%;
@@ -202,6 +228,7 @@
             animation: float 8s ease-in-out infinite;
             pointer-events: none;
         }
+
         .hero-orb-1 {
             width: 500px;
             height: 500px;
@@ -210,6 +237,7 @@
             right: -100px;
             animation-delay: 0s;
         }
+
         .hero-orb-2 {
             width: 400px;
             height: 400px;
@@ -218,6 +246,7 @@
             left: -100px;
             animation-delay: 2s;
         }
+
         .hero-orb-3 {
             width: 300px;
             height: 300px;
@@ -226,10 +255,12 @@
             left: 50%;
             animation-delay: 4s;
         }
+
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             50% { transform: translate(30px, -30px) scale(1.1); }
         }
+
         .hero-grid {
             position: absolute;
             top: 0;
@@ -242,12 +273,14 @@
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 60px 60px;
         }
+
         .hero-content {
             position: relative;
             z-index: 10;
             text-align: center;
             max-width: 900px;
         }
+
         .hero-badge {
             display: inline-flex;
             align-items: center;
@@ -261,6 +294,7 @@
             margin-bottom: 32px;
             backdrop-filter: blur(10px);
         }
+
         .hero-badge-dot {
             width: 8px;
             height: 8px;
@@ -268,10 +302,12 @@
             border-radius: 50%;
             animation: pulse 2s ease-in-out infinite;
         }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.2); }
         }
+
         .hero h1 {
             font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 800;
@@ -280,12 +316,14 @@
             letter-spacing: -2px;
             line-height: 1.1;
         }
+
         .hero h1 span {
             background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .hero p {
             font-size: 1.25rem;
             color: rgba(255, 255, 255, 0.7);
@@ -293,12 +331,14 @@
             margin: 0 auto 40px;
             line-height: 1.7;
         }
+
         .hero-buttons {
             display: flex;
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -312,25 +352,30 @@
             text-decoration: none;
             border: none;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 100%);
             color: white;
             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
         }
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
         }
+
         .btn-outline-light {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
             backdrop-filter: blur(10px);
         }
+
         .btn-outline-light:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.5);
         }
+
         .hero-stats {
             display: flex;
             gap: 48px;
@@ -339,20 +384,25 @@
             padding-top: 40px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .hero-stat {
             text-align: center;
         }
+
         .hero-stat-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: white;
             letter-spacing: -1px;
         }
+
         .hero-stat-label {
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.5);
             margin-top: 4px;
         }
+
+        
         .projects-section {
             padding: 120px 24px;
             background: var(--bg-main);
@@ -438,6 +488,7 @@
         .project-card.tmc::before { background: linear-gradient(90deg, var(--tmc-primary), var(--tmc-dark)); }
         .project-card.ral::before { background: linear-gradient(90deg, var(--ral-primary), var(--ral-dark)); }
         .project-card.virus::before { background: linear-gradient(90deg, var(--virus-primary), var(--virus-dark)); }
+        .project-card.tm::before { background: linear-gradient(90deg, var(--tm-primary), var(--tm-dark)); }
 
         .project-header {
             padding: 32px 32px 0;
@@ -469,6 +520,8 @@
         .project-card.ral .project-icon svg { color: var(--ral-primary); }
         .project-card.virus .project-icon { background: var(--virus-light); }
         .project-card.virus .project-icon svg { color: var(--virus-primary); }
+        .project-card.tm .project-icon { background: var(--tm-light); }
+        .project-card.tm .project-icon svg { color: var(--tm-primary); }
 
         .project-info h3 {
             font-size: 1.5rem;
@@ -880,6 +933,7 @@
                     <li><a href="TMC/">Transition Metal Catalysis</a></li>
                     <li><a href="redox-ligands/">Redox-Active Ligands</a></li>
                     <li><a href="virus/">Virology</a></li>
+                    <li><a href="technical-modules/">Technical Modules</a></li>
                 </ul>
             </nav>
         </div>
@@ -1049,6 +1103,52 @@
                 </a>
 
                 
+                <a href="technical-modules/" class="project-card tm">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                        </div>
+                        <div class="project-info">
+                            <h3>Technical Modules</h3>
+                            <p>Advanced computational research tools</p>
+                        </div>
+                    </div>
+                    <div class="project-body">
+                        <ul class="project-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Citation Network Analysis
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                AI Knowledge Graph
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                PDF Data Extraction
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Multi-LLM Provider Support
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="project-footer">
+                        <span class="project-tag">Active Research</span>
+                        <span class="project-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </span>
+                    </div>
+                </a>
+
                 <a href="redox-ligands/" class="project-card ral">
                     <div class="project-header">
                         <div class="project-icon">
@@ -1281,6 +1381,7 @@
                     <a href="TMC/">Transition Metal Catalysis</a>
                     <a href="redox-ligands/">Redox-Active Ligands</a>
                     <a href="virus/">Virology</a>
+                    <a href="technical-modules/">Technical Modules</a>
                 </div>
                 <div class="footer-section">
                     <h4>Resources</h4>

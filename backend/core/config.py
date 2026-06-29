@@ -29,6 +29,9 @@ class Config:
     LLM_MAX_TOKENS: int = 2000
     LLM_TEMPERATURE: float = 0.7
     MAX_PROMPT_LENGTH: int = 2000
+    # Larger limit for the /api/extract text-extraction endpoint, which
+    # intentionally accepts longer passages than the chat endpoints.
+    MAX_EXTRACTION_TEXT_LENGTH: int = 15000
 
     CACHE_ENABLED: bool = True
     CACHE_TTL_PAPER: int = 86400

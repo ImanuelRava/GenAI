@@ -50,9 +50,12 @@ def get_paper_details(doi: str) -> Tuple[str, Optional[int], int, List, str]:
     except requests.exceptions.Timeout:
         logger.error(f"Request timeout for DOI: {doi}")
         raise RuntimeError(f"Request timeout for {doi}")
-    except Exception as e:
+    except (requests.exceptions.RequestException, ValueError, KeyError, TypeError) as e:
+        # RequestException: connection errors, SSL errors, etc.
+        # ValueError: JSON decode errors. KeyError/TypeError: unexpected
+        # response shape (missing 'message', 'title', etc.).
         logger.error(f"Error fetching {doi}: {e}")
-        raise RuntimeError(f"Error fetching {doi}: {e}")
+        raise RuntimeError(f"Error fetching {doi}: {e}") from e
 
 
 def get_referenced_dois(references: List) -> List[str]:
@@ -116,6 +119,10 @@ def get_forward_citations(doi: str, max_papers: int = 1000) -> List[Dict[str, An
             page += 1
         return all_results
 
-    except Exception as e:
+    except (requests.exceptions.RequestException, ValueError, KeyError, TypeError) as e:
+        # RequestException: network/HTTP errors (Timeout, ConnectionError,
+        # HTTPError). ValueError: JSON decode errors. KeyError/TypeError:
+        # unexpected response shape (missing 'id', 'results', etc.).
+        # Return empty list so callers can continue gracefully.
         logger.error(f"API Error: {e}")
         return []

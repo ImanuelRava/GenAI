@@ -23,6 +23,7 @@ from urllib.error import URLError, HTTPError
 import time
 import socket
 import ssl
+from pathlib import Path
 from typing import Optional, List, Tuple
 import logging
 
@@ -34,11 +35,35 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class Config:
-    """Configuration settings for the pipeline."""
+# SECURITY: SSL verification is now ENABLED by default.
+# Set LIGAND_INSECURE_TLS=1 in the environment ONLY if you are behind a
+# corporate TLS-intercepting proxy whose CA Python cannot verify.
+_INSECURE_TLS = os.environ.get("LIGAND_INSECURE_TLS", "0") == "1"
 
-    INPUT_FILE = r"C:\Users\DELL\Documents\PhD\GenAI\redox-ligands\Ligand\Nitrogen_ligands.xlsx"
-    OUTPUT_DIR = r"C:\Users\DELL\Documents\PhD\GenAI\redox-ligands\Ligand\ligand_output"
+
+def _build_ssl_context() -> ssl.SSLContext:
+    """Build an SSL context. Defaults to verification ON."""
+    if _INSECURE_TLS:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        logger.warning("TLS verification DISABLED via LIGAND_INSECURE_TLS=1 "
+                       "— vulnerable to man-in-the-middle attacks.")
+        return ctx
+    return ssl.create_default_context()
+
+
+class Config:
+    """Configuration settings for the pipeline.
+
+    All paths default to locations relative to THIS script so the pipeline
+    is portable. Override via CLI flags (--input / --output) or by mutating
+    these attributes before calling :func:`run_pipeline`.
+    """
+
+    _SCRIPT_DIR = Path(__file__).resolve().parent
+    INPUT_FILE = str(_SCRIPT_DIR / "Nitrogen_ligands.xlsx")
+    OUTPUT_DIR = str(_SCRIPT_DIR / "ligand_output")
     SDF_DIR = os.path.join(OUTPUT_DIR, "sdf_files")
     GJF_DIR = os.path.join(OUTPUT_DIR, "gjf_files")
     UPDATED_EXCEL = os.path.join(OUTPUT_DIR, "Nitrogen_ligands_updated.xlsx")
@@ -80,11 +105,7 @@ def fetch_from_cactus(identifier: str, format_type: str = "smiles", retry_count:
         request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
         request.add_header('Accept', '*/*')
 
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
-
-        response = urlopen(request, timeout=Config.TIMEOUT, context=ssl_context)
+        response = urlopen(request, timeout=Config.TIMEOUT, context=_build_ssl_context())
         data = response.read().decode('utf-8')
         return data
 
@@ -110,7 +131,10 @@ def fetch_from_cactus(identifier: str, format_type: str = "smiles", retry_count:
         print(f"  [Connection Error] {identifier}: {str(e)}")
         return None
 
-    except Exception as e:
+    except (ssl.SSLError, ConnectionError, OSError, UnicodeDecodeError) as e:
+        # ssl.SSLError: TLS handshake / cert errors. ConnectionError: connection
+        # aborted / refused (covers 'forcibly closed' / 'connection reset').
+        # OSError: other IO errors. UnicodeDecodeError: bad response encoding.
         error_msg = str(e)
         if "forcibly closed" in error_msg.lower() or "connection reset" in error_msg.lower():
             if retry_count < Config.MAX_RETRIES:
@@ -210,7 +234,8 @@ def write_gjf(output_path: str, molecule_name: str, coordinates: List[Tuple[str,
             f.write(gjf_content)
 
         return True
-    except Exception as e:
+    except (OSError, ValueError, TypeError) as e:
+        # OSError: file write errors. ValueError/TypeError: bad coordinates.
         print(f"  [Error writing GJF] {molecule_name}: {e}")
         return False
 
@@ -224,7 +249,8 @@ def save_sdf_file(output_dir: str, molecule_id: str, sdf_data: str) -> bool:
                 f.write(sdf_data)
             return True
         return False
-    except Exception as e:
+    except (OSError, TypeError) as e:
+        # OSError: file write errors. TypeError: sdf_data not a string.
         print(f"  [Error saving SDF] {molecule_id}: {e}")
         return False
 
@@ -405,7 +431,9 @@ def process_gjf_conversion(df: pd.DataFrame) -> pd.DataFrame:
             else:
                 df.at[idx, 'GJF_Status'] = "Parse Error"
                 print(f"    -> Failed to parse SDF")
-        except Exception as e:
+        except (OSError, ValueError, IndexError, TypeError) as e:
+            # OSError: file read errors. ValueError/IndexError: SDF parse
+            # failures. TypeError: unexpected SDF structure.
             df.at[idx, 'GJF_Status'] = f"Error: {str(e)[:20]}"
             print(f"    -> Error: {e}")
 
@@ -422,7 +450,9 @@ def save_updated_excel(df: pd.DataFrame):
     try:
         df.to_excel(Config.UPDATED_EXCEL, index=False)
         print(f"  Saved to: {Config.UPDATED_EXCEL}")
-    except Exception as e:
+    except (OSError, ValueError, KeyError) as e:
+        # OSError: disk full / permission denied. ValueError/KeyError:
+        # DataFrame serialization failure.
         print(f"  [Error] Failed to save Excel: {e}")
 
 
@@ -445,7 +475,9 @@ def run_pipeline(steps: list = None):
         df = pd.read_excel(Config.INPUT_FILE)
         print(f"  Loaded {len(df)} molecules")
         print(f"  Columns: {list(df.columns)}")
-    except Exception as e:
+    except (FileNotFoundError, OSError, ValueError, KeyError) as e:
+        # FileNotFoundError: missing input file. OSError: permission denied.
+        # ValueError: not an Excel file / corrupt file. KeyError: empty DataFrame.
         print(f"  [Error] Failed to load Excel file: {e}")
         return
 

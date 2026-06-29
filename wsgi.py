@@ -93,5 +93,34 @@ except Exception as exc:
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    logger.info("Starting development server on http://0.0.0.0:5000")
-    application.run(debug=True, host='0.0.0.0', port=5000)
+    # SECURITY: never bind debug mode to 0.0.0.0 by default.
+    # - FLASK_DEBUG=1 enables the Werkzeug debugger (LOCALHOST ONLY — RCE if exposed).
+    # - FLASK_HOST defaults to 127.0.0.1; override only behind a reverse proxy in prod.
+    # For production, run via gunicorn/waitress against this module: `gunicorn wsgi:application`
+
+    # Detect Replit — Replit sets REPL_ID and REPL_SLUG env vars, and provides
+    # a PORT env var (usually 8080 or 5000) that the web preview proxies to.
+    # On Replit, we must bind to 0.0.0.0 so the web preview can reach us.
+    is_replit = bool(os.environ.get('REPL_ID') or os.environ.get('REPL_SLUG'))
+
+    debug = os.environ.get('FLASK_DEBUG', '0') == '1'
+    # On Replit, default to 0.0.0.0 (required for web preview). Elsewhere,
+    # default to 127.0.0.1 (secure — no network exposure).
+    default_host = '0.0.0.0' if is_replit else '127.0.0.1'
+    host = os.environ.get('FLASK_HOST', default_host)
+    # On Replit, prefer the PORT env var if set. Otherwise use FLASK_PORT or 5000.
+    default_port = os.environ.get('PORT', '5000') if is_replit else '5000'
+    port = int(os.environ.get('FLASK_PORT') or default_port)
+
+    if debug and host not in ('127.0.0.1', 'localhost'):
+        logger.warning(
+            "FLASK_DEBUG=1 with FLASK_HOST=%s — Werkzeug debugger would be exposed "
+            "to the network (RCE risk). Forcing host=127.0.0.1.", host
+        )
+        host = '127.0.0.1'
+
+    if is_replit:
+        logger.info("Replit environment detected (REPL_ID=%s). Binding to %s:%d.",
+                    os.environ.get('REPL_ID', '?')[:8], host, port)
+    logger.info("Starting development server on http://%s:%d (debug=%s)", host, port, debug)
+    application.run(debug=debug, host=host, port=port)

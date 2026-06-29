@@ -71,9 +71,9 @@ __all__ = [
     "call_vision_llm", "call_vision_llm_async",
     "call_text_llm", "call_text_llm_async",
     "call_text_llm_chunked", "call_text_llm_chunked_async",
-    # Retry helpers (re-exported for mermaid_integration.py compatibility)
+    # Retry helpers (kept for downstream code that imports them from this package)
     "_retry_on_failure", "_retry_on_failure_async",
-    # JSON parsing (re-exported for compatibility)
+    # JSON parsing (kept for downstream code that imports them from this package)
     "_parse_json_response",
     # SMILES utilities
     "assemble_rgroup_smiles", "assemble_rgroup_reactions",

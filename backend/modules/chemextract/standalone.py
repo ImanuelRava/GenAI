@@ -22,7 +22,9 @@ def call_text_llm(text, provider, model, api_key):
             return _call_anthropic_text(text, model, api_key)
         else:
             return _call_text_provider(provider, model, api_key, text)
-    except Exception as e:
+    except (ValueError, KeyError, TypeError, RuntimeError) as e:
+        # JSON parse errors, unexpected response shapes, or retry-exhausted
+        # RuntimeError from _retry_on_failure. Other exceptions (bugs) propagate.
         logger.error(f"[ChemExtract] Text LLM call failed: {e}")
         return None
 
@@ -37,7 +39,7 @@ async def call_text_llm_async(text, provider, model, api_key):
             return await _call_anthropic_text_async(text, model, api_key)
         else:
             return await _call_text_provider_async(provider, model, api_key, text)
-    except Exception as e:
+    except (ValueError, KeyError, TypeError, RuntimeError) as e:
         logger.error(f"[ChemExtract] Async text LLM call failed: {e}")
         return None
 

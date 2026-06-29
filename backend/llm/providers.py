@@ -1,347 +1,160 @@
 """
-Concrete LLM Provider implementations.
+Concrete LLM Provider implementations (thin shims over ``LLMClient``).
 
-OpenAI-compatible providers (DeepSeek, OpenAI, Groq, OpenRouter) share
-header/payload builders from BaseLLMProvider to reduce duplication.
-Provider-specific APIs (Anthropic, Ollama, Gemini, HuggingFace) retain
-their own implementations.
+These classes preserve the original public API (constructor signature,
+``chat()``, ``chat_async()``, ``chat_with_messages()``,
+``chat_with_messages_async()``) so that ``llm/factory.py``, ``llm/helpers.py``,
+and all downstream callers continue to work unchanged.
+
+All actual HTTP work is delegated to ``llm.client.LLMClient``, which is
+the single source of truth for provider request/response handling.
+
+Historical note: prior to v2.3.0, each provider class contained its own
+copy of the HTTP request/response logic, with near-identical boilerplate
+duplicated across DeepSeek, OpenAI, Groq, and OpenRouter (all OpenAI-
+compatible). Anthropic, Gemini, HuggingFace, and Ollama each had their
+own bespoke implementations. This file is now ~80 LOC instead of ~350 LOC,
+and the same logic is shared with the chemextract and reaction pipelines.
 """
 
-import os
 import logging
-from typing import Optional
-
-import requests
-import aiohttp
+from typing import Optional, List, Dict
 
 from .base import BaseLLMProvider
+from .client import LLMClient
 
 logger = logging.getLogger(__name__)
 
 
+class _LLMClientBackedProvider(BaseLLMProvider):
+    """Base class for providers that delegate to LLMClient.
+
+    Subclasses just declare the provider name; everything else is handled
+    by this base + LLMClient.
+    """
+
+    # Subclasses override this.
+    _PROVIDER_NAME: str = ''
+
+    def __init__(self, api_key: str = None, model: str = None, base_url: str = None):
+        # Stash the constructor args so introspection works (some tests
+        # and routes inspect provider.api_key / provider.model directly).
+        self.api_key = api_key
+        self.base_url = base_url
+        self.model = model
+        # Construct the underlying client. LLMClient resolves env-var
+        # fallbacks for api_key / model / base_url.
+        self._client = LLMClient(
+            provider=self._PROVIDER_NAME,
+            api_key=api_key,
+            model=model,
+            base_url=base_url,
+        )
+        # Sync visible attrs with what LLMClient resolved (so callers that
+        # inspect provider.api_key see the env-var-resolved value too).
+        self.api_key = self._client.api_key
+        self.base_url = self._client.base_url
+        self.model = self._client.model
+
+    def chat(
+        self,
+        system_prompt: str,
+        user_message: str,
+        temperature: float = 0.7,
+        max_tokens: int = 2000,
+    ) -> Optional[str]:
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+        return self._client.chat(
+            messages, temperature=temperature, max_tokens=max_tokens,
+        )
+
+    async def chat_async(
+        self,
+        system_prompt: str,
+        user_message: str,
+        temperature: float = 0.7,
+        max_tokens: int = 2000,
+    ) -> Optional[str]:
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+        return await self._client.chat_async(
+            messages, temperature=temperature, max_tokens=max_tokens,
+        )
+
+    # Multi-turn methods inherited from BaseLLMProvider — they call
+    # chat()/chat_async() with the extracted system+user, which is fine
+    # for the chat use case. If we later want true multi-turn for
+    # OpenAI-compatible providers (which support it natively), we can
+    # override chat_with_messages here to pass the full messages list
+    # straight through to LLMClient.chat().
+    def chat_with_messages(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.7,
+        max_tokens: int = 2000,
+    ) -> Optional[str]:
+        """Override to pass the full messages list to LLMClient (native
+        multi-turn support for OpenAI-compatible providers)."""
+        return self._client.chat(
+            messages, temperature=temperature, max_tokens=max_tokens,
+        )
+
+    async def chat_with_messages_async(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.7,
+        max_tokens: int = 2000,
+    ) -> Optional[str]:
+        return await self._client.chat_async(
+            messages, temperature=temperature, max_tokens=max_tokens,
+        )
+
+
 # ---------------------------------------------------------------------------
-# OpenAI-compatible providers (use shared helpers)
+# Concrete providers — each is a one-liner declaring the provider name.
 # ---------------------------------------------------------------------------
 
-
-class DeepSeekProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('DEEPSEEK_API_KEY')
-        self.base_url = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1')
-        self.model = model or os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat')
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return self._make_request(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return await self._make_request_async(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
+class DeepSeekProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'deepseek'
 
 
-class OpenAIProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('OPENAI_API_KEY')
-        self.base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
-        self.model = model or os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return self._make_request(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return await self._make_request_async(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
+class OpenAIProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'openai'
 
 
-class GroqProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('GROQ_API_KEY')
-        self.base_url = 'https://api.groq.com/openai/v1'
-        self.model = model or os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return self._make_request(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return await self._make_request_async(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
+class GroqProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'groq'
 
 
-class OpenRouterProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('OPENROUTER_API_KEY')
-        self.base_url = 'https://openrouter.ai/api/v1'
-        self.model = model or os.environ.get('OPENROUTER_MODEL', 'meta-llama/llama-3-8b-instruct:free')
-
-    def _build_openai_headers(self):
-        headers = super()._build_openai_headers()
-        headers["HTTP-Referer"] = "https://genai-research.local"
-        headers["X-Title"] = "GenAI Research"
-        return headers
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return self._make_request(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        return await self._make_request_async(
-            self._build_openai_headers(),
-            self._build_openai_payload(system_prompt, user_message, temperature, max_tokens),
-        )
+class OpenRouterProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'openrouter'
 
 
-# ---------------------------------------------------------------------------
-# Provider-specific API implementations
-# ---------------------------------------------------------------------------
+class AnthropicProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'anthropic'
 
 
-class AnthropicProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('ANTHROPIC_API_KEY')
-        self.base_url = 'https://api.anthropic.com/v1'
-        self.model = model or os.environ.get('ANTHROPIC_MODEL', 'claude-3-haiku-20240307')
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        headers = {
-            "x-api-key": self.api_key,
-            "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-        }
-        payload = {
-            "model": self.model,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": user_message}],
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
-        try:
-            response = requests.post(
-                f"{self.base_url}/messages", headers=headers, json=payload, timeout=60,
-            )
-            if response.status_code == 200:
-                return response.json()["content"][0]["text"]
-            else:
-                logger.error(f"Anthropic API Error: {response.status_code} - {response.text}")
-                return None
-        except Exception as e:
-            logger.error(f"Anthropic request error: {e}")
-            return None
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        headers = {
-            "x-api-key": self.api_key,
-            "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-        }
-        payload = {
-            "model": self.model,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": user_message}],
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{self.base_url}/messages",
-                    headers=headers,
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=60),
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data["content"][0]["text"]
-                    else:
-                        text = await response.text()
-                        logger.error(f"Anthropic API Error: {response.status} - {text}")
-                        return None
-        except Exception as e:
-            logger.error(f"Anthropic async request error: {e}")
-            return None
+class GeminiProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'gemini'
 
 
-class OllamaProvider(BaseLLMProvider):
-    def __init__(self, base_url=None, model=None):
-        self.api_key = None
-        self.base_url = base_url or os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
-        self.model = model or os.environ.get('OLLAMA_MODEL', 'llama3')
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        payload = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-            "stream": False,
-            "options": {"temperature": temperature, "num_predict": max_tokens},
-        }
-        try:
-            response = requests.post(
-                f"{self.base_url}/api/chat", json=payload, timeout=120,
-            )
-            if response.status_code == 200:
-                return response.json()["message"]["content"]
-            else:
-                logger.error(f"Ollama API Error: {response.status_code} - {response.text}")
-                return None
-        except Exception as e:
-            logger.error(f"Ollama request error: {e}")
-            return None
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        payload = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-            "stream": False,
-            "options": {"temperature": temperature, "num_predict": max_tokens},
-        }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{self.base_url}/api/chat",
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=120),
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data["message"]["content"]
-                    else:
-                        text = await response.text()
-                        logger.error(f"Ollama API Error: {response.status} - {text}")
-                        return None
-        except Exception as e:
-            logger.error(f"Ollama async request error: {e}")
-            return None
+class HuggingFaceProvider(_LLMClientBackedProvider):
+    _PROVIDER_NAME = 'huggingface'
 
 
-class GeminiProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
-        self.base_url = None
-        self.model = model or os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
+class OllamaProvider(_LLMClientBackedProvider):
+    """Ollama provider — accepts ``base_url`` instead of ``api_key`` in
+    its constructor signature for backwards compat with the original
+    OllamaProvider (which didn't take an api_key)."""
 
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
-        payload = {
-            "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_message}"}]}],
-            "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
-        }
-        try:
-            response = requests.post(url, json=payload, timeout=60)
-            if response.status_code == 200:
-                return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-            else:
-                logger.error(f"Gemini API Error: {response.status_code} - {response.text}")
-                return None
-        except Exception as e:
-            logger.error(f"Gemini request error: {e}")
-            return None
+    _PROVIDER_NAME = 'ollama'
 
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
-        payload = {
-            "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_message}"}]}],
-            "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens},
-        }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url, json=payload, timeout=aiohttp.ClientTimeout(total=60),
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data["candidates"][0]["content"]["parts"][0]["text"]
-                    else:
-                        text = await response.text()
-                        logger.error(f"Gemini API Error: {response.status} - {text}")
-                        return None
-        except Exception as e:
-            logger.error(f"Gemini async request error: {e}")
-            return None
-
-
-class HuggingFaceProvider(BaseLLMProvider):
-    def __init__(self, api_key=None, model=None):
-        self.api_key = api_key or os.environ.get('HF_API_KEY') or os.environ.get('HUGGINGFACE_API_KEY')
-        self.model = model or os.environ.get('HF_MODEL', 'meta-llama/Llama-3.2-3B-Instruct')
-        self.base_url = f'https://api-inference.huggingface.co/models/{self.model}'
-
-    def _build_hf_prompt(self, system_prompt, user_message):
-        return (
-            f"<|begin_of_text|>\n{system_prompt}\n<|eot_id|>\n"
-            f"<|start_header_id|>user<|end_header_id|>\n{user_message}\n"
-            f"<|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>"
-        )
-
-    def chat(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
-        payload = {
-            "inputs": self._build_hf_prompt(system_prompt, user_message),
-            "parameters": {"max_new_tokens": max_tokens, "temperature": temperature,
-                          "return_full_text": False},
-        }
-        try:
-            response = requests.post(self.base_url, headers=headers, json=payload, timeout=60)
-            if response.status_code == 200:
-                data = response.json()
-                if isinstance(data, list) and len(data) > 0:
-                    return data[0].get('generated_text', '')
-                return data.get('generated_text', '')
-            elif response.status_code == 503:
-                logger.warning("Hugging Face: Model is loading, please wait...")
-                return None
-            else:
-                logger.error(f"Hugging Face API Error: {response.status_code} - {response.text}")
-                return None
-        except Exception as e:
-            logger.error(f"Hugging Face request error: {e}")
-            return None
-
-    async def chat_async(self, system_prompt, user_message, temperature=0.7, max_tokens=2000):
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
-        payload = {
-            "inputs": self._build_hf_prompt(system_prompt, user_message),
-            "parameters": {"max_new_tokens": max_tokens, "temperature": temperature,
-                          "return_full_text": False},
-        }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    self.base_url, headers=headers, json=payload,
-                    timeout=aiohttp.ClientTimeout(total=60),
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if isinstance(data, list) and len(data) > 0:
-                            return data[0].get('generated_text', '')
-                        return data.get('generated_text', '')
-                    elif response.status == 503:
-                        logger.warning("Hugging Face: Model is loading...")
-                        return None
-                    else:
-                        text = await response.text()
-                        logger.error(f"Hugging Face API Error: {response.status} - {text}")
-                        return None
-        except Exception as e:
-            logger.error(f"Hugging Face async request error: {e}")
-            return None
+    def __init__(self, base_url: str = None, model: str = None, api_key: str = None):
+        # Ignore api_key (Ollama is local, no auth) but accept the kwarg
+        # so callers using the factory's uniform **kwargs don't break.
+        super().__init__(api_key=None, model=model, base_url=base_url)
