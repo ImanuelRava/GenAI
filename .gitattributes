@@ -1,0 +1,66 @@
+# ============================================================
+# GenAI Research Platform — .gitattributes
+# ============================================================
+# Git LFS tracking declaration. Without this file, large data
+# files (>100 MB hard limit, but practically anything >50 MB
+# should be LFS-tracked) get committed as tiny "pointer" stubs
+# that look like real files but contain no actual data — which
+# is what happened to the nicobot_data/*.csv files originally.
+#
+# Prerequisites:
+#   1. Install Git LFS:  https://git-lfs.com
+#   2. Run once per clone:  git lfs install
+#
+# To migrate existing pointer-stub files back to real data:
+#   git lfs pull
+#   # or for a single file:
+#   git lfs pull --include="backend/nicobot_data/data_all.csv"
+# ============================================================
+
+# ---- Large data files (NiCOBot database) ----
+# These CSV files were originally LFS-tracked but the LFS objects
+# were lost when the repo was exported as a zip. See
+# backend/nicobot_data/DATA_LFS.md for recovery instructions.
+backend/nicobot_data/*.csv filter=lfs diff=lfs merge=lfs -text
+backend/nicobot_data/*.xlsx filter=lfs diff=lfs merge=lfs -text
+backend/nicobot_data/*.json filter=lfs diff=lfs merge=lfs -text
+
+# ---- Uploaded user files (PDFs, Excels) ----
+backend/uploads/** filter=lfs diff=lfs merge=lfs -text
+
+# ---- ChemExtract cache (regenerated, but if committed should be LFS) ----
+chemextract_cache/** filter=lfs diff=lfs merge=lfs -text
+
+# ---- Binary assets that should always be LFS ----
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
+*.npz filter=lfs diff=lfs merge=lfs -text
+
+# ---- Normalize line endings for text files ----
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ---- Make sure these are never LFS (force text) ----
+*.py text
+*.html text
+*.css text
+*.js text
+*.md text
+*.txt text
+*.yml text
+*.yaml text
+*.json text eol=lf
+*.toml text
+*.cfg text
+*.ini text
+.gitignore text
+.gitattributes text

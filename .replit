@@ -1,0 +1,35 @@
+# Replit project configuration.
+# Docs: https://docs.replit.com/programming-ide/configuring-repl
+
+run = "python wsgi.py"
+entrypoint = "wsgi.py"
+
+# Hide non-essential files from the Replit file tree.
+hidden = [".config", "tmp", "__pycache__", "*.pyc", ".pytest_cache"]
+
+# Python version — 3.11 is the stable default on Replit and matches
+# the codebase's tested Python (3.10+). Change to 3.12 if needed.
+modules = ["python3-11"]
+
+# Nix channel — stable-23_11 has rdkit + all PDF libs.
+[nix]
+channel = "stable-23_11"
+
+# Map the Flask app's port (5000) to Replit's web preview.
+# Replit will proxy requests to the localPort below.
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+# Deployment target (for Replit Deployments — optional, only used if you
+# click "Deploy" in the Replit UI).
+[deployment]
+run = ["python", "wsgi.py"]
+deploymentTarget = "cloudrun"
+
+# Environment variables that should always be set when the app starts.
+# (User-provided API keys should go in Replit Secrets, not here.)
+[env]
+FLASK_HOST = "0.0.0.0"
+FLASK_PORT = "5000"
+PYTHONUNBUFFERED = "1"

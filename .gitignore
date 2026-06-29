@@ -1,138 +1,102 @@
-# Byte-compiled / optimized / DLL files
+# ============================================================
+# GenAI Research Platform — .gitignore
+# ============================================================
+# This file tells Git which files/dirs to NEVER commit.
+# Critical for security (no .env, no API keys) and cleanliness
+# (no __pycache__, no build artifacts).
+# ============================================================
+
+# ---- Secrets & environment files ----
+# NEVER commit .env files — they may contain real API keys.
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+# Note: .env.template and .env.example ARE committed (they hold placeholders only).
+
+# ---- Python bytecode & caches ----
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
+
+# ---- Distribution / packaging ----
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
+.eggs/
+sdist/
+wheels/
 
-# PyInstaller
-*.manifest
-*.spec
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+.python-version
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
+# ---- Test & coverage artifacts ----
+.pytest_cache/
+.coverage
+.coverage.*
 htmlcov/
 .tox/
 .nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
 .hypothesis/
-.pytest_cache/
-pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.python-version
-
-# IDEs and editors
-.idea/
+# ---- IDE / editor files ----
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
-.project
-.pydevproject
-.settings/
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Ruff
-.ruff_cache/
-
-# OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 desktop.ini
 
-# Log files
+# ---- Jupyter ----
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ---- Logs ----
 *.log
 logs/
+*.out
 
-# Temporary files
-*.tmp
-*.temp
+# ---- Project-specific runtime artifacts ----
+# Uploaded PDFs / Excel files from users (route: /api/network, /api/extract/*)
+backend/uploads/
+backend/tmp/
+
+# ChemExtract on-disk cache (regenerated per-run from PDF content hashes)
+/tmp/chemextract_cache/
+chemextract_cache/
+
+# Duplicate data archive (the unzipped nicobot_data/ folder is the source of truth)
+backend/nicobot_data.zip
+
+# ---- OS / misc ----
 *.bak
+*.tmp
 *.swp
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
 
-# Secrets and credentials
-*.pem
-*.key
-secrets.json
-credentials.json
-.secrets/
+# ---- Type-checker caches ----
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Uploaded files (if any)
-uploads/
-temp/
-
-# Node modules (if using frontend tooling)
-node_modules/
-
-# Build outputs
-*.min.js
-*.min.css
-
-# Lock files (optional - uncomment if you want to ignore)
-# package-lock.json
-# poetry.lock
-# pdm.lock
+# ---- Lint caches ----
+.ruff_cache/
+.cache/
