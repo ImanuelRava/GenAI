@@ -14,7 +14,98 @@
 
     <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        
+        /* ---- Data-extraction-style sidebar overrides ---- */
+        :root {
+            --bg-sidebar: #0f172a;
+            --bg-sidebar-hover: #1e293b;
+            --bg-sidebar-active: rgba(139, 92, 246, 0.15);
+            --text-sidebar: #cbd5e1;
+            --text-sidebar-muted: #64748b;
+            --text-sidebar-active: #a78bfa;
+            --border-sidebar: #1e293b;
+        }
+
+        .sidebar {
+            background: var(--bg-sidebar) !important;
+            border-right: 1px solid var(--border-sidebar) !important;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-sidebar); border-radius: 4px; }
+
+        .sidebar-section {
+            padding: 20px 18px !important;
+            margin-top: 0 !important;
+            border-top: none !important;
+            border-bottom: 1px solid var(--border-sidebar) !important;
+        }
+        .sidebar-section:last-child { border-bottom: none !important; }
+
+        .sidebar-section-title {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            color: var(--text-sidebar-active) !important;
+            margin-bottom: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+        .sidebar-section-title svg,
+        .sidebar-section-title .icon svg {
+            width: 14px !important;
+            height: 14px !important;
+            flex-shrink: 0 !important;
+            color: var(--text-sidebar-active) !important;
+        }
+        .sidebar-section-title .icon {
+            color: var(--text-sidebar-active) !important;
+        }
+
+        .sidebar .form-group,
+        .sidebar .form-label,
+        .sidebar .file-drop,
+        .sidebar .layout-selector,
+        .sidebar .filter-control,
+        .sidebar .filter-label {
+            color: var(--text-sidebar) !important;
+        }
+        .sidebar .form-label {
+            font-size: 0.82rem !important;
+            color: var(--text-sidebar) !important;
+        }
+        .sidebar .file-drop {
+            background: var(--bg-sidebar-hover) !important;
+            border: 1px dashed var(--border-sidebar) !important;
+            border-radius: 10px !important;
+        }
+        .sidebar .file-drop-text {
+            color: var(--text-sidebar-muted) !important;
+        }
+        .sidebar .file-name {
+            color: var(--text-sidebar) !important;
+        }
+        .sidebar .layout-btn {
+            background: var(--bg-sidebar-hover) !important;
+            color: var(--text-sidebar) !important;
+            border: 1px solid var(--border-sidebar) !important;
+        }
+        .sidebar .layout-btn.active,
+        .sidebar .layout-btn:hover {
+            background: var(--bg-sidebar-active) !important;
+            color: var(--text-sidebar-active) !important;
+            border-color: rgba(139, 92, 246, 0.3) !important;
+        }
+        .sidebar .filter-label {
+            font-size: 0.78rem !important;
+            color: var(--text-sidebar) !important;
+        }
+        .sidebar input[type="range"] {
+            accent-color: #8b5cf6;
+        }
+
+        /* Original content-panel styles */
         :root {
             --primary: #8b5cf6;
             --accent: #3b82f6;
