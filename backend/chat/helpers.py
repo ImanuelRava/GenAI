@@ -11,7 +11,7 @@ from core.errors import ValidationError
 from core.config import config
 from core.utils import sanitize_input
 
-from llm.prompts import NICOBOT_SYSTEM_PROMPT, EXPLAIN_SYSTEM_PROMPT, PREDEFINED_EXPLANATIONS
+from llm.prompts import NICOBOT_SYSTEM_PROMPT, REDOX_SYSTEM_PROMPT, EXPLAIN_SYSTEM_PROMPT, PREDEFINED_EXPLANATIONS
 from llm import get_llm_response, get_llm_response_async
 
 from .conversation import conversation_store
@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Lazy import guard for RAG
 _rag_available = None
+_ral_rag_available = None
 
 
 def _is_rag_available():
@@ -32,6 +33,18 @@ def _is_rag_available():
             _rag_available = False
             logger.warning("NiCOBot RAG service not available.")
     return _rag_available
+
+
+def _is_ral_rag_available():
+    global _ral_rag_available
+    if _ral_rag_available is None:
+        try:
+            from modules.ral_rag import get_ral_rag
+            _ral_rag_available = True
+        except ImportError:
+            _ral_rag_available = False
+            logger.warning("RAL RAG service not available.")
+    return _ral_rag_available
 
 
 def extract_chat_params(data: dict) -> tuple:
@@ -85,6 +98,32 @@ def build_nicobot_system_prompt(message: str, use_rag: bool,
             logger.warning(f"[{log_prefix}] RAG error: {e}. Falling back to base prompt.")
 
     return NICOBOT_SYSTEM_PROMPT, None
+
+
+def build_redox_system_prompt(message: str, use_rag: bool,
+                                log_prefix: str = "RAL-Bot") -> tuple:
+    """Build Redox/RAL-Bot system prompt with optional RAG context.
+
+    Returns (system_prompt, database_context_or_None).
+    """
+    database_context = None
+    if _is_ral_rag_available() and use_rag:
+        try:
+            from modules.ral_rag import get_ral_rag
+            rag = get_ral_rag()
+            enhanced = rag.build_enhanced_prompt(message, REDOX_SYSTEM_PROMPT)
+            # Check if RAG actually added data (enhanced will be longer than base)
+            if len(enhanced) > len(REDOX_SYSTEM_PROMPT) + 50:
+                database_context = rag.retrieve_context(message).formatted_context
+                logger.info(
+                    f"[{log_prefix}] RAG context retrieved: "
+                    f"database-enhanced prompt generated"
+                )
+                return enhanced, database_context
+        except (ImportError, OSError, ValueError, KeyError, AttributeError) as e:
+            logger.warning(f"[{log_prefix}] RAG error: {e}. Falling back to base prompt.")
+
+    return REDOX_SYSTEM_PROMPT, None
 
 
 def build_response_json(

@@ -139,7 +139,9 @@ def api_status():
             'llm': '/api/llm/*',
             'knowledge_graph': '/api/knowledge-graph',
             'nicobot_chat': '/api/nicobot/chat',
+            'redox_chat': '/api/redox/chat',
             'database': '/api/database/*',
+            'ral_database': '/api/ral-database/*',
         },
     })
 
@@ -235,6 +237,15 @@ try:
 except ImportError:
     _db_registered = False
 
+# --- Optional: RAL database (needs ral_data) ---
+try:
+    from routes.ral_database import ral_database_bp
+    app.register_blueprint(ral_database_bp)
+    _ral_db_registered = True
+except ImportError:
+    _ral_db_registered = False
+    logging.warning("[STARTUP] RAL database blueprint not registered (missing optional deps).")
+
 # ---------------------------------------------------------------------------
 # Register chat blueprints (NiCOBot, Redox, Knowledge Graph)
 # ---------------------------------------------------------------------------
@@ -256,6 +267,8 @@ if _viz_registered:
     _bps.append("viz")
 if _db_registered:
     _bps.append("database")
+if _ral_db_registered:
+    _bps.append("ral_database")
 _db_msg = ", ".join(_bps)
 logging.info(f"[STARTUP] GenAI Research Platform v2.2.0")
 logging.info(f"[STARTUP] Backend Dir: {BACKEND_DIR}")
