@@ -11,6 +11,7 @@ Loads and indexes two complementary datasets:
 
 import os
 import re
+import json
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 CLASS_ALIASES: Dict[str, str] = {
     # Bipyridine family
     'bipyridine': 'Bipy', 'bpy': 'Bipy', 'bpy)': 'Bipy',
+    "2,2'-bipyridine": 'Bipy', '2,2-bipyridine': 'Bipy',
     'dtbbpy': 'Bipy', 'dtbpy': 'Bipy', 'dtbbpy)': 'Bipy', 'dtbpy)': 'Bipy',
     'dtbbpy)': 'Bipy', "4,4'-di-tert-butyl-2,2'-bipyridine": 'Bipy',
     "4,4'-dimethyl-2,2'-bipyridine": 'Bipy',
@@ -39,6 +41,7 @@ CLASS_ALIASES: Dict[str, str] = {
     'neocuproine': 'Phen', 'me4phen': 'Phen',
     "3,4,7,8-tetramethyl-1,10-phenanthroline": 'Phen',
     "4,7-diphenyl-1,10-phenanthroline": 'Phen',
+    "1,10-phenanthroline": 'Phen',
     # Terpyridine (mapped to Phen as closest class)
     'terpyridine': 'Phen', "2,2':6',2''-terpyridine": 'Phen',
     # Bis(oxazoline) / Box family
@@ -49,12 +52,34 @@ CLASS_ALIASES: Dict[str, str] = {
     'bisimidazoline': 'BiIM', 'bis(imidazoline)': 'BiIM',
     # Pyridine mono-dentate (map to Bipy as closest)
     'pyridine': 'Bipy', 'dmap': 'Bipy',
+    # Pyrox / Pyrim / PyCam families
+    'pyrox': 'PyrOx', 'pyrim': 'PyrIm', 'pycam': 'PyCam',
     # Amidine / PyBCam (map to PyrIm as closest redox-active class)
     'amidine': 'PyrIm', 'pybcam': 'PyrIm', 'pyridinedicarboxamidine': 'PyrIm',
     # Imidazole (map to PyrIm as closest)
     'imidazole': 'PyrIm',
     # Pyrazolyl
     'pyrazolyl': 'PyrIm',
+}
+
+# ---------------------------------------------------------------------------
+# Ligand name aliases — maps common/IUPAC names to the short name used
+# in Grand_Data.xlsx so that a user query like "2,2'-bipyridine" finds "bpy".
+# ---------------------------------------------------------------------------
+
+LIGAND_NAME_ALIASES: Dict[str, str] = {
+    # Bipyridine
+    "2,2'-bipyridine": 'bpy',
+    '2,2-bipyridine': 'bpy',
+    '2 2 bipyridine': 'bpy',
+    '2 2-bipyridine': 'bpy',
+    # Phenanthroline
+    "1,10-phenanthroline": 'phen',
+    '1,10-phenanthroline': 'phen',
+    # DTBPy
+    "4,4'-di-tert-butyl-2,2'-bipyridine": '44-di-tBu-bpy',
+    'dtbbpy': '44-di-tBu-bpy',
+    'dtbpy': '44-di-tBu-bpy',
 }
 
 
@@ -123,30 +148,107 @@ class RALDatabase:
     # ------------------------------------------------------------------
 
     def load(self) -> bool:
-        """Load all data from Excel files and build indices."""
+        """Load all data and build indices.
+
+        Tries JSON files first (stdlib-only, no C extensions — safe for
+        Replit / constrained environments).  Falls back to Excel via
+        pandas/openpyxl only if JSON is absent.
+        """
         if self._loaded:
             return True
 
         try:
-            self._load_grand_data()
-            self._load_doi_list()
+            # --- Primary: JSON (no pandas, no C extensions) ---
+            json_ok = False
+            gd_json = self.data_dir / 'grand_data.json'
+            dl_json = self.data_dir / 'doi_list.json'
+
+            if gd_json.exists() and dl_json.exists():
+                self._load_grand_data_json(gd_json)
+                self._load_doi_list_json(dl_json)
+                json_ok = True
+
+            if not json_ok:
+                # --- Fallback: Excel via pandas ---
+                self._load_grand_data_excel()
+                self._load_doi_list_excel()
+
+            if not self.ligands and not self.reactions:
+                logger.error("RAL database: no data loaded from any source")
+                return False
+
             self._build_indices()
             self._loaded = True
             logger.info(
-                f"RAL Database loaded: {len(self.ligands)} ligands, "
+                f"RAL Database loaded ({'JSON' if json_ok else 'Excel'}): "
+                f"{len(self.ligands)} ligands, "
                 f"{len(self.reactions)} reactions "
                 f"({sum(1 for r in self.reactions if r.title)} curated)"
             )
             return True
-        except (OSError, ValueError, KeyError, TypeError, ImportError) as e:
-            # OSError: missing file.  ValueError: bad data.  KeyError:
-            # missing column.  TypeError: wrong type.  ImportError:
-            # openpyxl not installed.
+
+        except (OSError, ValueError, KeyError, TypeError) as e:
             logger.error(f"Failed to load RAL database: {e}")
             return False
 
-    def _load_grand_data(self):
-        """Load ligand electronic properties from Grand_Data.xlsx."""
+    # ------------------------------------------------------------------
+    # JSON loaders (stdlib-only — NO pandas, NO C extensions)
+    # ------------------------------------------------------------------
+
+    def _load_grand_data_json(self, path: Path):
+        """Load ligand electronic properties from grand_data.json."""
+        with open(path, 'r', encoding='utf-8') as f:
+            rows = json.load(f)
+
+        for row in rows:
+            lp = LigandProperty(
+                name=str(row.get('name', '')).strip(),
+                ligand_class=str(row.get('class', '')).strip(),
+                homo=float(row.get('HOMO (eV)', 0)),
+                lumo=float(row.get('LUMO (eV)', 0)),
+                gap=float(row.get('Gap (eV)', 0)),
+                omega=float(row.get('omega (eV)', 0)),
+                i_min=float(row.get('I_min (eV)', 0)),
+                v_min=float(row.get('V_min (eV)', 0)),
+                r1_homa=float(row.get('R1-HOMA', 0)),
+                r2_homa=float(row.get('R2-HOMA', 0)),
+            )
+            self.ligands.append(lp)
+            self._ligand_by_name[lp.name.lower()] = lp
+            self._ligands_by_class.setdefault(lp.ligand_class, []).append(lp)
+
+    def _load_doi_list_json(self, path: Path):
+        """Load reaction-ligand literature from doi_list.json."""
+        with open(path, 'r', encoding='utf-8') as f:
+            rows = json.load(f)
+
+        for row in rows:
+            doi = str(row.get('DOI', '')).strip()
+            if not doi or doi.lower() in ('nan', 'none', ''):
+                continue
+
+            title = str(row.get('Title', '') or '').strip()
+            opt_lig = str(row.get('Optimum Ligand', '') or '').strip()
+            partner = str(row.get('Coupling Partner', '') or '').strip()
+            knowledge = str(row.get('Ligand Knowledge', '') or '').strip()
+
+            mapped_class = self._resolve_ligand_class(opt_lig)
+
+            entry = ReactionLigandEntry(
+                doi=doi, title=title, optimum_ligand=opt_lig,
+                coupling_partner=partner, ligand_knowledge=knowledge,
+                mapped_class=mapped_class,
+            )
+            self.reactions.append(entry)
+            if doi:
+                self._reactions_by_doi[doi] = entry
+
+    # ------------------------------------------------------------------
+    # Excel loaders (fallback — requires pandas/openpyxl)
+    # ------------------------------------------------------------------
+
+    def _load_grand_data_excel(self):
+        """Load ligand electronic properties from Grand_Data.xlsx (fallback)."""
         path = self.data_dir / 'Grand_Data.xlsx'
         if not path.exists():
             logger.warning(f"Grand_Data.xlsx not found at {path}")
@@ -177,8 +279,8 @@ class RALDatabase:
             self._ligand_by_name[lp.name.lower()] = lp
             self._ligands_by_class.setdefault(lp.ligand_class, []).append(lp)
 
-    def _load_doi_list(self):
-        """Load reaction-ligand literature from DOI List.xlsx."""
+    def _load_doi_list_excel(self):
+        """Load reaction-ligand literature from DOI List.xlsx (fallback)."""
         path = self.data_dir / 'DOI List.xlsx'
         if not path.exists():
             logger.warning(f"DOI List.xlsx not found at {path}")
@@ -295,6 +397,17 @@ class RALDatabase:
             if idx not in seen:
                 seen.add(idx)
                 results.append((idx, score))
+
+        # 0. Name-alias resolution (e.g. "2,2'-bipyridine" → "bpy")
+        #    Gives the resolved ligand the highest priority.
+        resolved_name = None
+        for alias, canonical in LIGAND_NAME_ALIASES.items():
+            if alias in query_lower:
+                resolved_name = canonical
+                lp = self._ligand_by_name.get(canonical.lower())
+                if lp is not None:
+                    _add(self.ligands.index(lp), 120)
+                break
 
         # 1. Exact name match (highest score)
         for name, indices in self._name_index.items():

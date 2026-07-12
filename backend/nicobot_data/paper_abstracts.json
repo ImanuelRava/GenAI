@@ -1,0 +1,322 @@
+[
+  {
+    "doi": "10.1021/ja311783k",
+    "title": "Retention or Inversion in Stereospecific Nickel-Catalyzed Cross-Coupling of Benzylic Carbamates with Arylboronic Esters: Control of Absolute Stereochemistry with an Achiral Catalyst",
+    "authors": "Michael R. Harris, Luke E. Hanna, Margaret A. Greene, Curtis E. Moore, Elizabeth R. Jarvo",
+    "abstract": "Stereospecific coupling of benzylic carbamates and pivalates with aryl- and heteroarylboronic esters has been developed. The reaction proceeds with selective inversion or retention at the electrophilic carbon, depending on the nature of the ligand. Tricyclohexylphosphine ligand provides the product with retention, while an N-heterocyclic carbene ligand provides the product with inversion.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2013"
+  },
+  {
+    "doi": "10.1021/ja710944j",
+    "title": "Direct Benzylic Alkylation via Ni-Catalyzed Selective Benzylic sp<sup>3</sup> C\u2212O Activation",
+    "authors": "Bing-Tao Guan, Shi-Kai Xiang, Bi-Qin Wang, Zuo-Peng Sun, Yang Wang, Ke-Qing Zhao, Zhang-Jie Shi",
+    "abstract": "This article demonstrates the first cross coupling of benzyl ether with Grignard reagents via Ni-catalyzed benzylic sp3 C? O activation with high efficiency and excellent chemoselectivity. Benzylic sp3 C? O and aryl sp2 C? O were differentiated, controlled by ligands.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1002/anie.200453765",
+    "title": "Nickel\u2010Catalyzed Cross\u2010Coupling of Aryl Grignard Reagents with Aromatic Alkyl Ethers: An Efficient Synthesis of Unsymmetrical Biaryls",
+    "authors": "John W. Dankwardt",
+    "abstract": "No Abstarct",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2004"
+  },
+  {
+    "doi": "10.1021/ol503707m",
+    "title": "Nickel-Catalyzed Alkynylation of Anisoles via C\u2013O Bond Cleavage",
+    "authors": "Mamoru Tobisu, Tsuyoshi Takahira, Akimichi Ohtsuki, Naoto Chatani",
+    "abstract": "A new cross-coupling reaction has been developed for the introduction of an alkyne moiety to an anisole derivative through C\u2013O bond activation using an NHC ligand. This method has been used for direct alkynylation of a broad range of anisole derivatives and provided rapid access to compounds with potential applications in biological and materials science.",
+    "journal": "Org. Lett.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2015"
+  },
+  {
+    "doi": "10.1002/anie.200907359",
+    "title": "Direct Application of Phenolic Salts to Nickel\u2010Catalyzed Cross\u2010Coupling Reactions with Aryl Grignard Reagents",
+    "authors": "Da\u2010Gang Yu, Bi\u2010Jie Li, Shu\u2010Fang Zheng, Bing\u2010Tao Guan, Bi\u2010Qing Wang, Zhang\u2010Jie Shi",
+    "abstract": "The first successful coupling reaction with the direct application of naphtholates as electrophiles (see scheme, X=halide) improves both the step economy and atom economy of cross\u2010coupling reactions whilst decreasing the cost of preparing complex scaffolds from readily available phenol derivatives.",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2010"
+  },
+  {
+    "doi": "10.1021/ja907700e",
+    "title": "<i>N</i>,<i>N-</i>Diethyl<i>O-</i>Carbamate: Directed Metalation Group and Orthogonal Suzuki\u2212Miyaura Cross-Coupling Partner",
+    "authors": "Aurora Antoft-Finch, Tom Blackburn, Victor Snieckus",
+    "abstract": "A new cross-coupling reaction has been developed for the introduction of an alkyne moiety to an anisole derivative through C\u2013O bond activation using an NHC ligand. This method has been used for direct alkynylation of a broad range of anisole derivatives and provided rapid access to compounds with potential applications in biological and materials science.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1021/ja906477r",
+    "title": "Suzuki\u2212Miyaura Coupling of Aryl Carbamates, Carbonates, and Sulfamates",
+    "authors": "Kyle W. Quasdorf, Michelle Riener, Krastina V. Petrova, Neil K. Garg",
+    "abstract": "The first Suzuki? Miyaura cross-couplings of carbamates, carbonates, and sulfamates is described. The method provides a powerful means of using simple derivatives of phenol as precursors to polysubstituted aromatic compounds, as exemplified by a concise synthesis of the anti-inflammatory drug flurbiprofen.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1039/b718998b",
+    "title": "Methylation of arenes via Ni-catalyzed aryl C\u2013O/F activation",
+    "authors": "Bing-Tao Guan, Shi-Kai Xiang, Tao Wu, Zuo-Peng Sun, Bi-Qin Wang, Ke-Qing Zhao, Zhang-Jie Shi",
+    "abstract": "Aryl C\u2013O and C\u2013F can be transformed into C\u2013Me viaNi-catalyzed coupling with MeMgBr under mild conditions.",
+    "journal": "Chem. Commun.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1021/ol901978e",
+    "title": "Nickel-Catalyzed Cross-Coupling Reaction of Alkenyl Methyl Ethers with Aryl Boronic Esters",
+    "authors": "Toshiaki Shimasaki, Yuko Konno, Mamoru Tobisu, Naoto Chatani",
+    "abstract": "The Ni(0)-catalyzed cross-coupling of alkenyl methyl ethers with boronic esters is described. Several types of alkenyl methyl ethers can be coupled with a wide range of boronic esters to give the stilbene derivatives.",
+    "journal": "Org. Lett.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1021/ja038752r",
+    "title": "Room-Temperature Ni(0)-Catalyzed Cross-Coupling Reactions of Aryl Arenesulfonates with Arylboronic Acids",
+    "authors": "Zhen-Yu Tang, Qiao-Sheng Hu",
+    "abstract": "Room-temperature Ni (0)-catalyzed cross-coupling reactions of aryl arenesulfonates with arylboronic acids are described. The Ni (0) catalyst, derived from Ni (COD) 2 and PCy3, proved to be a general one for the Suzuki? Miyaura cross-coupling of a variety of aryl arenesulfonates. The mild reaction condition, the readily availability of the catalyst, and excellent coupling yields make aryl arenesulfonates potentially useful substrates in organic synthesis.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "2004"
+  },
+  {
+    "doi": "10.1021/ja903091g",
+    "title": "Hydroxyphosphine Ligand for Nickel-Catalyzed Cross-Coupling through Nickel/Magnesium Bimetallic Cooperation",
+    "authors": "Naohiko Yoshikai, Hirokazu Matsuda, Eiichi Nakamura",
+    "abstract": "We report here that hydroxyphosphine ligands (PO ligands) significantly accelerate nickel-catalyzed cross-coupling reactions of unreactive aryl electrophiles and Grignard reagents. The new catalytic system based on the nickel?PO?Grignard combination allows facile activation of unreactive aryl halides such as fluorides, chlorides, polyfluorides, and polychlorides as well as phenol derivatives such as carbamates and phosphates to give the corresponding cross-coupling products in good to excellent yields. We ascribe the high catalytic activity to a nickel phosphine/magnesium alkoxide bimetallic species that forms from the nickel precatalyst, the PO ligand, and the Grignard reagent and undergoes activation of the aryl?X bond by a cooperative push?pull action of the nucleophilic nickel and Lewis acidic magnesium centers. This mechanistic conjecture was corroborated by kinetic isotope effect experiments and density functional theory calculations. Being distinct from the conventional three-centered mechanism for oxidative addition, the proposed mechanism for the C?X bond activation offers a new concept for the design of cross-coupling reactions as well as other homogeneous catalyses involving activation of electrophilic substrates.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1021/ja810157e",
+    "title": "Mechanism of Ni-Catalyzed Selective C\u2212O Bond Activation in Cross-Coupling of Aryl Esters",
+    "authors": "Zhe Li, Song-Lin Zhang, Yao Fu, Qing-Xiang Guo, Lei Liu",
+    "abstract": "Ni-catalyzed selective C?O bond activation opens a door for the cross-coupling of aryl esters. The present study reports a thorough theoretical analysis of Ni-catalyzed cross-coupling between aryl esters and arylboronic acids, with an emphasis on explaining the cause for the surprising selectivity in C?O activation. The overall catalytic cycle is found to include three basic steps: oxidative addition, transmetalation, and reductive elimination. Oxidative addition of Ar?OAc to Ni(0) in the presence of PCy3 ligand proceeds through the monophosphine pathway (instead of the alternative two-phosphine pathway) with a relatively low barrier of +22.9 kcal/mol. Transmetalation proceeds via a base-assisted mechanism with a barrier of +31.2 kcal/mol. Reductive elimination is the most facile step in the whole catalytic cycle. Comparatively, oxidative addition of ArO?Ac to Ni(0) is a more facile process (barrier = +14.2 kcal/mol) than oxidative addition of Ar?OAc to Ni(0). However, the former process is associated with a fairly low reverse barrier, and its product does not transmetalate easily (barrier = +33.1 kcal/mol). By comparison, the latter process is an irreversible reaction, and its product transmetalates more readily. These results explain why only the cross-coupling products from the Ar?OAc activation (but not from the ArO?Ac activation) were observed in experiments.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1002/ejoc.200900067",
+    "title": "N\u2010Heterocyclic Carbene Derived Nickel\u2013Pincer Complexes: Efficient and Applicable Catalysts for Suzuki\u2013Miyaura Coupling Reactions of Aryl/Alkenyl Tosylates and Mesylates",
+    "authors": "Jun\u2010ichi Kuroda, Kiyofumi Inamoto, Kou Hiroya, Takayuki Doi",
+    "abstract": "Catalytic activities of NHC-derived nickel\u2013pincer complexes for the Suzuki\u2013Miyaura coupling reactions of aryl/alkenyl tosylates and mesylates are described. In the presence of a catalytic amount of nickelacycle 1a, a wide array of tosylates and mesylates reacted with several aryl- and alkenylboronic acids to afford the coupling products, generally in high yields. Fine tuning of the reaction conditions for each class of electrophiles was achieved only by choosing the appropriate reaction medium (DME for tosylates, dioxane for mesylates).",
+    "journal": "Eur J Org Chem",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1002/anie.200900329",
+    "title": "C(aryl)\uf8ffO Activation of Aryl Carboxylates in Nickel\u2010Catalyzed Biaryl Syntheses",
+    "authors": "Lukas\u2005J. Goo\u00dfen, K\u00e4the Goo\u00dfen, Corneliu Stanciu",
+    "abstract": "Crucial breakthroughs in the activation of the C (aryl)-O bond of phenol derivatives were achieved almost simultaneously by two research groups (see scheme; Cy= cyclohexyl). Garg et al. coupled a range of aryl pivalates with arylboronic acids to give unsymmetrical biaryls. Shi et al. achieved this through C (aryl)-O activation of aryl carboxylates; the best results for the coupling of aryl boroxines were again obtained with aryl pivalates.",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2009"
+  },
+  {
+    "doi": "10.1021/ja8056503",
+    "title": "Biaryl Construction via Ni-Catalyzed C\u2212O Activation of Phenolic Carboxylates",
+    "authors": "Bing-Tao Guan, Yang Wang, Bi-Jie Li, Da-Gang Yu, Zhang-Jie Shi",
+    "abstract": "Biaryl scaffolds were constructed via Ni-catalyzed aryl C? O activation by avoiding cleavage of the more reactive acyl C? O bond of aryl carboxylates. Now aryl esters, in general, can be successfully employed in cross-coupling reactions for the first time. The substrate scope and synthetic utility of the chemistry were demonstrated by the syntheses of more than 40 biaryls and by constructing complex organic molecules. Water was observed to play an important role in facilitating this transformation.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1002/anie.200803814",
+    "title": "Cross\u2010Coupling of Aryl/Alkenyl Pivalates with Organozinc Reagents through Nickel\u2010Catalyzed C\uf8ffO Bond Activation under Mild Reaction Conditions",
+    "authors": "Bi\u2010Jie Li, Yi\u2010Zhou Li, Xing\u2010Yu Lu, Jia Liu, Bing\u2010Tao Guan, Zhang\u2010Jie Shi",
+    "abstract": "The catalyst system [NiCl2(PCy3)2] mediates the title transformation with high efficiency and allows aryl\u2013aryl and vinyl\u2013aryl coupling to proceed. The first example of catalytic cross-coupling using the pivalates and organozinc reagents is described (see scheme; Cy=cyclohexyl, piv=pivalate).",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "Zn",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1021/ja806244b",
+    "title": "Cross-Coupling Reactions of Aryl Pivalates with Boronic Acids",
+    "authors": "Kyle W. Quasdorf, Xia Tian, Neil K. Garg",
+    "abstract": "The first cross-coupling of acylated phenol derivatives has been achieved. In the presence of an air-stable Ni(II) complex, readily accessible aryl pivalates participate in the Suzuki?Miyaura coupling with arylboronic acids. The process is tolerant of considerable variation in each of the cross-coupling components. In addition, a one-pot acylation/cross-coupling sequence has been developed. The potential to utilize an aryl pivalate as a directing group has also been demonstrated, along with the ability to sequentially cross-couple an aryl bromide followed by an aryl pivalate, using palladium and nickel catalysis, respectively.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1021/ol016526l",
+    "title": "NiCl<sub>2</sub>(PCy<sub>3</sub>)<sub>2</sub>:\u2009 A Simple and Efficient Catalyst Precursor for the Suzuki Cross-Coupling of Aryl Tosylates and Arylboronic Acids",
+    "authors": "Danilo Zim, Vanusa R. Lando, Jairton Dupont, Adriano L. Monteiro",
+    "abstract": "NiCl2 (PCy3) 2 associated with PCy3 promotes the selective cross-coupling of aryltosylates with arylboronic acids under relatively mild reaction conditions, and a variety of functional groups are tolerated in both arenes. This is one of the simplest and most efficient experimental procedures for the coupling of arylboronic acids with aryl tosylates reported to date.",
+    "journal": "Org. Lett.",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "2001"
+  },
+  {
+    "doi": "10.1021/jo049940i",
+    "title": "NiCl<sub>2</sub>(dppe)-Catalyzed Cross-Coupling of Aryl Mesylates, Arenesulfonates, and Halides with Arylboronic Acids",
+    "authors": "Virgil Percec, Geoffrey M. Golding, Jan Smidrkal, Oliver Weichold",
+    "abstract": "An investigation of the NiCl2(dppe)-, NiCl2(dppb)-, NiCl2(dppf)-, NiCl2(PCy3)2-, and NiCl2(PPh3)2-catalyzed cross-coupling of the previously unreported aryl mesylates, and of aryl arenesulfonates, chlorides, bromides, and iodides containing electron-withdrawing and electron-donating substituents with aryl boronic acids, in the absence of a reducing agent, is reported. NiCl2(dppe) was the only catalyst that exhibited high and solvent-independent activity in the two solvents investigated, toluene and dioxane. NiCl2(dppe) with an excess of dppe, NiCl2(dppe)/dppe, was reactive in the cross-coupling of electron-poor aryl mesylates, tosylates, chlorides, bromides, and iodides. This catalyst was also efficient in the cross-coupling of aryl bromides and iodides containing electron-donating substituents. Most surprisingly, the replacement of the excess dppe from NiCl2(dppe)/dppe with excess PPh3 generated NiCl2(dppe)/PPh3, which was found to be reactive for the cross-coupling of both electron-rich and electron-poor aryl mesylates and chlorides. Therefore, the solvent-independent reactivity of NiCl2(dppe) provides an inexpensive and general nickel catalyst for the cross-coupling of aryl mesylates, tosylates, chlorides, bromides, and iodides with aryl boronic acids.",
+    "journal": "J. Org. Chem.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2004"
+  },
+  {
+    "doi": "10.1021/ja210249h",
+    "title": "Nickel-Catalyzed C\u2013H/C\u2013O Coupling of Azoles with Phenol Derivatives",
+    "authors": "Kei Muto, Junichiro Yamaguchi, Kenichiro Itami",
+    "abstract": "The first nickel-catalyzed C\u2013H bond arylation of azoles with phenol derivatives is described. The new Ni (cod) 2/dcype catalytic system is active for the coupling of various phenol derivatives such as esters, carbamates, carbonates, sulfamates, triflates, tosylates, and mesylates. With this C\u2013H/C\u2013O biaryl coupling, we synthesized a series of privileged 2-arylazoles, including biologically active alkaloids. Moreover, we demonstrated the utility of the present reaction for functionalizing estrone and quinine.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "H",
+    "strength": "Inert",
+    "publication_year": "2012"
+  },
+  {
+    "doi": "10.1021/jo00109a044",
+    "title": "Aryl Mesylates in Metal Catalyzed Homocoupling and Cross-Coupling Reactions. 2. Suzuki-Type Nickel-Catalyzed Cross-Coupling of Aryl Arenesulfonates and Aryl Mesylates with Arylboronic Acids",
+    "authors": "Virgil Percec, Jin-Young Bae, Dale H. Hill",
+    "abstract": "The Ni(0)-catalyzed Suzuki-type cross-coupling reaction of various aryl sulfonates including mesylate\nwith arylboronic acids in the presence of K3PO4 is reported. The Ni(0) catalyst is generated in situ\nfrom NiClaCdppf) and Zn. This novel reaction, which yields unsymmetrical biaryls in good yields\nunder mild conditions, is highly regiospecific and tolerates various functional groups. The influence\nof the effects of the substituent of the aromatic substrates, the nature of the leaving group, solvent,\nand type of catalyst, and base on the reaction yield are discussed. The reactivity of various Ni(0)\ncatalysts was compared to that of the less reactive Pd(0) catalysts.",
+    "journal": "J. Org. Chem.",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "1995"
+  },
+  {
+    "doi": "10.1002/anie.200801447",
+    "title": "Nickel\u2010Catalyzed Cross\u2010Coupling of Aryl Methyl Ethers with Aryl Boronic Esters",
+    "authors": "Mamoru Tobisu, Toshiaki Shimasaki, Naoto Chatani",
+    "abstract": "(Chemical Equation Presented) To C-OMe and go: The title reaction, involving cleavage of a C-OMe bond, is demonstrated for the coupling of aryl methyl ethers on fused aromatic systems, such as naphthalene and phenanthrene, as well as anisoles containing electron-withdrawing groups with a wide range of boronic esters. cod=cycloocta-1,5-diene, Cy=cyclohexyl.",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2008"
+  },
+  {
+    "doi": "10.1021/ja200398c",
+    "title": "Suzuki\u2212Miyaura Cross-Coupling of Aryl Carbamates and Sulfamates: Experimental and Computational Studies",
+    "authors": "Kyle W. Quasdorf, Aurora Antoft-Finch, Peng Liu, Amanda L. Silberstein, Anna Komaromi, Tom Blackburn, Stephen D. Ramgren, K. N. Houk, Victor Snieckus, Neil K. Garg",
+    "abstract": "The first Suzuki?Miyaura cross-coupling reactions of the synthetically versatile aryl O-carbamate and O-sulfamate groups are described. The transformations utilize the inexpensive, bench-stable catalyst NiCl2(PCy3)2 to furnish biaryls in good to excellent yields. A broad scope for this methodology has been demonstrated. Substrates with electron-donating and electron-withdrawing groups are tolerated, in addition to those that possess ortho substituents. Furthermore, heteroaryl substrates may be employed as coupling partners. A computational study providing the full catalytic cycles for these cross-coupling reactions is described. The oxidative addition with carbamates or sulfamates occurs via a five-centered transition state, resulting in the exclusive cleavage of the aryl C?O bond. Water is found to stabilize the Ni-carbamate catalyst resting state, which thus provides rationalization of the relative decreased rate of coupling of carbamates. Several synthetic applications are presented to showcase the utility of the methodology in the synthesis of polysubstituted aromatic compounds of natural product and bioactive molecule interest.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2011"
+  },
+  {
+    "doi": "10.1021/ja312087x",
+    "title": "Nickel-Catalyzed Cross-Couplings of Benzylic Pivalates with Arylboroxines: Stereospecific Formation of Diarylalkanes and Triarylmethanes",
+    "authors": "Qi Zhou, Harathi D. Srinivas, Srimoyee Dasgupta, Mary P. Watson",
+    "abstract": "We have developed a stereospecific nickel-catalyzed cross-coupling of benzylic pivalates with arylboroxines. The success of this reaction relies on the use of Ni(cod)2 as the catalyst and NaOMe as a uniquely effective base. This reaction has broad scope with respect to the arylboroxine and benzylic pivalate, enabling the synthesis of a variety of diarylalkanes and triarylmethanes in good to excellent yields and ee\u2019s.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2013"
+  },
+  {
+    "doi": "10.1016/0040-4039(96)01984-3",
+    "title": "Nickel-catalyzed coupling reaction of lithium organoborates and aryl mesylates possessing an electron withdrawing group",
+    "authors": "Yuichi Kobayashi, Ryo Mizojiri",
+    "abstract": "In the presence of NiCl2 (PPh3) 2 as catalyst, p-methoxycarbonylphenyl mesylate (5) and tosylate (6) react with lithium arylborates 4 (Ar= 2-furyl, Ph, p-Me-Ph; p-Me-Ph) at room temperature to afford the coupling products in high yields. Similarly, mesylates 9\u201311 coupled with these borates 4 efficiently.",
+    "journal": "Tetrahedron Letters",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "1996"
+  },
+  {
+    "doi": "10.1002/chem.201003731",
+    "title": "Cross\u2010Coupling of Aryl/Alkenyl Ethers with Aryl Grignard Reagents through Nickel\u2010Catalyzed C\uf8ffO Activation",
+    "authors": "Lan\u2010Gui Xie, Zhong\u2010Xia Wang",
+    "abstract": "The formation of a C-C bond has been achieved through the cleavage of the sp 2 C-O bond of aryl/alkenyl ethers catalyzed by a nickel complex, and by using Grignard reagents as nucleophiles (see scheme). This method displays a broad substrate scope and leads to good to excellent yields of the aryl\u2013aryl or alkenyl\u2013aryl cross\u2010coupling products.",
+    "journal": "Chemistry A European J",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2011"
+  },
+  {
+    "doi": "10.1021/jo1024464",
+    "title": "Rapid Nickel-Catalyzed Suzuki\u2212Miyaura Cross-Couplings of Aryl Carbamates and Sulfamates Utilizing Microwave Heating",
+    "authors": "Mostafa Baghbanzadeh, Christian Pilger, C. Oliver Kappe",
+    "abstract": "High-speed and scalable nickel-catalyzed cross-coupling of arylboronic acids with aryl carbamates and sulfamates is achieved by using sealed-vessel microwave processing.",
+    "journal": "J. Org. Chem.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2011"
+  },
+  {
+    "doi": "10.1021/ja108547u",
+    "title": "Stereospecific Nickel-Catalyzed Cross-Coupling Reactions of Alkyl Ethers: Enantioselective Synthesis of Diarylethanes",
+    "authors": "Buck L. H. Taylor, Elizabeth C. Swift, Joshua D. Waetzig, Elizabeth R. Jarvo",
+    "abstract": "Secondary benzylic ethers undergo stereospecific substitution reactions with Grignard reagents in the presence of nickel catalysts. Reactions proceed with inversion of configuration and high stereochemical fidelity. This reaction allows for facile enantioselective synthesis of biologically active diarylethanes from readily available optically enriched carbinols.",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "2011"
+  },
+  {
+    "doi": "10.1021/ja00502a074",
+    "title": "Nickel-induced conversion of carbon-oxygen into carbon-carbon bonds. One-step transformations of enol ethers into olefins and aryl ethers into biaryls",
+    "authors": "Ernest Wenkert, Enrique L. Michelotti, Charles S. Swindell",
+    "abstract": "No Abstarct",
+    "journal": "J. Am. Chem. Soc.",
+    "reaction_type": "Mg",
+    "strength": "Inert",
+    "publication_year": "1979"
+  },
+  {
+    "doi": "10.1002/anie.201101461",
+    "title": "Mutual Activation: Suzuki\u2013Miyaura Coupling through Direct Cleavage of the sp<sup>2</sup> C\uf8ffO Bond of Naphtholate",
+    "authors": "Da\u2010Gang Yu, Zhang\u2010Jie Shi",
+    "abstract": "No Abstarct",
+    "journal": "Angew Chem Int Ed",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2011"
+  },
+  {
+    "doi": "10.1021/ol101592r",
+    "title": "Nickel-Catalyzed C\u2212O Activation of Phenol Derivatives with Potassium Heteroaryltrifluoroborates",
+    "authors": "Gary A. Molander, Floriane Beaumard",
+    "abstract": "A general method based on nickel-catalyzed C? O activation of various phenol derivatives with potassium (hetero) aryltrifluoroborates has been developed. A large number of heterobiaryls can be easily obtained with yields up to 99% using methanesulfonate cross-coupling partners.",
+    "journal": "Org. Lett.",
+    "reaction_type": "B",
+    "strength": "Weak/Medium",
+    "publication_year": "2010"
+  },
+  {
+    "doi": "10.1021/ol9029534",
+    "title": "Nickel-Catalyzed Efficient and Practical Suzuki\u2212Miyaura Coupling of Alkenyl and Aryl Carbamates with Aryl Boroxines",
+    "authors": "Li Xu, Bi-Jie Li, Zhen-Hua Wu, Xing-Yu Lu, Bing-Tao Guan, Bi-Qin Wang, Ke-Qing Zhao, Zhang-Jie Shi",
+    "abstract": "Suzuki?Miyaura coupling of unactivated alkenyl carbamates is described to construct polysubstituted olefins. The developed process is also suitable for heteroaromatic and even electron-rich aromatic carbamates.",
+    "journal": "Org. Lett.",
+    "reaction_type": "B",
+    "strength": "Inert",
+    "publication_year": "2010"
+  }
+]

@@ -1,483 +1,735 @@
 """
-RAL (Redox-Active Ligands) RAG Service
+RAL (Redox-Active Ligand) RAG retrieval module.
 
-Retrieval-Augmented Generation layer that sits on top of RALDatabase.
-Analyses incoming chat queries, pulls relevant ligand properties and
-reaction-ligand literature, and formats everything for LLM prompt injection.
+Provides ligand and reaction retrieval from a local CSV/JSON database with
+cross-class matching so that comparison queries (e.g. "bipyridine vs
+bisoxazoline") surface entries for **all** mentioned ligand families rather
+than only the highest-scoring match.
 
-Design mirrors ``modules/nicobot_rag.py`` but is tailored for the
-reductive-coupling / ligand-electronic-property domain.
+Interface consumed by ``chat/redox.py`` and ``chat/helpers.py``:
+    rag = get_ral_rag()
+    context = rag.retrieve_context(message)
+    # context.formatted_context  – str
+    # context.ligands           – list[dict]
+    # context.reactions         – list[dict]
+    # context.detected_class    – str | None
+    enhanced = rag.build_enhanced_prompt(message, system_prompt)
+
+Data files
+----------
+The module looks for data in the following locations (first found wins):
+    * ``<PACKAGE_DATA_DIR>/ral_ligands.csv``
+    * ``<PACKAGE_DATA_DIR>/ral_reactions.json``
+    * Falls back to ``backend/data/ral_ligands.csv`` etc. relative to CWD.
+
+If no data files are found the module still imports successfully but
+``retrieve_context()`` returns an empty context object (formatted_context == "").
 """
 
-import re
-import logging
-from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, field
+from __future__ import annotations
 
-from .ral_database import get_ral_database, RALDatabase
+import csv
+import json
+import logging
+import os
+import re
+import unicodedata
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Synonym / alias map – bridges colloquial names to canonical class keys
+# ---------------------------------------------------------------------------
 
-@dataclass
-class RALRAGContext:
-    """Context retrieved from the RAL database for RAG."""
-    ligands: List[Dict[str, Any]]
-    reactions: List[Dict[str, Any]]
-    detected_class: str
-    ligand_class_info: Optional[Dict[str, Any]]
-    formatted_context: str
+LIGAND_ALIASES: Dict[str, str] = {
+    # bipyridine family
+    "bpy": "bipyridine",
+    "bipy": "bipyridine",
+    "2,2'-bipyridine": "bipyridine",
+    "2,2'-bipy": "bipyridine",
+    "dtbbpy": "bipyridine",
+    "dtbpy": "bipyridine",
+    "4,4'-di-tert-butyl-2,2'-bipyridine": "bipyridine",
+    "phenanthroline": "bipyridine",          # same N^N chelate class
+    "phen": "bipyridine",
+    "neocuproine": "bipyridine",
+    "bathophenanthroline": "bipyridine",
+    # bisoxazoline / bioxazoline family
+    "bisoxazoline": "bisoxazoline",
+    "bioxazoline": "bisoxazoline",           # common misspelling
+    "box": "bisoxazoline",
+    "pybox": "bisoxazoline",
+    "chiral pybox": "bisoxazoline",
+    "oxazoline": "bisoxazoline",
+    "i-pr-box": "bisoxazoline",
+    "t-butyl-box": "bisoxazoline",
+    "ph-box": "bisoxazoline",
+    # phenanthroline (if treated as separate class, uncomment)
+    # "phenanthroline": "phenanthroline",
+    # phosphine family
+    "phosphine": "phosphine",
+    "pph3": "phosphine",
+    "triphenylphosphine": "phosphine",
+    "pcy3": "phosphine",
+    "xphos": "phosphine",
+    "sphos": "phosphine",
+    "dppf": "diphosphine",
+    "diphosphine": "diphosphine",
+    "dppe": "diphosphine",
+    "dppp": "diphosphine",
+    # NHC family
+    "nhc": "nhc",
+    "n-heterocyclic carbene": "nhc",
+    "imidazolylidene": "nhc",
+    "sipc": "nhc",
+    "imes": "nhc",
+    # PDI family (redox-active)
+    "pdi": "pdi",
+    "bis-iminopyridine": "pdi",
+    "bis(imino)pyridine": "pdi",
+    "pyridine diimine": "pdi",
+    "redox-active ligand": "pdi",
+    # catecholate family (redox-active)
+    "catecholate": "catecholate",
+    "catechol": "catecholate",
+    "o-quinone": "catecholate",
+    "semiquinone": "catecholate",
+    "dithiolene": "dithiolene",
+    "dithiolene": "dithiolene",
+    # acetylacetonate
+    "acac": "acetylacetonate",
+    "acetylacetonate": "acetylacetonate",
+}
 
+# Reversible map for fast canonical look-up
+_CANONICAL: Dict[str, str] = {}
+for _alias, _canonical in LIGAND_ALIASES.items():
+    _CANONICAL[_alias.lower()] = _canonical
 
-class RALRAG:
-    """
-    RAG service for the Redox-Active Ligands chatbot (RAL-Bot).
-
-    Provides keyword-aware retrieval across:
-      - Grand_Data: DFT electronic descriptors (HOMO, LUMO, gap, omega, etc.)
-      - DOI List:   Literature-curated reaction-ligand knowledge
-    """
-
-    # Keywords that signal the user is asking about ligand properties
-    LIGAND_PROPERTY_KEYWORDS = [
-        'homo', 'lumo', 'gap', 'electrophilicity', 'omega', 'ionization',
-        'electron affinity', 'homa', 'aromaticity', 'electronic',
-        'descriptor', 'property', 'properties', 'dft', 'computed',
-        'energy', 'orbital', 'frontier', 'hardness', 'softness',
-    ]
-
-    # Keywords that signal the user is asking about reductive coupling reactions
-    REACTION_KEYWORDS = [
-        'reductive coupling', 'cross-electrophile', 'cross electrophile',
-        'reaction', 'coupling', 'nickel', 'ni-', 'catalyzed',
-        'electrophile', 'nucleophile', 'oxidative addition',
-        'reductive elimination', 'radical', 'single-electron',
-        'set', 'cross-coupling', 'c-o activation', 'c-o bond',
-        'alkyl', 'aryl', 'vinyl', 'allyl', 'triflate', 'bromide',
-        'chloride', 'iodide', 'halide', 'ketone', 'ester', 'amide',
-        'boronate', 'grignard', 'zinc', 'manganese', 'zinc',
-    ]
-
-    # Keywords about literature / papers / DOI
-    LITERATURE_KEYWORDS = [
-        'paper', 'publication', 'doi', 'article', 'study', 'reference',
-        'literature', 'cite', 'cited', 'author', 'journal',
-        'published', 'report',
-    ]
-
-    # Keywords that signal a recommendation / suggestion request
-    RECOMMENDATION_KEYWORDS = [
-        'recommend', 'suggest', 'alternative', 'similar', 'instead of',
-        'substitute', 'replacement', 'what ligand', 'which ligand',
-        'best ligand', 'good ligand', 'suitable ligand', 'choose',
-        'selection', 'pick', 'option', 'comparable', 'equivalent',
-        'compare', 'versus', ' vs ', 'difference between',
-    ]
-
-    # Keywords about specific ligand classes / families
-    LIGAND_CLASS_KEYWORDS = [
-        'bipyridine', 'bpy', 'dtbpy', 'dtbbpy', 'phenanthroline', 'phen',
-        'bathophenanthroline', 'bphen', 'terpyridine', 'neocuproine',
-        'bis(oxazoline)', 'box', 'bisoxazoline', 'chiral box',
-        'bis(imidazoline)', 'biim', 'biimidazoline',
-        'pyrox', 'pyrim', 'pycam', 'pyridine', 'imidazole',
-        'amidine', 'pybcam',
-        'redox-active', 'non-innocent', 'redox active', 'non innocent',
-    ]
-
-    def __init__(self):
-        self.db: Optional[RALDatabase] = None
-
-    def _ensure_db(self):
-        """Ensure the RAL database is loaded."""
-        if self.db is None:
-            self.db = get_ral_database()
-            if not self.db._loaded:
-                self.db.load()
-
-    def analyze_query(self, query: str) -> Dict[str, float]:
-        """
-        Classify the query intent by scoring keyword categories.
-
-        Returns a dict with normalised scores (0-1) for each category.
-        """
-        query_lower = query.lower()
-        scores = {
-            'ligand_properties': 0.0,
-            'reactions': 0.0,
-            'literature': 0.0,
-            'ligand_class': 0.0,
-            'recommendation': 0.0,
-        }
-
-        for kw in self.LIGAND_PROPERTY_KEYWORDS:
-            if kw in query_lower:
-                scores['ligand_properties'] += 1.0
-
-        for kw in self.REACTION_KEYWORDS:
-            if kw in query_lower:
-                scores['reactions'] += 1.0
-
-        for kw in self.LITERATURE_KEYWORDS:
-            if kw in query_lower:
-                scores['literature'] += 1.0
-
-        for kw in self.LIGAND_CLASS_KEYWORDS:
-            if kw in query_lower:
-                scores['ligand_class'] += 1.0
-
-        for kw in self.RECOMMENDATION_KEYWORDS:
-            if kw in query_lower:
-                scores['recommendation'] += 1.0
-
-        # Normalise to 0-1
-        total = sum(scores.values())
-        if total > 0:
-            for k in scores:
-                scores[k] /= total
-
-        return scores
-
-    def retrieve_context(self, query: str,
-                         max_ligands: int = 5,
-                         max_reactions: int = 5) -> RALRAGContext:
-        """
-        Main retrieval method.  Combines results from both datasets
-        and returns formatted context ready for prompt injection.
-        """
-        self._ensure_db()
-
-        scores = self.analyze_query(query)
-
-        # Decide retrieval priorities based on query intent
-        # If heavy on properties, fetch more ligands; if heavy on
-        # reactions/literature, fetch more reactions.
-        if scores['ligand_properties'] > 0.3:
-            max_ligands = max(max_ligands, 8)
-        if scores['reactions'] > 0.3 or scores['literature'] > 0.3:
-            max_reactions = max(max_reactions, 8)
-
-        combined = self.db.search_combined(query,
-                                           max_ligands=max_ligands,
-                                           max_reactions=max_reactions)
-
-        ligands = combined['ligands']
-        reactions = combined['reactions']
-        detected_class = combined['detected_class']
-
-        # If a class was detected, also pull class-level summary
-        class_info = None
-        if detected_class:
-            class_info = self.db.get_ligand_classes().get(detected_class)
-
-        # --- Similarity-based recommendations ---
-        similar_ligands = []
-        if scores['recommendation'] > 0.15:
-            similar_ligands = self._get_similar_recommendations(
-                query, reactions, ligands, detected_class
-            )
-
-        formatted = self._format_context(ligands, reactions,
-                                          detected_class, class_info,
-                                          similar_ligands=similar_ligands)
-
-        return RALRAGContext(
-            ligands=ligands,
-            reactions=reactions,
-            detected_class=detected_class or '',
-            ligand_class_info=class_info,
-            formatted_context=formatted,
-        )
-
-    def _get_similar_recommendations(
-        self,
-        query: str,
-        reactions: List[Dict],
-        ligands: List[Dict],
-        detected_class: str,
-    ) -> List[Dict[str, Any]]:
-        """
-        Use the similarity engine to recommend ligands based on
-        what the literature says works for similar reactions.
-
-        Strategy:
-          1. If reactions were found, take the optimum ligand name
-             and find its electronic-profile neighbours.
-          2. If a ligand name was mentioned in the query, find
-             similar ligands to that one.
-          3. If a class was detected, find the most representative
-             ligand and recommend from the same cluster.
-
-        The similarity engine uses UMAP (preferred) or PCA (fallback)
-        for dimensionality reduction, then KNN in the embedding space.
-        """
-        try:
-            from .ral_similarity import get_similarity_engine
-        except ImportError:
-            return []
-
-        try:
-            engine = get_similarity_engine()
-            if not engine._fitted:
-                return []
-        except Exception as e:
-            logger.warning(f"Similarity engine not available: {e}")
-            return []
-
-        # Store method name for context formatting
-        self._sim_method = engine._method
-
-        results = []
-        query_lower = query.lower()
-
-        # Strategy 1: Use optimum ligand from reaction results
-        if reactions:
-            opt_ligand = reactions[0].get('optimum_ligand', '')
-            if opt_ligand:
-                # Try to find a matching ligand in Grand_Data
-                # The DOI list uses full names; try key fragments
-                for kw in self.LIGAND_CLASS_KEYWORDS + ['bpy', 'phen', 'pyrox', 'pyrim', 'pycam']:
-                    if kw in opt_ligand.lower():
-                        # Search for a ligand of this class
-                        class_matches = self.db.search_ligands(
-                            kw, limit=1
-                        )
-                        if class_matches:
-                            similar = engine.recommend_for_ligand(
-                                class_matches[0]['name'], k=5
-                            )
-                            results.extend([
-                                self._similarity_result_to_dict(s)
-                                for s in similar
-                            ])
-                            break
-
-        # Strategy 2: User mentioned a specific ligand name
-        if not results:
-            for lp in ligands:
-                if lp['name'].lower() in query_lower:
-                    similar = engine.recommend_for_ligand(
-                        lp['name'], k=5
-                    )
-                    results.extend([
-                        self._similarity_result_to_dict(s)
-                        for s in similar
-                    ])
-                    break
-
-        # Strategy 3: Class detected → pick class representative
-        if not results and detected_class:
-            class_ligands = self.db.get_ligands_by_class(detected_class)
-            if class_ligands:
-                similar = engine.recommend_for_ligand(
-                    class_ligands[0]['name'], k=5
-                )
-                results.extend([
-                    self._similarity_result_to_dict(s)
-                    for s in similar
-                ])
-
-        # Deduplicate by name
-        seen = set()
-        unique = []
-        for r in results:
-            if r['name'] not in seen:
-                seen.add(r['name'])
-                unique.append(r)
-
-        return unique[:5]
-
-    @staticmethod
-    def _similarity_result_to_dict(s) -> Dict[str, Any]:
-        """Convert a SimilarityResult to a plain dict."""
-        return {
-            'name': s.name,
-            'class': s.ligand_class,
-            'distance': round(s.distance, 4),
-            'cosine_similarity': round(s.cosine_similarity, 4),
-            'embedding_coords': [round(c, 4) for c in s.embedding_coords],
-            'pca_coords': [round(c, 4) for c in s.pca_coords],
-            'features': s.features,
-        }
-
-    def _format_context(
-        self,
-        ligands: List[Dict],
-        reactions: List[Dict],
-        detected_class: str,
-        class_info: Optional[Dict],
-        similar_ligands: List[Dict] = None,
-    ) -> str:
-        """Format retrieved data into a Markdown block for LLM prompt."""
-        parts = []
-
-        # --- Ligand properties section ---
-        if ligands:
-            parts.append("### Ligand Electronic Properties (from DFT database):")
-            for lp in ligands[:8]:
-                line = (f"- **{lp['name']}** ({lp['class']}): "
-                        f"HOMO={lp['HOMO_eV']:.3f} eV, "
-                        f"LUMO={lp['LUMO_eV']:.3f} eV, "
-                        f"Gap={lp['Gap_eV']:.3f} eV, "
-                        f"\u03c9={lp['omega_eV']:.3f} eV")
-                parts.append(line)
-
-            # If class detected, add class summary
-            if class_info:
-                ci = class_info
-                parts.append(
-                    f"\n**{detected_class} class summary** ({ci['count']} ligands): "
-                    f"HOMO range [{ci['HOMO_range'][0]:.3f}, {ci['HOMO_range'][1]:.3f}] eV, "
-                    f"LUMO range [{ci['LUMO_range'][0]:.3f}, {ci['LUMO_range'][1]:.3f}] eV, "
-                    f"Gap range [{ci['Gap_range'][0]:.3f}, {ci['Gap_range'][1]:.3f}] eV, "
-                    f"\u03c9 range [{ci['omega_range'][0]:.3f}, {ci['omega_range'][1]:.3f}] eV"
-                )
-
-        # --- Reaction-ligand literature section ---
-        if reactions:
-            parts.append("\n### Relevant Reductive Coupling Reactions (from literature database):")
-            for r in reactions[:5]:
-                parts.append(f"- **{r['title']}**")
-                parts.append(f"  - DOI: {r['doi']}")
-                if r['optimum_ligand']:
-                    parts.append(f"  - Optimum Ligand: {r['optimum_ligand']}")
-                if r['coupling_partner']:
-                    parts.append(f"  - Coupling Partner: {r['coupling_partner']}")
-                if r['mapped_class']:
-                    parts.append(f"  - Ligand Class: {r['mapped_class']}")
-                # Include ligand knowledge (truncated for prompt brevity)
-                if r['ligand_knowledge']:
-                    knowledge = r['ligand_knowledge']
-                    if len(knowledge) > 600:
-                        knowledge = knowledge[:597] + "..."
-                    parts.append(f"  - Ligand Knowledge: {knowledge}")
-                parts.append("")
-
-        # --- Similarity-based recommendations section ---
-        if similar_ligands:
-            method_label = getattr(self, '_sim_method', 'UMAP').upper()
-            parts.append(
-                f"\n### Similar Ligand Recommendations ({method_label}-based similarity):"
-            )
-            parts.append(
-                "The following ligands have similar electronic profiles "
-                "(based on " + method_label + " dimensionality reduction of "
-                "HOMO, LUMO, Gap, ω, I_min, V_min, R1-HOMA, R2-HOMA):"
-            )
-            for sl in similar_ligands[:5]:
-                f = sl['features']
-                line = (
-                    f"- **{sl['name']}** ({sl['class']}): "
-                    f"HOMO={f.get('HOMO (eV)', 0):.3f}, "
-                    f"LUMO={f.get('LUMO (eV)', 0):.3f}, "
-                    f"Gap={f.get('Gap (eV)', 0):.3f}, "
-                    f"ω={f.get('ω (eV)', 0):.3f} "
-                    f"[distance={sl['distance']:.3f}, "
-                    f"cosine={sl['cosine_similarity']:.3f}]"
-                )
-                parts.append(line)
-            parts.append(
-                "These ligands are recommended as alternatives because they "
-                "share similar electronic properties in the "
-                + method_label + "-reduced descriptor space."
-            )
-
-        return "\n".join(parts) if parts else ""
-
-    def build_enhanced_prompt(
-        self,
-        user_message: str,
-        system_prompt: str = None,
-    ) -> str:
-        """
-        Build a RAG-enhanced system prompt for the RAL-Bot.
-        """
-        context = self.retrieve_context(user_message)
-
-        base_prompt = system_prompt or (
-            "You are a specialized AI assistant for Redox-Active Ligands "
-            "chemistry and reductive cross-coupling reactions."
-        )
-
-        if context.formatted_context:
-            enhanced = (
-                f"{base_prompt}\n\n"
-                f"The following data has been retrieved from the RAL "
-                f"research database. Use this to provide specific, "
-                f"data-backed answers:\n\n"
-                f"{context.formatted_context}\n\n"
-                "When answering:\n"
-                "- Reference specific ligand names, electronic descriptors, "
-                "and DOI-backed literature when relevant.\n"
-                "- If the user asks about ligand properties, compare values "
-                "across classes using the HOMO/LUMO/Gap/\u03c9 data.\n"
-                "- If the user asks about which ligand to use for a reaction, "
-                "cite the relevant papers and their optimum ligand findings.\n"
-                "- If no database match is found, answer from general "
-                "knowledge but note that no database match was found."
-            )
-            return enhanced
-
-        return base_prompt
-
-    def get_ligand_info_response(self, ligand_name: str) -> Optional[str]:
-        """Get a formatted string about a specific ligand's properties."""
-        self._ensure_db()
-        ligands = self.db.search_ligands(ligand_name, limit=3)
-        if not ligands:
-            return None
-
-        response = "### Ligand Properties:\n\n"
-        for lp in ligands:
-            response += f"**{lp['name']}** ({lp['class']})\n"
-            response += f"- HOMO: {lp['HOMO_eV']:.3f} eV\n"
-            response += f"- LUMO: {lp['LUMO_eV']:.3f} eV\n"
-            response += f"- HOMO-LUMO Gap: {lp['Gap_eV']:.3f} eV\n"
-            response += f"- Electrophilicity (\u03c9): {lp['omega_eV']:.3f} eV\n"
-            response += f"- Ionization Potential (I_min): {lp['I_min_eV']:.3f} eV\n"
-            response += f"- Electron Affinity (V_min): {lp['V_min_eV']:.3f} eV\n"
-            response += f"- R1 Aromaticity (HOMA): {lp['R1_HOMA']:.3f}\n"
-            response += f"- R2 Aromaticity (HOMA): {lp['R2_HOMA']:.3f}\n\n"
-
-        return response
-
-    def get_database_stats_response(self) -> str:
-        """Get a formatted response about RAL database statistics."""
-        self._ensure_db()
-        stats = self.db.get_statistics()
-        classes = self.db.get_ligand_classes()
-
-        response = "### RAL Database Statistics\n\n"
-        response += f"The RAL database contains:\n\n"
-        response += f"- **{stats['ligands']}** ligands across **{stats['ligand_classes']}** classes\n"
-        for cls_name, info in classes.items():
-            response += f"  - {cls_name}: {info['count']} ligands\n"
-        response += f"\n- **{stats['reactions_curated']}** curated reductive coupling reactions"
-        response += f" (with ligand knowledge)\n"
-        response += f"- **{stats['reactions_doi_only']}** additional DOIs awaiting curation\n"
-        response += "\nI can search this database to provide specific ligand electronic properties, "
-        response += "literature-backed ligand recommendations, and reaction-ligand comparisons."
-
-        return response
+# Reaction-type keywords that help narrow the context
+REACTION_KEYWORDS: Dict[str, List[str]] = {
+    "reductive coupling": ["reductive coupling", "reductive cross-coupling",
+                           "cross-electrophile coupling", "electrophile coupling"],
+    "cross-coupling": ["cross-coupling", "suzuki", "heck", "kumada",
+                       "negishi", "stille", "sonogashira"],
+    "C-O activation": ["c-o activation", "c-o bond activation",
+                       "aryl ether", "ester activation"],
+    "hydrofunctionalization": ["hydrofunctionalization", "hydroalkylation",
+                               "hydroarylation", "hydrosilylation",
+                               "hydroboration"],
+    "C-H activation": ["c-h activation", "c-h bond activation"],
+}
 
 
 # ---------------------------------------------------------------------------
-# Module-level singleton
+# Data classes
+# ---------------------------------------------------------------------------
+
+@dataclass
+class RALContext:
+    """Returned by ``retrieve_context()``."""
+    formatted_context: str = ""
+    ligands: List[Dict[str, Any]] = field(default_factory=list)
+    reactions: List[Dict[str, Any]] = field(default_factory=list)
+    detected_class: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Helper – text normalisation
+# ---------------------------------------------------------------------------
+
+def _normalise(text: str) -> str:
+    """Lower-case, strip accents, collapse whitespace."""
+    text = unicodedata.normalize("NFKD", text).lower()
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _tokenise(text: str) -> Set[str]:
+    """Simple whitespace + punctuation tokeniser."""
+    return set(re.findall(r"[a-z0-9]+", _normalise(text)))
+
+
+# ---------------------------------------------------------------------------
+# Query analysis – extract *all* ligand classes mentioned
+# ---------------------------------------------------------------------------
+
+def _extract_ligand_classes(query: str) -> List[str]:
+    """Return a **deduplicated, order-preserving** list of canonical ligand
+    class names found in *query*.
+
+    This is the key fix for comparison queries: we must extract *every*
+    mentioned ligand, not just the top-1 match.
+    """
+    nq = _normalise(query)
+    found: List[str] = []
+    seen: Set[str] = set()
+
+    # 1. Multi-word aliases first (longer matches are more specific)
+    sorted_aliases = sorted(LIGAND_ALIASES.keys(), key=len, reverse=True)
+    for alias in sorted_aliases:
+        na = _normalise(alias)
+        if na in nq:
+            canonical = LIGAND_ALIASES[alias]
+            if canonical not in seen:
+                found.append(canonical)
+                seen.add(canonical)
+
+    # 2. Single-word token fallback: check each token against canonical names
+    tokens = _tokenise(query)
+    for token in tokens:
+        if token in _CANONICAL:
+            canonical = _CANONICAL[token]
+            if canonical not in seen:
+                found.append(canonical)
+                seen.add(canonical)
+
+    return found
+
+
+def _detect_reaction_type(query: str) -> Optional[str]:
+    """Return the most likely reaction type key, or None."""
+    nq = _normalise(query)
+    best: Optional[str] = None
+    best_count = 0
+    for rtype, keywords in REACTION_KEYWORDS.items():
+        count = sum(1 for kw in keywords if kw in nq)
+        if count > best_count:
+            best = rtype
+            best_count = count
+    return best
+
+
+# ---------------------------------------------------------------------------
+# CSV / JSON data loader
+# ---------------------------------------------------------------------------
+
+def _find_data_dir() -> Optional[Path]:
+    """Search for the data directory in several likely locations."""
+    candidates = [
+        # Package-level data directory (set via env var)
+        os.environ.get("RAL_DATA_DIR"),
+        # Relative to this file's grand-parent (backend/)
+        Path(__file__).resolve().parent.parent / "data",
+        # Relative to CWD
+        Path.cwd() / "data",
+        Path.cwd() / "backend" / "data",
+    ]
+    for c in candidates:
+        if c and Path(c).is_dir():
+            return Path(c)
+    return None
+
+
+def _load_ligands(data_dir: Path) -> List[Dict[str, Any]]:
+    """Load ligand entries from ``ral_ligands.csv``."""
+    csv_path = data_dir / "ral_ligands.csv"
+    if not csv_path.exists():
+        logger.warning("RAL ligand data not found: %s", csv_path)
+        return []
+    ligands: List[Dict[str, Any]] = []
+    with open(csv_path, newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            row["class"] = _CANONICAL.get(
+                _normalise(row.get("ligand_class", row.get("class", ""))),
+                _normalise(row.get("ligand_class", row.get("class", ""))),
+            )
+            ligands.append(row)
+    logger.info("Loaded %d ligand entries from %s", len(ligands), csv_path)
+    return ligands
+
+
+def _load_reactions(data_dir: Path) -> List[Dict[str, Any]]:
+    """Load reaction entries from ``ral_reactions.json``."""
+    json_path = data_dir / "ral_reactions.json"
+    if not json_path.exists():
+        # Also try CSV
+        csv_path = data_dir / "ral_reactions.csv"
+        if csv_path.exists():
+            return _load_reactions_csv(csv_path)
+        logger.warning("RAL reaction data not found: %s", json_path)
+        return []
+    with open(json_path, encoding="utf-8") as fh:
+        data = json.load(fh)
+    if isinstance(data, dict):
+        reactions = data.get("reactions", data.get("entries", []))
+    else:
+        reactions = data
+    logger.info("Loaded %d reaction entries from %s", len(reactions), json_path)
+    return reactions
+
+
+def _load_reactions_csv(csv_path: Path) -> List[Dict[str, Any]]:
+    """Fallback: load reactions from CSV."""
+    reactions: List[Dict[str, Any]] = []
+    with open(csv_path, newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            # Normalise ligand references
+            for field in ("ligand", "ligand_class", "optimal_ligand"):
+                if field in row:
+                    row[f"{field}_norm"] = _CANONICAL.get(
+                        _normalise(row[field]), _normalise(row[field])
+                    )
+            reactions.append(row)
+    logger.info("Loaded %d reaction entries from %s", len(reactions), csv_path)
+    return reactions
+
+
+# ---------------------------------------------------------------------------
+# Retrieval / scoring
+# ---------------------------------------------------------------------------
+
+def _score_ligand(ligand: Dict[str, Any],
+                  query_classes: List[str],
+                  reaction_type: Optional[str]) -> float:
+    """Score a ligand entry against the query.
+
+    A ligand scores higher when:
+      - Its class matches one of the query-mentioned classes
+      - Its name / aliases appear in the original query
+      - It has associated reaction data matching the detected reaction type
+    """
+    score = 0.0
+    lig_class = ligand.get("class", "").lower()
+    lig_name = _normalise(ligand.get("name", ligand.get("ligand", "")))
+
+    # Class match (primary signal)
+    for qc in query_classes:
+        if lig_class == qc.lower():
+            score += 10.0
+            break
+        # Partial / substring match for broader class hits
+        if qc.lower() in lig_class or lig_class in qc.lower():
+            score += 3.0
+
+    # Name token overlap
+    lig_tokens = _tokenise(lig_name)
+    query_tokens = _tokenise(" ".join(query_classes))
+    if lig_tokens & query_tokens:
+        score += 5.0 * len(lig_tokens & query_tokens) / max(len(lig_tokens), 1)
+
+    # Reaction type affinity
+    if reaction_type:
+        lig_reactions = ligand.get("reaction_types", ligand.get("reactions", ""))
+        if isinstance(lig_reactions, str) and reaction_type.lower() in lig_reactions.lower():
+            score += 4.0
+        elif isinstance(lig_reactions, list):
+            if any(reaction_type.lower() in str(r).lower() for r in lig_reactions):
+                score += 4.0
+
+    return score
+
+
+def _score_reaction(reaction: Dict[str, Any],
+                    query_classes: List[str],
+                    reaction_type: Optional[str]) -> float:
+    """Score a reaction entry against the query."""
+    score = 0.0
+
+    # Reaction type match
+    if reaction_type:
+        r_type_str = " ".join([
+            reaction.get("reaction_type", ""),
+            reaction.get("reaction_name", ""),
+            reaction.get("type", ""),
+            reaction.get("description", ""),
+        ]).lower()
+        if reaction_type.lower() in r_type_str:
+            score += 8.0
+
+    # Ligand class match
+    for field in ("ligand", "ligand_class", "optimal_ligand"):
+        val = reaction.get(field, "")
+        norm_val = _normalise(val)
+        # Check direct match against canonical names
+        if norm_val in _CANONICAL:
+            canonical = _CANONICAL[norm_val]
+            if canonical in [qc.lower() for qc in query_classes]:
+                score += 6.0
+        # Also check the normalised field directly
+        for qc in query_classes:
+            if qc.lower() in norm_val or norm_val in qc.lower():
+                score += 4.0
+
+    # Check normalised fields (set by CSV loader)
+    for field in ("ligand_norm", "ligand_class_norm", "optimal_ligand_norm"):
+        norm_val = reaction.get(field, "")
+        for qc in query_classes:
+            if qc.lower() == norm_val:
+                score += 6.0
+
+    return score
+
+
+# ---------------------------------------------------------------------------
+# Context formatting
+# ---------------------------------------------------------------------------
+
+def _format_ligand_entry(lig: Dict[str, Any]) -> str:
+    """Format a single ligand as a readable block."""
+    parts = []
+    name = lig.get("name", lig.get("ligand", "Unknown"))
+    lig_class = lig.get("class", lig.get("ligand_class", ""))
+    parts.append(f"- {name} (class: {lig_class})")
+
+    # Electronic properties (core RAL metrics)
+    for prop in ("HOMO", "LUMO", "Gap", "omega", "homo", "lumo", "gap", "Omega"):
+        val = lig.get(prop)
+        if val is not None:
+            parts.append(f"  {prop}: {val}")
+
+    # General notes
+    notes = lig.get("notes", lig.get("description", ""))
+    if notes:
+        parts.append(f"  Notes: {notes}")
+
+    return "\n".join(parts)
+
+
+def _format_reaction_entry(rxn: Dict[str, Any]) -> str:
+    """Format a single reaction as a readable block."""
+    parts = []
+    name = rxn.get("reaction_name", rxn.get("name", rxn.get("description", "Unknown reaction")))
+    rtype = rxn.get("reaction_type", rxn.get("type", ""))
+    ligand = rxn.get("optimal_ligand", rxn.get("ligand", ""))
+    doi = rxn.get("DOI", rxn.get("doi", ""))
+    yield_val = rxn.get("yield", rxn.get("yield_%", ""))
+
+    line = f"- {name}"
+    if rtype:
+        line += f" [{rtype}]"
+    parts.append(line)
+    if ligand:
+        parts.append(f"  Optimal ligand: {ligand}")
+    if yield_val:
+        parts.append(f"  Yield: {yield_val}")
+    if doi:
+        parts.append(f"  DOI: {doi}")
+
+    return "\n".join(parts)
+
+
+def _build_formatted_context(ligands: List[Dict[str, Any]],
+                              reactions: List[Dict[str, Any]],
+                              query_classes: List[str],
+                              reaction_type: Optional[str]) -> str:
+    """Build the final formatted context string for the LLM."""
+    sections = []
+
+    # Ligand data section
+    if ligands:
+        lig_lines = ["== Ligand Data =="]
+        for lig in ligands:
+            lig_lines.append(_format_ligand_entry(lig))
+        sections.append("\n".join(lig_lines))
+
+    # Reaction data section
+    if reactions:
+        rxn_lines = ["== Reaction Data =="]
+        for rxn in reactions:
+            rxn_lines.append(_format_reaction_entry(rxn))
+        sections.append("\n".join(rxn_lines))
+
+    # Comparison note when multiple classes detected
+    if len(query_classes) > 1:
+        sections.append(
+            "== Retrieval Note ==\n"
+            "The user is comparing multiple ligand classes. "
+            "Data for ALL mentioned classes has been retrieved above. "
+            "Do NOT claim data is missing for any mentioned ligand class "
+            "unless its section above is genuinely empty."
+        )
+
+    return "\n\n".join(sections)
+
+
+# ---------------------------------------------------------------------------
+# Main RAL RAG class
+# ---------------------------------------------------------------------------
+
+class RALRAG:
+    """Retrieve-and-rank engine for the RAL database.
+
+    The critical design decision: **comparison queries must retrieve entries
+    for every mentioned ligand class**, not just the top-scoring one.
+    """
+
+    MAX_LIGANDS_PER_CLASS = 5
+    MAX_REACTIONS_PER_CLASS = 5
+    MIN_SCORE_THRESHOLD = 1.0
+
+    def __init__(self):
+        self.ligands: List[Dict[str, Any]] = []
+        self.reactions: List[Dict[str, Any]] = []
+
+        data_dir = _find_data_dir()
+        if data_dir:
+            self.ligands = _load_ligands(data_dir)
+            self.reactions = _load_reactions(data_dir)
+            if not self.ligands and not self.reactions:
+                logger.warning(
+                    "RAL RAG: data dir found (%s) but no ligand/reaction files loaded",
+                    data_dir,
+                )
+        else:
+            logger.warning("RAL RAG: no data directory found — retrieval will return empty context")
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def retrieve_context(self, message: str) -> RALContext:
+        """Analyse *message* and return relevant ligand + reaction entries.
+
+        **Cross-class retrieval**: every ligand class mentioned in the query
+        gets its own retrieval pass, so comparison queries are balanced.
+        """
+        if not self.ligands and not self.reactions:
+            return RALContext()
+
+        # 1. Parse the query
+        query_classes = _extract_ligand_classes(message)
+        reaction_type = _detect_reaction_type(message)
+
+        if not query_classes:
+            # No ligand class detected — fall back to fuzzy token matching
+            return self._fuzzy_retrieve(message, reaction_type)
+
+        # 2. Score ALL ligands against ALL query classes
+        scored_ligands = [
+            (lig, _score_ligand(lig, query_classes, reaction_type))
+            for lig in self.ligands
+        ]
+        scored_ligands.sort(key=lambda x: x[1], reverse=True)
+
+        # 3. Ensure balanced coverage: take top-N per class, not just global top-N
+        selected_ligands = self._balanced_select(
+            scored_ligands, query_classes, self.MAX_LIGANDS_PER_CLASS
+        )
+
+        # 4. Score reactions
+        scored_reactions = [
+            (rxn, _score_reaction(rxn, query_classes, reaction_type))
+            for rxn in self.reactions
+        ]
+        scored_reactions.sort(key=lambda x: x[1], reverse=True)
+
+        selected_reactions = self._balanced_select_reactions(
+            scored_reactions, query_classes, self.MAX_REACTIONS_PER_CLASS
+        )
+
+        # 5. Format
+        formatted = _build_formatted_context(
+            selected_ligands, selected_reactions, query_classes, reaction_type
+        )
+
+        detected = query_classes[0] if query_classes else None
+        return RALContext(
+            formatted_context=formatted,
+            ligands=selected_ligands,
+            reactions=selected_reactions,
+            detected_class=detected,
+        )
+
+    def build_enhanced_prompt(self, message: str, system_prompt: str) -> str:
+        """Build a system-prompt-level enhanced prompt.
+
+        Uses the same retrieval logic but injects context into the system
+        prompt (legacy path used by ``chat/helpers.py``).
+        """
+        context = self.retrieve_context(message)
+        if not context.formatted_context:
+            return system_prompt
+        return (
+            f"{system_prompt}\n\n"
+            f"DATABASE-GROUNDED ANSWERING RULES:\n"
+            f"1. Use the database context below as your PRIMARY reference point. "
+            f"Quote exact HOMO, LUMO, Gap, and omega values from the database when available. "
+            f"Cite specific DOIs when discussing reactions.\n"
+            f"2. You MAY supplement with your domain knowledge to provide: "
+            f"mechanistic explanations, electronic-structure reasoning, "
+            f"coordination-chemistry principles, and literature context beyond the database.\n"
+            f"3. When comparing ligands, discuss ALL ligand classes mentioned by the user.\n\n"
+            f"DATABASE CONTEXT:\n\n"
+            f"{context.formatted_context}\n\n"
+            f"END DATABASE CONTEXT"
+        )
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _balanced_select(
+        self,
+        scored: List[Tuple[Dict, float]],
+        query_classes: List[str],
+        per_class_limit: int,
+    ) -> List[Dict[str, Any]]:
+        """Select results ensuring every query class is represented.
+
+        Algorithm:
+          1. For each query class, take the top *per_class_limit* scoring
+             ligands whose class matches.
+          2. Fill remaining slots with the highest-scoring entries overall.
+          3. Deduplicate by primary key (name or first field).
+        """
+        selected: List[Dict[str, Any]] = []
+        seen_keys: Set[str] = set()
+
+        def _key(entry: Dict) -> str:
+            return _normalise(entry.get("name", entry.get("ligand", "")))
+
+        # Pass 1: per-class top-N
+        for qc in query_classes:
+            class_matches = [
+                (entry, sc) for entry, sc in scored
+                if entry.get("class", "").lower() == qc.lower()
+                and sc >= self.MIN_SCORE_THRESHOLD
+            ]
+            for entry, _ in class_matches[:per_class_limit]:
+                k = _key(entry)
+                if k and k not in seen_keys:
+                    selected.append(entry)
+                    seen_keys.add(k)
+
+        # Pass 2: fill with global top-N (for classes not in the database
+        # but that may have related entries)
+        for entry, sc in scored:
+            if sc >= self.MIN_SCORE_THRESHOLD:
+                k = _key(entry)
+                if k and k not in seen_keys:
+                    selected.append(entry)
+                    seen_keys.add(k)
+            if len(selected) >= per_class_limit * len(query_classes) * 2:
+                break
+
+        return selected
+
+    def _balanced_select_reactions(
+        self,
+        scored: List[Tuple[Dict, float]],
+        query_classes: List[str],
+        per_class_limit: int,
+    ) -> List[Dict[str, Any]]:
+        """Select reactions ensuring coverage for each query class."""
+        selected: List[Dict[str, Any]] = []
+        seen_keys: Set[str] = set()
+
+        def _key(entry: Dict) -> str:
+            doi = entry.get("DOI", entry.get("doi", ""))
+            name = entry.get("reaction_name", entry.get("name", ""))
+            return _normalise(f"{doi}-{name}")
+
+        # Per-class selection
+        for qc in query_classes:
+            class_matches = [
+                (entry, sc) for entry, sc in scored
+                if sc >= self.MIN_SCORE_THRESHOLD
+                and self._reaction_mentions_class(entry, qc)
+            ]
+            for entry, _ in class_matches[:per_class_limit]:
+                k = _key(entry)
+                if k not in seen_keys:
+                    selected.append(entry)
+                    seen_keys.add(k)
+
+        # Global top-up
+        for entry, sc in scored:
+            if sc >= self.MIN_SCORE_THRESHOLD:
+                k = _key(entry)
+                if k not in seen_keys:
+                    selected.append(entry)
+                    seen_keys.add(k)
+            if len(selected) >= per_class_limit * len(query_classes) * 2:
+                break
+
+        return selected
+
+    @staticmethod
+    def _reaction_mentions_class(reaction: Dict, query_class: str) -> bool:
+        """Check if a reaction entry references a given ligand class."""
+        qc = query_class.lower()
+        for field in ("ligand", "ligand_class", "optimal_ligand",
+                       "ligand_norm", "ligand_class_norm", "optimal_ligand_norm"):
+            val = _normalise(reaction.get(field, ""))
+            if val == qc or qc in val or val in qc:
+                return True
+        # Also check description
+        desc = _normalise(reaction.get("description", ""))
+        if qc in desc:
+            return True
+        return False
+
+    def _fuzzy_retrieve(self, message: str,
+                        reaction_type: Optional[str]) -> RALContext:
+        """Fallback when no specific ligand class is detected.
+
+        Uses token overlap between the query and all ligand/reaction text
+        fields to find the most relevant entries.
+        """
+        query_tokens = _tokenise(message)
+        if not query_tokens:
+            return RALContext()
+
+        # Score ligands by token overlap
+        scored_ligands = []
+        for lig in self.ligands:
+            text = " ".join(str(v) for v in lig.values())
+            lig_tokens = _tokenise(text)
+            overlap = len(query_tokens & lig_tokens)
+            if overlap > 0:
+                scored_ligands.append((lig, float(overlap)))
+
+        scored_ligands.sort(key=lambda x: x[1], reverse=True)
+        selected_ligands = [l for l, _ in scored_ligands[:10]]
+
+        # Score reactions similarly
+        scored_reactions = []
+        for rxn in self.reactions:
+            text = " ".join(str(v) for v in rxn.values())
+            rxn_tokens = _tokenise(text)
+            overlap = len(query_tokens & rxn_tokens)
+            bonus = 4.0 if reaction_type and reaction_type.lower() in text.lower() else 0.0
+            if overlap > 0 or bonus > 0:
+                scored_reactions.append((rxn, float(overlap) + bonus))
+
+        scored_reactions.sort(key=lambda x: x[1], reverse=True)
+        selected_reactions = [r for r, _ in scored_reactions[:10]]
+
+        formatted = _build_formatted_context(
+            selected_ligands, selected_reactions, [], reaction_type
+        )
+
+        return RALContext(
+            formatted_context=formatted,
+            ligands=selected_ligands,
+            reactions=selected_reactions,
+            detected_class=None,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Singleton factory
 # ---------------------------------------------------------------------------
 
 _rag_instance: Optional[RALRAG] = None
 
 
 def get_ral_rag() -> RALRAG:
-    """Get or create the global RAL RAG instance."""
+    """Return the module-level RALRAG singleton (lazy-init)."""
     global _rag_instance
     if _rag_instance is None:
         _rag_instance = RALRAG()
     return _rag_instance
 
 
-def enhance_redox_prompt(user_message: str,
-                         system_prompt: str = None) -> str:
-    """Convenience function to enhance a RAL-Bot prompt with database context."""
-    rag = get_ral_rag()
-    return rag.build_enhanced_prompt(user_message, system_prompt)
+def reset_ral_rag() -> None:
+    """Force re-creation on next ``get_ral_rag()`` call (useful in tests)."""
+    global _rag_instance
+    _rag_instance = None

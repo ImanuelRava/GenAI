@@ -1,0 +1,2144 @@
+[
+  {
+    "DATA ID": "JL1-001",
+    "DOI": "10.1021/acs.accounts.5b00051",
+    "JOURNAL ISO": "ACCOUNTS OF CHEMICAL RESEARCH",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Review Article",
+    "REACTION TYPE": "Review Article",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-002",
+    "DOI": "10.1021/ar100082d",
+    "JOURNAL ISO": "ACCOUNTS OF CHEMICAL RESEARCH",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Review Article",
+    "REACTION TYPE": "Review Article",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-003",
+    "DOI": "10.1021/acscatal.0c00291",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-004",
+    "DOI": "10.1021/acscatal.0c01199",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-005",
+    "DOI": "10.1021/acscatal.0c03993",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-006",
+    "DOI": "10.1021/acscatal.1c03010",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-007",
+    "DOI": "10.1021/acscatal.1c04800",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphates",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-008",
+    "DOI": "10.1021/acscatal.1c05208",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-009",
+    "DOI": "10.1021/acscatal.2c00512",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-010",
+    "DOI": "10.1021/acscatal.5b00498",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Review Article",
+    "REACTION TYPE": "Review Article",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-011",
+    "DOI": "10.1021/acscatal.5b01021",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL1-012",
+    "DOI": "10.1021/acscatal.6b00801",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL1-013",
+    "DOI": "10.1021/acscatal.6b00865",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-014",
+    "DOI": "10.1021/acscatal.6b02964",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Review Article",
+    "REACTION TYPE": "Review Article",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-015",
+    "DOI": "10.1021/acscatal.7b00772",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Xanthate Ester",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-016",
+    "DOI": "10.1021/acscatal.7b00941",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL1-017",
+    "DOI": "10.1021/acscatal.7b01058",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Organoaluminum",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL1-018",
+    "DOI": "10.1021/acscatal.7b02618",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-019",
+    "DOI": "10.1021/acscatal.7b04030",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphates",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2020
+  },
+  {
+    "DATA ID": "JL1-020",
+    "DOI": "10.1021/acscatal.8b02954",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-021",
+    "DOI": "10.1021/acscatal.8b03436",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-022",
+    "DOI": "10.1021/acscatal.9b00521",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL1-023",
+    "DOI": "10.1021/acscatal.9b00744",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Stille",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-024",
+    "DOI": "10.1021/acscatal.9b02458",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-025",
+    "DOI": "10.1021/acscatal.9b03352",
+    "JOURNAL ISO": "ACS CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-026",
+    "DOI": "10.1002/anie.200453765",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-027",
+    "DOI": "10.1002/anie.200801447",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2018
+  },
+  {
+    "DATA ID": "JL1-028",
+    "DOI": "10.1002/anie.200803814",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2019
+  },
+  {
+    "DATA ID": "JL1-029",
+    "DOI": "10.1002/anie.200900329",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2018
+  },
+  {
+    "DATA ID": "JL1-030",
+    "DOI": "10.1002/anie.200907359",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2004
+  },
+  {
+    "DATA ID": "JL1-031",
+    "DOI": "10.1002/anie.201101191",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL1-032",
+    "DOI": "10.1002/anie.201101461",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL1-033",
+    "DOI": "10.1002/anie.201202527",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL1-034",
+    "DOI": "10.1002/anie.201308391",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Heck",
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-035",
+    "DOI": "10.1002/anie.201308666",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1981
+  },
+  {
+    "DATA ID": "JL1-036",
+    "DOI": "10.1002/anie.201402922",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organolithium",
+    "TIME": 1983
+  },
+  {
+    "DATA ID": "JL1-037",
+    "DOI": "10.1002/anie.201403823",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": 1995
+  },
+  {
+    "DATA ID": "JL1-038",
+    "DOI": "10.1002/anie.201412051",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": 1979
+  },
+  {
+    "DATA ID": "JL1-039",
+    "DOI": "10.1002/anie.201503936",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-040",
+    "DOI": "10.1002/anie.201507494",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-041",
+    "DOI": "10.1002/anie.201508757",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL1-042",
+    "DOI": "10.1002/anie.201510497",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organoaluminum",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL1-043",
+    "DOI": "10.1002/anie.201511438",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL1-044",
+    "DOI": "10.1002/anie.201601206",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL1-045",
+    "DOI": "10.1002/anie.201607646",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL1-046",
+    "DOI": "10.1002/anie.201700097",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-047",
+    "DOI": "10.1002/anie.201705521",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-048",
+    "DOI": "10.1002/anie.201710241",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Heck",
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-049",
+    "DOI": "10.1002/anie.201800701",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-050",
+    "DOI": "10.1002/anie.201809919",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL1-051",
+    "DOI": "10.1002/anie.201909543",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-052",
+    "DOI": "10.1002/anie.201910168",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-053",
+    "DOI": "10.1002/anie.202004116",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Trifluoromethylation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-054",
+    "DOI": "10.1002/anie.202011036",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-055",
+    "DOI": "10.1002/anie.202103327",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-056",
+    "DOI": "10.1002/anie.202110391",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-057",
+    "DOI": "10.1002/anie.202114556",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-058",
+    "DOI": "10.1002/anie.202114731",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-059",
+    "DOI": "10.1002/anie.202114981",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive Allylation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-060",
+    "DOI": "10.1002/anie.202213739",
+    "JOURNAL ISO": "ANGEWANDTE CHEMIE-INTL EDITION",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-061",
+    "DOI": "10.1039/b609064h",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphates",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-062",
+    "DOI": "10.1039/b718998b",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-063",
+    "DOI": "10.1039/b803072c",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-064",
+    "DOI": "10.1039/c0cc02173c",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-065",
+    "DOI": "10.1039/c0cc03107k",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-066",
+    "DOI": "10.1039/c1cc11193k",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-067",
+    "DOI": "10.1039/c3cc46663a",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-068",
+    "DOI": "10.1039/c4cc08187k",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organolithium",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-069",
+    "DOI": "10.1039/c4cc08426h",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-070",
+    "DOI": "10.1039/c7cc06717h",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-071",
+    "DOI": "10.1039/c9cc08079a",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-072",
+    "DOI": "10.1039/d1cc00634g",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-073",
+    "DOI": "10.1039/c39810000313",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-074",
+    "DOI": "10.1039/c39830000112",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-075",
+    "DOI": "10.1039/c39940001789",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-076",
+    "DOI": "10.1039/c39950001863",
+    "JOURNAL ISO": "CHEMICAL COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-077",
+    "DOI": "10.1039/c1sc00026h",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-078",
+    "DOI": "10.1039/c4sc03106g",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-079",
+    "DOI": "10.1039/c5sc02942b",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-080",
+    "DOI": "10.1039/c7sc03140h",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-081",
+    "DOI": "10.1039/c7sc05216b",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-082",
+    "DOI": "10.1039/c8sc00609a",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-083",
+    "DOI": "10.1039/c9sc03347e",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-084",
+    "DOI": "10.1039/d0sc05452f",
+    "JOURNAL ISO": "CHEMICAL SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive Vinylation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-085",
+    "DOI": "10.1021/ja00132a039",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-086",
+    "DOI": "10.1021/ja00502a074",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-087",
+    "DOI": "10.1021/ja00531a016",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-088",
+    "DOI": "10.1021/ja038752r",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-089",
+    "DOI": "10.1021/ja074453g",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Alpha-H",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-090",
+    "DOI": "10.1021/ja101186p",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-091",
+    "DOI": "10.1021/ja106943q",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-092",
+    "DOI": "10.1021/ja108547u",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-093",
+    "DOI": "10.1021/ja200398c",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-094",
+    "DOI": "10.1021/ja202769t",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-095",
+    "DOI": "10.1021/ja2084509",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-096",
+    "DOI": "10.1021/ja210249h",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-097",
+    "DOI": "10.1021/ja300031w",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-098",
+    "DOI": "10.1021/ja307045r",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-099",
+    "DOI": "10.1021/ja311783k",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-100",
+    "DOI": "10.1021/ja4034999",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-101",
+    "DOI": "10.1021/ja408561b",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-102",
+    "DOI": "10.1021/ja410704d",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-103",
+    "DOI": "10.1021/ja5026485",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Heck",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-104",
+    "DOI": "10.1021/ja5029793",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-105",
+    "DOI": "10.1021/ja5076426",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-106",
+    "DOI": "10.1021/ja510653n",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-107",
+    "DOI": "10.1021/ja710944j",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL1-108",
+    "DOI": "10.1021/ja8056503",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL1-109",
+    "DOI": "10.1021/ja806244b",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL1-110",
+    "DOI": "10.1021/ja810157e",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2020
+  },
+  {
+    "DATA ID": "JL1-111",
+    "DOI": "10.1021/ja903091g",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL1-112",
+    "DOI": "10.1021/ja906477r",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-113",
+    "DOI": "10.1021/ja907700e",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL1-114",
+    "DOI": "10.1021/jacs.0c01330",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-115",
+    "DOI": "10.1021/jacs.0c02805",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-116",
+    "DOI": "10.1021/jacs.0c04670",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL1-117",
+    "DOI": "10.1021/jacs.0c06904",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2018
+  },
+  {
+    "DATA ID": "JL1-118",
+    "DOI": "10.1021/jacs.0c06995",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2019
+  },
+  {
+    "DATA ID": "JL1-119",
+    "DOI": "10.1021/jacs.0c10471",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL1-120",
+    "DOI": "10.1021/jacs.0c12462",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-121",
+    "DOI": "10.1021/jacs.0c13093",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2008
+  },
+  {
+    "DATA ID": "JL1-122",
+    "DOI": "10.1021/jacs.1c08105",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Epoxide",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL1-123",
+    "DOI": "10.1021/jacs.1c08399",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-124",
+    "DOI": "10.1021/jacs.1c09797",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-125",
+    "DOI": "10.1021/jacs.1c12203",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL1-126",
+    "DOI": "10.1021/jacs.2c02062",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2021
+  },
+  {
+    "DATA ID": "JL1-127",
+    "DOI": "10.1021/jacs.5b01909",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2006
+  },
+  {
+    "DATA ID": "JL1-128",
+    "DOI": "10.1021/jacs.6b03253",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL1-129",
+    "DOI": "10.1021/jacs.6b08075",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-130",
+    "DOI": "10.1021/jacs.6b11412",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL1-131",
+    "DOI": "10.1021/jacs.7b02326",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2020
+  },
+  {
+    "DATA ID": "JL1-132",
+    "DOI": "10.1021/jacs.7b04279",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1994
+  },
+  {
+    "DATA ID": "JL1-133",
+    "DOI": "10.1021/jacs.7b04973",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-134",
+    "DOI": "10.1021/jacs.7b11707",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": 2004
+  },
+  {
+    "DATA ID": "JL1-135",
+    "DOI": "10.1021/jacs.7b12865",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL1-136",
+    "DOI": "10.1021/jacs.8b02134",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL1-137",
+    "DOI": "10.1021/jacs.8b12801",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-138",
+    "DOI": "10.1021/jacs.8b13403",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-139",
+    "DOI": "10.1021/jacs.9b00097",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-140",
+    "DOI": "10.1021/jacs.9b03280",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-141",
+    "DOI": "10.1021/jacs.9b03863",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-142",
+    "DOI": "10.1021/jacs.9b05461",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-143",
+    "DOI": "10.1021/ja312087x",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-144",
+    "DOI": "10.1038/nature14676",
+    "JOURNAL ISO": "NATURE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-145",
+    "DOI": "10.1038/s41929-020-00560-3",
+    "JOURNAL ISO": "NATURE CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-146",
+    "DOI": "10.1038/nchem.2741",
+    "JOURNAL ISO": "NATURE CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-147",
+    "DOI": "10.1038/ncomms11073",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": null,
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-148",
+    "DOI": "10.1038/s41467-018-07198-7",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-149",
+    "DOI": "10.1038/s41467-020-17224-2",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-150",
+    "DOI": "10.1038/s41467-020-20725-9",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-151",
+    "DOI": "10.1038/s41467-021-23887-2",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "YES",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-152",
+    "DOI": "10.1038/s41467-021-27507-x",
+    "JOURNAL ISO": "NATURE COMMUNICATIONS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Photochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-153",
+    "DOI": "10.1126/science.abo0039",
+    "JOURNAL ISO": "SCIENCE",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Electrochemistry",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL1-154",
+    "DOI": "10.1021/jacs.9b05224",
+    "JOURNAL ISO": "JOURNAL OF THE AMERICAN CHEMICAL SOCIETY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": null,
+    "REACTION TYPE": "Reductive",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-001",
+    "DOI": "10.1002/adsc.200404150",
+    "JOURNAL ISO": "ADVANCED SYNTHESIS & CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL2-002",
+    "DOI": "10.1002/adsc.201000710",
+    "JOURNAL ISO": "ADVANCED SYNTHESIS & CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-003",
+    "DOI": "10.1002/adsc.201100151",
+    "JOURNAL ISO": "ADVANCED SYNTHESIS & CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-004",
+    "DOI": "10.1002/adsc.201100241",
+    "JOURNAL ISO": "ADVANCED SYNTHESIS & CATALYSIS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-005",
+    "DOI": "10.1246/cl.150936",
+    "JOURNAL ISO": "CHEMISTRY LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organoaluminum",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-006",
+    "DOI": "10.1246/cl.2005.796",
+    "JOURNAL ISO": "CHEMISTRY LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Negishi",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-007",
+    "DOI": "10.1246/cl.2011.1001",
+    "JOURNAL ISO": "CHEMISTRY LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Silicaoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-008",
+    "DOI": "10.1246/cl.2011.913",
+    "JOURNAL ISO": "CHEMISTRY LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL2-009",
+    "DOI": "10.1002/chem.200902785",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL2-010",
+    "DOI": "10.1002/chem.201000420",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-011",
+    "DOI": "10.1002/chem.201003731",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-012",
+    "DOI": "10.1002/chem.201103050",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1980
+  },
+  {
+    "DATA ID": "JL2-013",
+    "DOI": "10.1002/chem.201103784",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL2-015",
+    "DOI": "10.1002/chem.201505106",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organolithium",
+    "TIME": 2017
+  },
+  {
+    "DATA ID": "JL2-016",
+    "DOI": "10.1002/chem.201603436",
+    "JOURNAL ISO": "CHEMISTRY-A EUROPEAN JOURNAL",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Organolithium",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-018",
+    "DOI": "10.1002/ejic.201900692",
+    "JOURNAL ISO": "EUROPEAN JOURNAL OF INORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1995
+  },
+  {
+    "DATA ID": "JL2-019",
+    "DOI": "10.1002/ejoc.200900067",
+    "JOURNAL ISO": "EUROPEAN JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1995
+  },
+  {
+    "DATA ID": "JL2-020",
+    "DOI": "10.1002/ejoc.201000147",
+    "JOURNAL ISO": "EUROPEAN JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1985
+  },
+  {
+    "DATA ID": "JL2-021",
+    "DOI": "10.1002/ejoc.201001519",
+    "JOURNAL ISO": "EUROPEAN JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2001
+  },
+  {
+    "DATA ID": "JL2-022",
+    "DOI": "10.1002/ejoc.201200444",
+    "JOURNAL ISO": "EUROPEAN JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2003
+  },
+  {
+    "DATA ID": "JL2-023",
+    "DOI": "10.1002/hlca.19800630427",
+    "JOURNAL ISO": "HELVETICA CHIMICA ACTA",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2004
+  },
+  {
+    "DATA ID": "JL2-024",
+    "DOI": "10.1021/acs.joc.6b01627",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2007
+  },
+  {
+    "DATA ID": "JL2-025",
+    "DOI": "10.1021/acs.joc.6b02564",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-026",
+    "DOI": "10.1021/jo00041a004",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Perioxide",
+    "REACTION TYPE": "Organolithium",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-027",
+    "DOI": "10.1021/jo00109a044",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2011
+  },
+  {
+    "DATA ID": "JL2-028",
+    "DOI": "10.1021/jo00126a047",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-029",
+    "DOI": "10.1021/jo00205a042",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Perioxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-030",
+    "DOI": "10.1021/jo010452+",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-031",
+    "DOI": "10.1021/jo026449n",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL2-032",
+    "DOI": "10.1021/jo049940i",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-033",
+    "DOI": "10.1021/jo070912k",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1999
+  },
+  {
+    "DATA ID": "JL2-034",
+    "DOI": "10.1021/jo1024464",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carbamate/Sulfumate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2000
+  },
+  {
+    "DATA ID": "JL2-035",
+    "DOI": "10.1021/jo2000034",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1977
+  },
+  {
+    "DATA ID": "JL2-036",
+    "DOI": "10.1021/jo202037x",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2002
+  },
+  {
+    "DATA ID": "JL2-037",
+    "DOI": "10.1021/jo2022982",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Mesylate/Sulfamate/Carboxylate/Carbamate/Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-038",
+    "DOI": "10.1021/jo3001194",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2000
+  },
+  {
+    "DATA ID": "JL2-039",
+    "DOI": "10.1021/jo300547v",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfamate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL2-040",
+    "DOI": "10.1021/jo4005537",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Triazine ether",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL2-042",
+    "DOI": "10.1021/jo982060h",
+    "JOURNAL ISO": "JOURNAL OF ORGANIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1998
+  },
+  {
+    "DATA ID": "JL2-043",
+    "DOI": "10.1016/s0022-328x(00)00164-9",
+    "JOURNAL ISO": "JOURNAL OF ORGANOMETALLIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2016
+  },
+  {
+    "DATA ID": "JL2-044",
+    "DOI": "10.1016/s0022-328x(00)98073-2",
+    "JOURNAL ISO": "JOURNAL OF ORGANOMETALLIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Hydroxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-045",
+    "DOI": "10.1016/s0022-328x(02)01174-9",
+    "JOURNAL ISO": "JOURNAL OF ORGANOMETALLIC CHEMISTRY",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2001
+  },
+  {
+    "DATA ID": "JL2-047",
+    "DOI": "10.1039/a908076g",
+    "JOURNAL ISO": "JOURNAL OF THE CHEMICAL SOCIETY-PERKIN TRANSACTIONS 1",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2005
+  },
+  {
+    "DATA ID": "JL2-048",
+    "DOI": "10.1039/b002547j",
+    "JOURNAL ISO": "JOURNAL OF THE CHEMICAL SOCIETY-PERKIN TRANSACTIONS 1",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Aryloxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL2-049",
+    "DOI": "10.1021/acs.orglett.5b02200",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-050",
+    "DOI": "10.1021/acs.orglett.5b03151",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-051",
+    "DOI": "10.1021/acs.orglett.6b00819",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carbamate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-052",
+    "DOI": "10.1021/acs.orglett.6b01398",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-054",
+    "DOI": "10.1021/ol016526l",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-055",
+    "DOI": "10.1021/ol050393c",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfamate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-056",
+    "DOI": "10.1021/ol101592r",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-058",
+    "DOI": "10.1021/ol201248c",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-060",
+    "DOI": "10.1021/ol203322v",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2012
+  },
+  {
+    "DATA ID": "JL2-062",
+    "DOI": "10.1021/ol300364s",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL2-063",
+    "DOI": "10.1021/ol300891k",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL2-065",
+    "DOI": "10.1021/ol302112q",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL2-066",
+    "DOI": "10.1021/ol4011757",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2013
+  },
+  {
+    "DATA ID": "JL2-067",
+    "DOI": "10.1021/ol401727y",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfamate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL2-068",
+    "DOI": "10.1021/ol4031364",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-069",
+    "DOI": "10.1021/ol4031815",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Perioxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL2-070",
+    "DOI": "10.1021/ol5016724",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2014
+  },
+  {
+    "DATA ID": "JL2-071",
+    "DOI": "10.1021/ol501707z",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL2-072",
+    "DOI": "10.1021/ol502583h",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-073",
+    "DOI": "10.1021/ol503061c",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfamate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2007
+  },
+  {
+    "DATA ID": "JL2-074",
+    "DOI": "10.1021/ol503707m",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-076",
+    "DOI": "10.1021/ol702499h",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Negishi",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL2-077",
+    "DOI": "10.1021/ol800335v",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "Organosilica",
+    "TIME": 2009
+  },
+  {
+    "DATA ID": "JL2-078",
+    "DOI": "10.1021/ol901429g",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Perioxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL2-079",
+    "DOI": "10.1021/ol901978e",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2010
+  },
+  {
+    "DATA ID": "JL2-080",
+    "DOI": "10.1021/ol9028308",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2015
+  },
+  {
+    "DATA ID": "JL2-081",
+    "DOI": "10.1021/ol9029534",
+    "JOURNAL ISO": "ORGANIC LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carbamate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-082",
+    "DOI": "10.1021/acs.organomet.5b00874",
+    "JOURNAL ISO": "ORGANOMETALLICS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-085",
+    "DOI": "10.1016/j.tet.2013.04.096",
+    "JOURNAL ISO": "TETRAHEDRON",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-086",
+    "DOI": "10.1016/s0040-4020(97)10211-3",
+    "JOURNAL ISO": "TETRAHEDRON",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Perioxide",
+    "REACTION TYPE": "Ring-opening",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-087",
+    "DOI": "10.1016/s0040-4020(98)00809-6",
+    "JOURNAL ISO": "TETRAHEDRON",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1998
+  },
+  {
+    "DATA ID": "JL2-088",
+    "DOI": "10.1016/0040-4039(80)80215-2",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Silicaoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1980
+  },
+  {
+    "DATA ID": "JL2-089",
+    "DOI": "10.1016/0040-4039(96)01302-0",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Carboxylate",
+    "REACTION TYPE": "C-H Activation",
+    "TIME": null
+  },
+  {
+    "DATA ID": "JL2-090",
+    "DOI": "10.1016/0040-4039(96)01984-3",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1996
+  },
+  {
+    "DATA ID": "JL2-091",
+    "DOI": "10.1016/j.tetlet.2006.01.145",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 2006
+  },
+  {
+    "DATA ID": "JL2-092",
+    "DOI": "10.1016/s0040-4039(00)94062-0",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1983
+  },
+  {
+    "DATA ID": "JL2-093",
+    "DOI": "10.1016/s0040-4039(01)82980-4",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1981
+  },
+  {
+    "DATA ID": "JL2-094",
+    "DOI": "10.1016/s0040-4039(97)00178-0",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Alkoxide",
+    "REACTION TYPE": "Kumada",
+    "TIME": 1997
+  },
+  {
+    "DATA ID": "JL2-095",
+    "DOI": "10.1016/s0040-4039(99)00517-1",
+    "JOURNAL ISO": "TETRAHEDRON LETTERS",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Phosphate",
+    "REACTION TYPE": "Suzuki",
+    "TIME": 1999
+  },
+  {
+    "DATA ID": "JL2-096",
+    "DOI": "10.1039/D2CY01805E",
+    "JOURNAL ISO": "CATALYSIS SCI & TECH",
+    "IN SITU ACTIVATION": "NO",
+    "MAIN ELECTROPHILE LVG": "Sulfonate",
+    "REACTION TYPE": "Kumada",
+    "TIME": 2022
+  }
+]
