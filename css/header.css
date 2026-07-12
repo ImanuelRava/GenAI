@@ -7,9 +7,9 @@
   --tmc-primary: #8b5cf6;
   --tmc-light: #ede9fe;
   --tmc-dark: #6d28d9;
-  --ral-primary: #10b981;
-  --ral-light: #d1fae5;
-  --ral-dark: #059669;
+  --rc-primary: #10b981;
+  --rc-light: #d1fae5;
+  --rc-dark: #059669;
   --virus-primary: #ef4444;
   --virus-light: #fee2e2;
   --virus-dark: #dc2626;
@@ -99,7 +99,7 @@ header {
 .logo-title {
   font-size: 1.35rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--rc-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -156,9 +156,9 @@ nav a.active-tmc {
   background: var(--tmc-light);
 }
 
-nav a.active-ral {
-  color: var(--ral-primary);
-  background: var(--ral-light);
+nav a.active-rc {
+  color: var(--rc-primary);
+  background: var(--rc-light);
 }
 
 nav a.active-virus {

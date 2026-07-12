@@ -56,9 +56,9 @@
             --tmc-primary: #8b5cf6;
             --tmc-light: #ede9fe;
             --tmc-dark: #6d28d9;
-            --ral-primary: #10b981;
-            --ral-light: #d1fae5;
-            --ral-dark: #059669;
+            --rc-primary: #10b981;
+            --rc-light: #d1fae5;
+            --rc-dark: #059669;
             --virus-primary: #ef4444;
             --virus-light: #fee2e2;
             --virus-dark: #dc2626;
@@ -151,7 +151,7 @@
         .logo-title {
             font-size: 1.35rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+            background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--rc-primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -250,7 +250,7 @@
         .hero-orb-3 {
             width: 300px;
             height: 300px;
-            background: var(--ral-primary);
+            background: var(--rc-primary);
             top: 50%;
             left: 50%;
             animation-delay: 4s;
@@ -298,7 +298,7 @@
         .hero-badge-dot {
             width: 8px;
             height: 8px;
-            background: var(--ral-primary);
+            background: var(--rc-primary);
             border-radius: 50%;
             animation: pulse 2s ease-in-out infinite;
         }
@@ -486,7 +486,7 @@
 
         .project-card.ai::before { background: linear-gradient(90deg, var(--ai-primary), var(--ai-dark)); }
         .project-card.tmc::before { background: linear-gradient(90deg, var(--tmc-primary), var(--tmc-dark)); }
-        .project-card.ral::before { background: linear-gradient(90deg, var(--ral-primary), var(--ral-dark)); }
+        .project-card.rc::before { background: linear-gradient(90deg, var(--rc-primary), var(--rc-dark)); }
         .project-card.virus::before { background: linear-gradient(90deg, var(--virus-primary), var(--virus-dark)); }
         .project-card.tm::before { background: linear-gradient(90deg, var(--tm-primary), var(--tm-dark)); }
 
@@ -516,8 +516,8 @@
         .project-card.ai .project-icon svg { color: var(--ai-primary); }
         .project-card.tmc .project-icon { background: var(--tmc-light); }
         .project-card.tmc .project-icon svg { color: var(--tmc-primary); }
-        .project-card.ral .project-icon { background: var(--ral-light); }
-        .project-card.ral .project-icon svg { color: var(--ral-primary); }
+        .project-card.rc .project-icon { background: var(--rc-light); }
+        .project-card.rc .project-icon svg { color: var(--rc-primary); }
         .project-card.virus .project-icon { background: var(--virus-light); }
         .project-card.virus .project-icon svg { color: var(--virus-primary); }
         .project-card.tm .project-icon { background: var(--tm-light); }
@@ -565,7 +565,7 @@
 
         .project-card.ai .project-features li svg { color: var(--ai-primary); }
         .project-card.tmc .project-features li svg { color: var(--tmc-primary); }
-        .project-card.ral .project-features li svg { color: var(--ral-primary); }
+        .project-card.rc .project-features li svg { color: var(--rc-primary); }
         .project-card.virus .project-features li svg { color: var(--virus-primary); }
 
         .project-footer {
@@ -586,7 +586,7 @@
 
         .project-card.ai .project-tag { color: var(--ai-primary); }
         .project-card.tmc .project-tag { color: var(--tmc-primary); }
-        .project-card.ral .project-tag { color: var(--ral-primary); }
+        .project-card.rc .project-tag { color: var(--rc-primary); }
         .project-card.virus .project-tag { color: var(--virus-primary); }
 
         .project-arrow {
@@ -605,7 +605,7 @@
 
         .project-card.ai .project-arrow { background: var(--ai-light); color: var(--ai-primary); }
         .project-card.tmc .project-arrow { background: var(--tmc-light); color: var(--tmc-primary); }
-        .project-card.ral .project-arrow { background: var(--ral-light); color: var(--ral-primary); }
+        .project-card.rc .project-arrow { background: var(--rc-light); color: var(--rc-primary); }
         .project-card.virus .project-arrow { background: var(--virus-light); color: var(--virus-primary); }
 
         
@@ -659,8 +659,8 @@
         .feature-card:nth-child(1) .feature-icon svg { color: var(--ai-primary); }
         .feature-card:nth-child(2) .feature-icon { background: var(--tmc-light); }
         .feature-card:nth-child(2) .feature-icon svg { color: var(--tmc-primary); }
-        .feature-card:nth-child(3) .feature-icon { background: var(--ral-light); }
-        .feature-card:nth-child(3) .feature-icon svg { color: var(--ral-primary); }
+        .feature-card:nth-child(3) .feature-icon { background: var(--rc-light); }
+        .feature-card:nth-child(3) .feature-icon svg { color: var(--rc-primary); }
         .feature-card:nth-child(4) .feature-icon { background: var(--virus-light); }
         .feature-card:nth-child(4) .feature-icon svg { color: var(--virus-primary); }
 
@@ -738,7 +738,7 @@
         }
 
         .cta-card:nth-child(1) .cta-icon { background: linear-gradient(135deg, var(--ai-primary), var(--tmc-primary)); }
-        .cta-card:nth-child(2) .cta-icon { background: linear-gradient(135deg, var(--ral-primary), var(--tmc-primary)); }
+        .cta-card:nth-child(2) .cta-icon { background: linear-gradient(135deg, var(--rc-primary), var(--tmc-primary)); }
 
         .cta-card h3 {
             font-size: 1.5rem;
@@ -931,7 +931,7 @@
                     <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="AI/">Artificial Intelligence</a></li>
                     <li><a href="TMC/">Transition Metal Catalysis</a></li>
-                    <li><a href="redox-ligands/">Redox-Active Ligands</a></li>
+                    <li><a href="reductive-coupling/">Reductive Coupling</a></li>
                     <li><a href="virus/">Virology</a></li>
                     <li><a href="technical-modules/">Technical Modules</a></li>
                 </ul>
@@ -1149,7 +1149,7 @@
                     </div>
                 </a>
 
-                <a href="redox-ligands/" class="project-card ral">
+                <a href="reductive-coupling/" class="project-card rc">
                     <div class="project-header">
                         <div class="project-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1161,7 +1161,7 @@
                             </svg>
                         </div>
                         <div class="project-info">
-                            <h3 id="nitrogen-title">Redox-Active Ligands</h3>
+                            <h3 id="nitrogen-title">Reductive Coupling</h3>
                             <p>AI-driven ligand optimization</p>
                         </div>
                     </div>
@@ -1379,7 +1379,7 @@
                     <a href="index.html">Home</a>
                     <a href="AI/">Artificial Intelligence</a>
                     <a href="TMC/">Transition Metal Catalysis</a>
-                    <a href="redox-ligands/">Redox-Active Ligands</a>
+                    <a href="reductive-coupling/">Reductive Coupling</a>
                     <a href="virus/">Virology</a>
                     <a href="technical-modules/">Technical Modules</a>
                 </div>
@@ -1419,7 +1419,7 @@
                 "teaser": "TMC utilizes machine learning to predict outcomes in Nickel-catalyzed reactions. Click this card to access the dedicated research portal, live tools, and detailed methodology."
             },
             "nitrogen": {
-                "sectionTitle": "Redox-Active Ligands",
+                "sectionTitle": "Reductive Coupling",
                 "teaser": "Nitrogen-based ligands play a pivotal role in modulating the electronic and steric environment of metal centers. Click to explore our AI-driven ligand optimization research and interactive database."
             },
             "virus": {

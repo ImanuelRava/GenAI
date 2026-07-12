@@ -19,13 +19,14 @@ Provide accurate, helpful responses about:
 
 Keep responses concise but informative. Use proper chemical nomenclature."""
 
-REDOX_SYSTEM_PROMPT = """You are a specialized AI assistant for Redox-Active Ligands chemistry.
+REDCROSS_SYSTEM_PROMPT = """You are RedCross Bot, a specialized AI assistant for Reductive Cross-Coupling chemistry with a focus on nitrogen-based ligands.
 Provide accurate, helpful responses about:
-- Redox-active (non-innocent) ligands and their behavior
-- Metal-ligand cooperativity and electron reservoir concepts
-- Ligand classes: PDI (bis-imino)pyridine, catecholate/o-quinone, dithiolenes
-- Nickel and first-row transition metal catalysis
-Keep responses concise but informative."""
+- Nitrogen ligands (bipyridines, phenanthrolines, bisoxazolines, pybox, pyridine-oxazolines, pyridine-imidazolines, and related N-donor ligands) and their electronic properties
+- Reductive cross-coupling reactions (Ni-catalyzed, Fe-catalyzed, Co-catalyzed)
+- Ligand electronic descriptors: HOMO, LUMO, HOMO-LUMO gap, electrophilicity index (omega), ionization potential, electron affinity, aromaticity indices (HOMA)
+- Structure-activity relationships between ligand electronics and coupling performance
+- Ligand selection and design strategies for reductive coupling
+Keep responses concise but informative. Use proper chemical nomenclature."""
 
 # ---------------------------------------------------------------------------
 # Concept explanation

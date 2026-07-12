@@ -9,9 +9,9 @@
   --tmc-light: #ede9fe;
   --tmc-dark: #6d28d9;
 
-  --ral-primary: #10b981;
-  --ral-light: #d1fae5;
-  --ral-dark: #059669;
+  --rc-primary: #10b981;
+  --rc-light: #d1fae5;
+  --rc-dark: #059669;
 
   --virus-primary: #ef4444;
   --virus-light: #fee2e2;
@@ -155,7 +155,7 @@ header {
 .logo-title {
   font-size: 1.25rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--ral-primary) 100%);
+  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--tmc-primary) 50%, var(--rc-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -177,7 +177,7 @@ header {
 }
 
 .theme-green .logo-title {
-  background: linear-gradient(135deg, var(--ral-primary) 0%, var(--tmc-primary) 100%);
+  background: linear-gradient(135deg, var(--rc-primary) 0%, var(--tmc-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -732,12 +732,12 @@ nav a.active {
 
 .highlight-box.success,
 .info-box.success {
-  background: linear-gradient(135deg, var(--ral-light) 0%, var(--bg-white) 100%);
-  border-left-color: var(--ral-primary);
+  background: linear-gradient(135deg, var(--rc-light) 0%, var(--bg-white) 100%);
+  border-left-color: var(--rc-primary);
 }
 
 .highlight-box.success h4,
-.info-box.success h4 { color: var(--ral-primary); }
+.info-box.success h4 { color: var(--rc-primary); }
 
 .highlight-box.pink,
 .info-box.pink {
@@ -785,12 +785,12 @@ nav a.active {
 
 .highlight-box.green,
 .info-box.green {
-  background: linear-gradient(135deg, var(--ral-light) 0%, var(--bg-white) 100%);
-  border-left-color: var(--ral-primary);
+  background: linear-gradient(135deg, var(--rc-light) 0%, var(--bg-white) 100%);
+  border-left-color: var(--rc-primary);
 }
 
 .highlight-box.green h4,
-.info-box.green h4 { color: var(--ral-primary); }
+.info-box.green h4 { color: var(--rc-primary); }
 
 .highlight-box.red,
 .info-box.red {
@@ -900,12 +900,12 @@ nav a.active {
 }
 
 .btn-accent {
-  background: var(--ral-primary);
+  background: var(--rc-primary);
   color: white;
 }
 
 .btn-accent:hover:not(:disabled) {
-  background: var(--ral-dark);
+  background: var(--rc-dark);
 }
 
 .btn-outline {
@@ -1100,8 +1100,8 @@ nav a.active {
 }
 
 .badge-beginner {
-  background: var(--ral-light);
-  color: var(--ral-primary);
+  background: var(--rc-light);
+  color: var(--rc-primary);
 }
 
 .badge-intermediate {
@@ -1187,8 +1187,8 @@ nav a.active {
 }
 
 .api-status.connected {
-  background: var(--ral-light);
-  color: var(--ral-primary);
+  background: var(--rc-light);
+  color: var(--rc-primary);
 }
 
 .api-status.disconnected {
@@ -1203,8 +1203,8 @@ nav a.active {
 }
 
 .api-status.connected .api-status-dot { 
-  background: var(--ral-primary); 
-  box-shadow: 0 0 8px var(--ral-primary);
+  background: var(--rc-primary); 
+  box-shadow: 0 0 8px var(--rc-primary);
 }
 
 .api-status.disconnected .api-status-dot { 
@@ -1273,8 +1273,8 @@ nav a.active {
 
 .file-drop.has-file {
   border-style: solid;
-  border-color: var(--ral-primary);
-  background: var(--ral-light);
+  border-color: var(--rc-primary);
+  background: var(--rc-light);
 }
 
 .file-drop-icon {
@@ -1320,9 +1320,9 @@ nav a.active {
 
 .btn-upload.has-file {
   border-style: solid;
-  border-color: var(--ral-primary);
-  color: var(--ral-primary);
-  background: var(--ral-light);
+  border-color: var(--rc-primary);
+  color: var(--rc-primary);
+  background: var(--rc-light);
 }
 
 .status-badge {
@@ -1339,8 +1339,8 @@ nav a.active {
 }
 
 .status-badge.success {
-  background: var(--ral-light);
-  color: var(--ral-primary);
+  background: var(--rc-light);
+  color: var(--rc-primary);
 }
 
 .status-badge.error {
@@ -1722,8 +1722,8 @@ nav a.active {
 }
 
 .settings-btn.configured {
-  background: var(--ral-light);
-  border-color: var(--ral-primary);
+  background: var(--rc-light);
+  border-color: var(--rc-primary);
 }
 
 .loading-overlay {
@@ -2481,8 +2481,8 @@ footer p {
 }
 .diagram-box.output { 
   background: var(--bg-green-light); 
-  border: 2px solid var(--ral-primary); 
-  color: var(--ral-primary); 
+  border: 2px solid var(--rc-primary); 
+  color: var(--rc-primary); 
 }
 .diagram-arrow { font-size: 1.5rem; color: var(--text-muted); }
 
@@ -2499,12 +2499,12 @@ footer p {
   padding: 16px; 
   background: transparent; 
   border-radius: var(--radius); 
-  border-left: 4px solid var(--ral-primary); 
+  border-left: 4px solid var(--rc-primary); 
 }
 .step-number { 
   width: 32px; 
   height: 32px; 
-  background: var(--ral-primary); 
+  background: var(--rc-primary); 
   color: white; 
   border-radius: 50%; 
   display: flex; 

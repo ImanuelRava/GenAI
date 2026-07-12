@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reductive Coupling | GenAI Research</title>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
+    <style>
+        :root {
+            --rc-primary: #2563eb;
+            --rc-primary-light: #3b82f6;
+            --rc-primary-dark: #1d4ed8;
+            --rc-accent: #06b6d4;
+            --rc-bg: #f0f9ff;
+            --rc-bg-card: #ffffff;
+            --rc-border: #e0e7ff;
+            --rc-text: #1e293b;
+            --rc-text-muted: #64748b;
+            --rc-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f1f5f9;
+            color: var(--rc-text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--rc-text);
+        }
+        .logo-icon svg { width: 36px; height: 36px; }
+        .logo-title { font-weight: 700; font-size: 1.1rem; }
+        .logo-subtitle { display: block; font-size: 0.7rem; color: var(--rc-text-muted); }
+        nav ul { list-style: none; display: flex; gap: 8px; }
+        nav a {
+            text-decoration: none;
+            color: var(--rc-text-muted);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        nav a:hover { background: #f1f5f9; color: var(--rc-text); }
+        nav a.active-rc { background: var(--rc-bg); color: var(--rc-primary); font-weight: 600; }
+
+        /* Layout */
+        .main-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            min-height: calc(100vh - 60px - 48px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px 0;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 0 20px 16px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--rc-text-muted);
+        }
+        .sidebar-nav { list-style: none; }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--rc-text-muted);
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: var(--rc-bg); color: var(--rc-text); }
+        .sidebar-item.active {
+            background: var(--rc-bg);
+            color: var(--rc-primary);
+            border-left-color: var(--rc-primary);
+            font-weight: 600;
+        }
+        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* Content */
+        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
+        .content-panel { display: none; }
+        .content-panel.active { display: block; }
+
+        .content-header {
+            background: var(--rc-gradient);
+            color: #fff;
+            padding: 32px 28px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+        }
+        .content-header h2 { font-size: 1.5rem; margin-bottom: 6px; }
+        .content-header p { opacity: 0.9; font-size: 0.95rem; }
+
+        .content-body h3 {
+            font-size: 1.15rem;
+            margin: 24px 0 12px;
+            color: var(--rc-text);
+        }
+        .content-body p { margin-bottom: 14px; color: #334155; }
+        .content-body ul, .content-body ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        .content-body li { margin-bottom: 6px; color: #334155; }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: var(--rc-bg);
+            padding: 16px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--rc-border);
+        }
+        .stat-number { font-size: 1.6rem; font-weight: 700; color: var(--rc-primary); }
+        .stat-label { font-size: 0.8rem; color: var(--rc-text-muted); margin-top: 2px; }
+
+        .module-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .module-card {
+            background: var(--rc-bg-card);
+            border: 1px solid var(--rc-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-decoration: none;
+            color: var(--rc-text);
+            transition: all 0.2s;
+        }
+        .module-card:hover {
+            border-color: var(--rc-primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+        .module-card h4 { margin-bottom: 8px; color: var(--rc-primary-dark); }
+        .module-card p { font-size: 0.88rem; color: var(--rc-text-muted); margin-bottom: 0; }
+        .module-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .badge-interactive { background: #dbeafe; color: #1d4ed8; }
+        .badge-ai { background: #ede9fe; color: #7c3aed; }
+        .badge-data { background: #d1fae5; color: #059669; }
+
+        /* Info boxes */
+        .highlight-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--rc-primary);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 20px 0;
+        }
+        .highlight-box h4 { margin-bottom: 6px; color: var(--rc-primary-dark); }
+        .highlight-box p:last-child { margin-bottom: 0; }
+        .highlight-box.purple { background: #faf5ff; border-left-color: #8b5cf6; }
+        .highlight-box.purple h4 { color: #6d28d9; }
+        .highlight-box.green { background: #f0fdf4; border-left-color: #22c55e; }
+        .highlight-box.green h4 { color: #15803d; }
+        .highlight-box.cyan { background: #ecfeff; border-left-color: #06b6d4; }
+        .highlight-box.cyan h4 { color: #0e7490; }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+        .data-table th {
+            background: var(--rc-primary);
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .data-table th:first-child { border-radius: 8px 0 0 0; }
+        .data-table th:last-child { border-radius: 0 8px 0 0; }
+        .data-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .data-table tr:hover td { background: var(--rc-bg); }
+
+        /* Welcome panel */
+        .welcome-panel { text-align: center; padding: 48px 24px; }
+        .welcome-icon { margin-bottom: 16px; }
+        .welcome-icon svg { width: 64px; height: 64px; color: var(--rc-primary); }
+        .welcome-panel h2 { font-size: 1.6rem; margin-bottom: 10px; }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--rc-primary);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--rc-primary-dark); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--rc-primary);
+            color: var(--rc-primary);
+        }
+        .btn-outline:hover { background: var(--rc-bg); }
+        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+
+        /* Chat widget */
+        .chat-container {
+            background: var(--rc-bg-card);
+            border: 1px solid var(--rc-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .chat-header {
+            background: var(--rc-gradient);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-header h4 { font-size: 0.95rem; }
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .chat-status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+        }
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .chat-msg.bot {
+            background: var(--rc-bg);
+            border: 1px solid var(--rc-border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg.user {
+            background: var(--rc-primary);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid #e2e8f0;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .chat-send {
+            background: var(--rc-primary);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .chat-send:hover { background: var(--rc-primary-dark); }
+
+        /* Descriptor cards */
+        .descriptor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .descriptor-card {
+            background: var(--rc-bg-card);
+            border: 1px solid var(--rc-border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .descriptor-card .symbol {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--rc-primary);
+        }
+        .descriptor-card .desc-name {
+            font-size: 0.82rem;
+            color: var(--rc-text-muted);
+            margin-top: 4px;
+        }
+
+        /* Reaction scheme */
+        .reaction-scheme {
+            background: #f8fafc;
+            border: 2px solid var(--rc-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+        }
+        .reaction-scheme .arrow {
+            display: inline-block;
+            color: var(--rc-primary);
+            font-weight: 700;
+            margin: 0 12px;
+        }
+        .reaction-scheme .conditions {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--rc-text-muted);
+            margin-top: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 16px;
+            color: var(--rc-text-muted);
+            font-size: 0.82rem;
+            border-top: 1px solid #e2e8f0;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="../index.html" class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#2563eb" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#06b6d4"/>
+                        <circle cx="32" cy="49" r="6" fill="#2563eb"/>
+                        <circle cx="15" cy="32" r="6" fill="#0ea5e9"/>
+                        <circle cx="32" cy="32" r="7" fill="#2563eb"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/">Transition Metal Catalysis</a></li>
+                    <li><a href="../reductive-coupling/" class="active-rc">Reductive Coupling</a></li>
+                    <li><a href="../virus/">Virology</a></li>
+                    <li><a href="../technical-modules/">Technical Modules</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">Reductive Coupling</div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="chatbot">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="sidebar-item-text">RedCross Bot</span>
+                </li>
+                <li class="sidebar-item" data-panel="ligands">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span class="sidebar-item-text">N-Ligand Classes</span>
+                </li>
+                <li class="sidebar-item" data-panel="descriptors">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="3" y1="15" x2="21" y2="15"/>
+                        <line x1="9" y1="3" x2="9" y2="21"/>
+                        <line x1="15" y1="3" x2="15" y2="21"/>
+                    </svg>
+                    <span class="sidebar-item-text">Electronic Descriptors</span>
+                </li>
+                <li class="sidebar-item" data-panel="database">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                    </svg>
+                    <span class="sidebar-item-text">Database & API</span>
+                </li>
+                <li class="sidebar-item" data-panel="mechanism">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                    <span class="sidebar-item-text">Mechanism & Theory</span>
+                </li>
+                <li class="sidebar-item" data-panel="resources">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    <span class="sidebar-item-text">Key References</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+
+            <!-- ===== WELCOME ===== -->
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h2>Reductive Cross-Coupling</h2>
+                    <p>Explore the application of nitrogen ligands in reductive cross-coupling reactions, powered by AI-driven analysis of electronic structure and catalytic performance data.</p>
+                    <p style="color: var(--rc-text-muted); font-size: 0.95rem; margin-top: 8px;">Select a section from the sidebar to explore.</p>
+                </div>
+            </div>
+
+            <!-- ===== REDCROSS BOT ===== -->
+            <div id="chatbot" class="content-panel">
+                <div class="content-header">
+                    <h2>RedCross Bot</h2>
+                    <p>AI-powered assistant for reductive coupling chemistry and nitrogen ligand selection</p>
+                </div>
+                <div class="content-body">
+                    <p>RedCross Bot is a specialized AI assistant designed to help researchers navigate the complex landscape of nitrogen-based ligands for reductive cross-coupling reactions. It is grounded in a curated database of 238 ligands with DFT-computed electronic properties and 49 fully-curated reductive coupling literature entries.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">238</div>
+                            <div class="stat-label">Ligands with DFT Data</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">49</div>
+                            <div class="stat-label">Curated Reactions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">7</div>
+                            <div class="stat-label">N-Ligand Families</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Electronic Descriptors</div>
+                        </div>
+                    </div>
+
+                    <h3>What RedCross Bot Can Do</h3>
+                    <ul>
+                        <li><strong>Ligand Comparison:</strong> Compare electronic properties across nitrogen ligand families (bipyridines, phenanthrolines, bisoxazolines, pybox, etc.) with database-grounded quantitative data</li>
+                        <li><strong>Ligand Recommendation:</strong> Suggest optimal nitrogen ligands for specific reductive coupling transformations based on electronic descriptors and literature precedent</li>
+                        <li><strong>Database Query:</strong> Retrieve HOMO, LUMO, HOMO-LUMO gap, electrophilicity index (omega), ionization potential, electron affinity, and HOMA aromaticity indices for any ligand in the database</li>
+                        <li><strong>Mechanistic Insight:</strong> Provide electronic-structure reasoning for why certain nitrogen ligands excel in particular coupling reactions, supplementing database data with domain knowledge</li>
+                        <li><strong>Literature Guidance:</strong> Reference specific DOIs and curated reaction entries from the research database</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Database-Grounded Responses</h4>
+                        <p>RedCross Bot always prioritizes data from the research database. When database values are used, they are explicitly attributed. When the database lacks specific information, the bot clearly labels any supplemental knowledge from its training data.</p>
+                    </div>
+
+                    <h3>Example Queries</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li>"Compare bipyridine and bisoxazoline ligands for reductive cross-coupling"</li>
+                            <li>"What is the HOMO-LUMO gap of 4,4'-di-tert-butyl-2,2'-bipyridine?"</li>
+                            <li>"Which nitrogen ligand class has the lowest electrophilicity index?"</li>
+                            <li>"What ligand was used in the reductive coupling of aryl bromides with benzyl chlorides?"</li>
+                            <li>"How does phenanthroline compare to bipyridine in terms of HOMO energy?"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== N-LIGAND CLASSES ===== -->
+            <div id="ligands" class="content-panel">
+                <div class="content-header">
+                    <h2>Nitrogen Ligand Classes</h2>
+                    <p>Seven families of N-donor ligands characterised by DFT-computed electronic descriptors</p>
+                </div>
+                <div class="content-body">
+                    <p>The research database encompasses 238 nitrogen-based ligands organised into seven structural families. Each family exhibits distinct electronic properties that influence their performance in reductive cross-coupling reactions. Understanding these electronic differences is key to rational ligand selection.</p>
+
+                    <div class="module-cards">
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">Bpy</span>
+                            <h4>Bipyridines</h4>
+                            <p>Classic bidentate N,N-chelating ligands. 2,2'-Bipyridine and its substituted derivatives (dtbbpy, dmbpy, etc.) are the most widely studied class for nickel-catalysed reductive couplings. Tunable via 4,4'- and 6,6'-substitution.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">Phen</span>
+                            <h4>Phenanthrolines</h4>
+                            <p>Rigid, planar N,N-chelators with extended pi-conjugation. Phenanthroline, bathophenanthroline, neocuproine, and Me4-phen offer stronger pi-accepting ability and higher HOMA aromaticity compared to bipyridines.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">BiOX</span>
+                            <h4>Bisoxazolines (BOX)</h4>
+                            <p>C2-symmetric N,O-chelating ligands with tunable steric and electronic properties via oxazoline ring substituents. The chiral backbone enables enantioselective variants of reductive coupling.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">PyrOx</span>
+                            <h4>Pyridine-Oxazolines</h4>
+                            <p>Unsymmetrical N,N-chelators combining a pyridine ring with an oxazoline moiety. The electronic asymmetry creates distinct trans-influence differences that can be exploited for selective bond formation.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">PyrIm</span>
+                            <h4>Pyridine-Imidazolines</h4>
+                            <p>N,N-chelating ligands where the oxazoline oxygen is replaced by a nitrogen atom in the imidazoline ring. The increased sigma-donation from the imidazoline nitrogen modulates metal electron density differently than PyrOx.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">PyCam</span>
+                            <h4>Pyridine-Carboxamides</h4>
+                            <p>N,N-chelators featuring a pyridine and a carboxamide group. The amide oxygen provides an additional coordination site, and the carbonyl group offers distinct electronic tuning via resonance effects.</p>
+                        </div>
+                        <div class="module-card">
+                            <span class="module-badge badge-interactive">BiIM</span>
+                            <h4>Bis(imidazolines)</h4>
+                            <p>C2-symmetric N,N-chelating ligands with two imidazoline rings. These ligands provide strong sigma-donation and are particularly effective in stabilising low-valent nickel intermediates in reductive coupling catalytic cycles.</p>
+                        </div>
+                    </div>
+
+                    <h3>Ligand Selection Principles</h3>
+                    <p>The choice of nitrogen ligand profoundly affects reductive cross-coupling outcomes. Key electronic factors include the HOMO energy (governing electron donation to the metal), the LUMO energy (determining pi-backbonding acceptance), and the electrophilicity index (omega), which captures the ligand's overall tendency to accept electron density. The HOMA aromaticity indices (R1 and R2) reflect the degree of electron delocalisation in each chelating ring, influencing ligand rigidity and reactivity.</p>
+
+                    <div class="highlight-box cyan">
+                        <h4>Why Nitrogen Ligands?</h4>
+                        <p>Nitrogen-based ligands are indispensable in reductive cross-coupling because they stabilise low-valent first-row transition metal catalysts (Ni, Fe, Co) through strong sigma-donation while their pi-accepting ability facilitates oxidative addition and reductive elimination steps. Their modular synthesis allows fine-tuning of steric and electronic properties for specific transformations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ELECTRONIC DESCRIPTORS ===== -->
+            <div id="descriptors" class="content-panel">
+                <div class="content-header">
+                    <h2>Electronic Descriptors</h2>
+                    <p>Eight DFT-computed parameters that govern ligand behaviour in catalysis</p>
+                </div>
+                <div class="content-body">
+                    <p>Each ligand in the database is characterised by eight quantum-chemically computed electronic descriptors. These parameters capture the essential electronic structure features that determine how a nitrogen ligand interacts with a transition metal centre and influences catalytic performance in reductive cross-coupling reactions.</p>
+
+                    <div class="descriptor-grid">
+                        <div class="descriptor-card">
+                            <div class="symbol">HOMO</div>
+                            <div class="desc-name">Highest Occupied Molecular Orbital (eV) — measures electron-donating ability to the metal</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">LUMO</div>
+                            <div class="desc-name">Lowest Unoccupied Molecular Orbital (eV) — measures pi-backbonding acceptance from the metal</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">Gap</div>
+                            <div class="desc-name">HOMO-LUMO Gap (eV) — indicates kinetic stability and chemical hardness of the ligand</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">omega</div>
+                            <div class="desc-name">Electrophilicity Index (eV) — global electrophilicity; higher values indicate stronger electron-accepting character</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">I<sub>min</sub></div>
+                            <div class="desc-name">Vertical Ionisation Potential (eV) — energy required to remove an electron from the ligand</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">V<sub>min</sub></div>
+                            <div class="desc-name">Vertical Electron Affinity (eV) — energy released when adding an electron to the ligand</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">R1-HOMA</div>
+                            <div class="desc-name">HOMA Aromaticity of Ring 1 — harmonic oscillator model of aromaticity for the first chelating ring</div>
+                        </div>
+                        <div class="descriptor-card">
+                            <div class="symbol">R2-HOMA</div>
+                            <div class="desc-name">HOMA Aromaticity of Ring 2 — harmonic oscillator model of aromaticity for the second chelating ring</div>
+                        </div>
+                    </div>
+
+                    <h3>Interpreting Descriptors for Ligand Selection</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Descriptor</th>
+                                <th>Higher Value Implies</th>
+                                <th>Relevance to Coupling</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>HOMO</strong></td>
+                                <td>Stronger electron donor</td>
+                                <td>Stabilises low-valent metal; may slow oxidative addition</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LUMO</strong></td>
+                                <td>Better pi-acceptor</td>
+                                <td>Facilitates electron redistribution during catalytic cycle</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gap</strong></td>
+                                <td>Higher kinetic stability</td>
+                                <td>Wide gap = robust ligand; narrow gap = more redox-active</td>
+                            </tr>
+                            <tr>
+                                <td><strong>omega</strong></td>
+                                <td>Stronger electrophile</td>
+                                <td>Higher omega ligands accept more electron density from metal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>R1/R2-HOMA</strong></td>
+                                <td>Greater aromaticity</td>
+                                <td>Higher HOMA = more rigid, planar ring; affects chelation geometry</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box green">
+                        <h4>Complementary Analysis</h4>
+                        <p>No single descriptor tells the whole story. Effective ligand selection requires considering multiple parameters together. For example, a ligand with high HOMO but also high omega may be an excellent choice when both strong sigma-donation and pi-acceptance are needed for a challenging reductive coupling. Use RedCross Bot to perform multi-parameter comparisons across ligand classes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DATABASE & API ===== -->
+            <div id="database" class="content-panel">
+                <div class="content-header">
+                    <h2>Database & API</h2>
+                    <p>Programmatic access to ligand electronic properties and reaction literature</p>
+                </div>
+                <div class="content-body">
+                    <p>The Reductive Coupling module is backed by two curated datasets that power both the RedCross Bot chat interface and the programmatic REST API. These datasets are continuously expanded as new literature is curated.</p>
+
+                    <h3>Datasets</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dataset</th>
+                                <th>Contents</th>
+                                <th>Records</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Grand_Data.xlsx</strong></td>
+                                <td>238 nitrogen ligands with 8 DFT-computed electronic descriptors across 7 structural families</td>
+                                <td>238 ligands</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DOI List.xlsx</strong></td>
+                                <td>Fully-curated reductive coupling reactions with optimum ligand, coupling partner, and detailed ligand knowledge entries</td>
+                                <td>49 curated + 182 DOI-only</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>REST API Endpoints</h3>
+                    <p>All endpoints are prefixed with <code>/api/redcross-database</code>:</p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>/status</code></td><td>GET</td><td>Database availability and statistics</td></tr>
+                            <tr><td><code>/ligand-classes</code></td><td>GET</td><td>All ligand classes with descriptor ranges and counts</td></tr>
+                            <tr><td><code>/search/ligands?q=...</code></td><td>GET</td><td>Search ligands by name or keyword</td></tr>
+                            <tr><td><code>/ligands/&lt;name&gt;</code></td><td>GET</td><td>Full electronic properties for a specific ligand</td></tr>
+                            <tr><td><code>/ligands/by-class/&lt;class&gt;</code></td><td>GET</td><td>All ligands in a given class</td></tr>
+                            <tr><td><code>/compare-classes/&lt;A&gt;/&lt;B&gt;</code></td><td>GET</td><td>Compare average descriptors between two classes</td></tr>
+                            <tr><td><code>/search/reactions?q=...</code></td><td>GET</td><td>Search reaction literature by keyword</td></tr>
+                            <tr><td><code>/reactions/&lt;doi&gt;</code></td><td>GET</td><td>Specific reaction entry by DOI</td></tr>
+                            <tr><td><code>/similarity/&lt;ligand&gt;</code></td><td>GET</td><td>Find electronically similar ligands (UMAP/KNN)</td></tr>
+                            <tr><td><code>/embedding/data</code></td><td>GET</td><td>2D/3D embedding coordinates for visualisation</td></tr>
+                            <tr><td><code>/clusters</code></td><td>GET</td><td>Ligand cluster assignments and centroids</td></tr>
+                            <tr><td><code>/context?q=...</code></td><td>GET</td><td>Debug: raw RAG context for a query</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Chat API</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>/api/redcross/chat</code></td><td>POST</td><td>Synchronous RedCross Bot chat with RAG</td></tr>
+                            <tr><td><code>/api/redcross/chat/async</code></td><td>POST</td><td>Async RedCross Bot chat with RAG</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box purple">
+                        <h4>Similarity Engine</h4>
+                        <p>The built-in similarity engine uses UMAP (preferred) or PCA (fallback) for dimensionality reduction over the 8D electronic descriptor space, followed by KNN search in the embedding. This enables ligand recommendation based on electronic profile similarity, not just structural class membership.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MECHANISM & THEORY ===== -->
+            <div id="mechanism" class="content-panel">
+                <div class="content-header">
+                    <h2>Mechanism & Theory</h2>
+                    <p>How nitrogen ligands enable reductive cross-coupling with first-row transition metals</p>
+                </div>
+                <div class="content-body">
+                    <p>Reductive cross-coupling is a powerful C-C bond-forming strategy that couples two electrophiles (e.g., two aryl halides) under reducing conditions, bypassing the need for pre-formed organometallic nucleophiles required in traditional cross-coupling (Suzuki, Negishi, Stille). Nitrogen ligands play a central role in enabling these transformations with first-row transition metals.</p>
+
+                    <div class="reaction-scheme">
+                        R<sup>1</sup>-X + R<sup>2</sup>-Y
+                        <span class="arrow">&xrarr;</span>
+                        R<sup>1</sup>-R<sup>2</sup>
+                        <span class="conditions">Ni catalyst, N-ligand, reductant (Mn/Zn), solvent</span>
+                    </div>
+
+                    <h3>General Catalytic Cycle</h3>
+                    <ol>
+                        <li><strong>Ligand Exchange / Pre-catalyst Activation:</strong> The nitrogen ligand displaces labile ligands on the Ni(II) pre-catalyst (e.g., NiCl2-glyme) to form the active LNiX2 complex. The chelating N,N or N,O donor set establishes the coordination geometry.</li>
+                        <li><strong>Single-Electron Reduction to Ni(I):</strong> A chemical reductant (Mn(0) or Zn(0)) transfers one electron to LNi(II)X2, generating a Ni(I) species. The nitrogen ligand stabilises this unusual oxidation state through sigma-donation and electronic delocalisation.</li>
+                        <li><strong>Oxidative Addition of First Electrophile (R<sup>1</sup>-X):</strong> The Ni(I) centre undergoes oxidative addition with the first electrophile, forming a Ni(III) intermediate (or a Ni(II) species via a radical pathway, depending on the substrate and ligand electronics).</li>
+                        <li><strong>Transmetalation / Radical Capture:</strong> The second electrophile (R<sup>2</sup>-Y) is incorporated via transmetalation (if an organometallic reagent is used) or radical capture (in true reductive couplings of two electrophiles). The ligand's steric profile governs selectivity at this step.</li>
+                        <li><strong>Reductive Elimination:</strong> The two organic fragments (R<sup>1</sup> and R<sup>2</sup>) couple and are released as the product. The nitrogen ligand's electronic properties (particularly HOMO energy and LUMO energy) influence the rate and thermodynamics of this bond-forming step.</li>
+                        <li><strong>Catalyst Regeneration:</strong> The resulting Ni(I) or Ni(0) species is reduced back to the active Ni(I) state by the chemical reductant, closing the catalytic cycle.</li>
+                    </ol>
+
+                    <h3>Role of Electronic Descriptors</h3>
+                    <ul>
+                        <li><strong>HOMO Energy:</strong> A higher HOMO energy indicates stronger electron-donating ability, which stabilises low-valent Ni(I) intermediates. However, excessive electron density at the metal may slow oxidative addition of less reactive electrophiles.</li>
+                        <li><strong>LUMO Energy:</strong> A lower LUMO energy suggests better pi-accepting ability, which helps delocalise electron density away from the metal during high-energy oxidative addition and reductive elimination transitions states.</li>
+                        <li><strong>Electrophilicity Index (omega):</strong> Balances electron donation and acceptance. Ligands with moderate omega values often provide the best compromise between stabilising low-valent Ni and facilitating bond-forming steps.</li>
+                        <li><strong>HOMA Aromaticity (R1, R2):</strong> Higher HOMA values indicate greater aromatic character and ring rigidity. Rigid, planar ligand frameworks enforce specific coordination geometries that can enhance selectivity in asymmetric reductive couplings.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Why First-Row Metals?</h4>
+                        <p>Nickel, iron, and cobalt are earth-abundant, cost-effective alternatives to palladium. However, they operate through different mechanistic pathways (often involving single-electron steps and radical intermediates) that place unique demands on the supporting ligand. Nitrogen ligands, with their tunable electronic structures captured in the database, are uniquely suited to meet these demands.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== KEY REFERENCES ===== -->
+            <div id="resources" class="content-panel">
+                <div class="content-header">
+                    <h2>Key References</h2>
+                    <p>Foundational literature on reductive coupling and nitrogen ligand design</p>
+                </div>
+                <div class="content-body">
+                    <p>The following references represent some of the foundational work in reductive cross-coupling with nitrogen ligands. The full database contains 49 curated reaction entries with DOIs — query RedCross Bot for specific literature recommendations.</p>
+
+                    <h3>Reviews and Perspectives</h3>
+                    <ul>
+                        <li><strong>Reductive Cross-Coupling:</strong> Weix, D. J. "Methods and Mechanisms for Cross-Coupling of Aryl Halides with Alkyl Electrophiles." <em>Acc. Chem. Res.</em> 2015, 48, 1767-1775. A comprehensive review of the mechanistic landscape and emerging methodologies in reductive cross-coupling reactions.</li>
+                        <li><strong>Nickel Catalysis:</strong> Chen, X.; Engle, K. M.; Wang, D.-H.; Yu, J.-Q. "Nickel-Catalyzed Cross-Coupling of Non-activated Alkyl Halides." <em>Angew. Chem. Int. Ed.</em> 2009, 48, 5094-5115. Seminal perspective on nickel's unique ability to activate challenging C(sp3)-X bonds.</li>
+                        <li><strong>Ligand Effects:</strong> Everson, D. A.; Sherry, B. D.; Weix, D. J. "Nickel-Catalyzed Reductive Cross-Coupling of Aryl Halides with Alkyl Halides." <em>J. Am. Chem. Soc.</em> 2010, 132, 9204-9205. Demonstrated the critical role of bipyridine ligands in enabling Ni-catalyzed reductive couplings.</li>
+                    </ul>
+
+                    <h3>Nitrogen Ligand Design</h3>
+                    <ul>
+                        <li><strong>Bisoxazolines:</strong> Nishiyama, H. et al. "The Chiral Ligand, 2,2'-Bis(4-Phenyloxazolin-2-yl)-1,1'-Binaphthyl." <em>Tetrahedron Lett.</em> 1993. Foundational work on C2-symmetric bisoxazoline ligands that enabled enantioselective catalysis.</li>
+                        <li><strong>Pyridine-Oxazolines:</strong> Bolm, C.; Hermanns, N.; Hildebrand, J. P.; Muñiz, K. "Structural and Mechanistic Aspects of Pyridine-Oxazoline (PyOx) Ligands in Asymmetric Catalysis." <em>Angew. Chem. Int. Ed.</em> 2000, 39, 3465-3467.</li>
+                        <li><strong>Electronic Tuning:</strong> Beller, M.; Tse, M. K. "Copper-Catalyzed Cross-Coupling Reactions of Organoboronic Compounds with Aryl Halides." <em>Comprehensive Organic Synthesis</em> 2014. Discusses how electronic modification of nitrogen ligand frameworks influences catalytic performance.</li>
+                    </ul>
+
+                    <h3>Electronic Structure and Descriptors</h3>
+                    <ul>
+                        <li><strong>Electrophilicity Index:</strong> Parr, R. G.; Szentpály, L. v.; Liu, S. "Electrophilicity Index." <em>J. Am. Chem. Soc.</em> 1999, 121, 1922-1924. The foundational paper defining the global electrophilicity index (omega), one of the key descriptors in the database.</li>
+                        <li><strong>HOMA Aromaticity:</strong> Kruszewski, J.; Krygowski, T. M. "Definition of Aromaticity Basing on the Harmonic Oscillator Model." <em>Tetrahedron Lett.</em> 1972, 38, 3839-3842. Introduced the HOMA index used to quantify aromaticity in the chelating rings of nitrogen ligands.</li>
+                        <li><strong>DFT Descriptors for Catalysis:</strong> Geerlings, P.; De Proft, F.; Langenaeker, W. "Conceptual Density Functional Theory." <em>Chem. Rev.</em> 2003, 103, 1793-1874. Comprehensive review of how DFT-computed electronic descriptors relate to chemical reactivity and catalytic behaviour.</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>Explore Further with RedCross Bot</h4>
+                        <p>Ask RedCross Bot about specific reactions, ligands, or comparisons. The bot can retrieve exact electronic descriptor values, cite relevant DOIs, and provide mechanistic context — all grounded in the research database. Example: "What is the optimum ligand for reductive coupling of aryl bromides with alkyl bromides according to the database?"</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>Powered by GenAI Research | Reductive Coupling Initiative &mdash; Nitrogen Ligands for Cross-Coupling Catalysis</p>
+    </footer>
+
+    <script>
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                contentPanels.forEach(p => p.classList.remove('active'));
+
+                item.classList.add('active');
+
+                const panelId = item.getAttribute('data-panel');
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

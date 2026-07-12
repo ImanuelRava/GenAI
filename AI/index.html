@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI | GenAI Research</title>
+    <link rel="stylesheet" href="../TMC/css/shared.css">
+    <style>
+        
+        .content-panel {
+            padding: 24px;
+        }
+        .content-header {
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
+        }
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
+        }
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
+        }
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .btn-group {
+            padding: 24px 0 0 0;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/header.css">
+</head>
+<body class="theme-blue">
+
+    
+    <header>
+        <div class="header-inner">
+            <a href="../index.html" class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
+                        <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">GenAI Research</span>
+                    <span class="logo-subtitle">Innovate & Discover</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../AI/" class="active-ai">Artificial Intelligence</a></li>
+                    <li><a href="../TMC/" >Transition Metal Catalysis</a></li>
+                    <li><a href="../reductive-coupling/" >Reductive Coupling</a></li>
+                    <li><a href="../virus/" >Virology</a></li>
+                    <li><a href="../technical-modules/">Technical Modules</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    
+    <div class="main-wrapper">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Machine Learning</span>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item active" data-panel="welcome">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    <span class="sidebar-item-text">Overview</span>
+                </li>
+                <li class="sidebar-item" data-panel="module1">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 1: ML Basics</span>
+                </li>
+                <li class="sidebar-item" data-panel="module2">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 2: Supervised</span>
+                </li>
+                <li class="sidebar-item" data-panel="module3">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="sidebar-item-text">Module 3: Deep Learning</span>
+                </li>
+                <li class="sidebar-item" data-panel="visualizations">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span class="sidebar-item-text">Visualizations</span>
+                </li>
+            </ul>
+        </aside>
+
+        
+        <main class="content-area">
+            
+            <div id="welcome" class="content-panel active">
+                <div class="welcome-panel">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                            <circle cx="7.5" cy="14.5" r="1.5"/>
+                            <circle cx="16.5" cy="14.5" r="1.5"/>
+                        </svg>
+                    </div>
+                    <h2>Machine Learning Education</h2>
+                    <p>Master the fundamentals of machine learning and artificial intelligence with our comprehensive, interactive modules designed for scientific applications.</p>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Select a module from the sidebar to begin your learning journey.</p>
+                </div>
+            </div>
+
+            
+            <div id="module1" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 1: Introduction to Machine Learning</h2>
+                    <p>Learn the fundamental concepts, types, and applications of machine learning in modern science.</p>
+                </div>
+                <div class="content-body">
+                    <p>This foundational module introduces you to the core concepts of machine learning, from basic definitions to real-world applications in chemistry and scientific research.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Topics</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Beginner</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li>What is Machine Learning and how it differs from traditional programming</li>
+                        <li>Types of ML: Supervised, Unsupervised, and Reinforcement Learning</li>
+                        <li>The standard ML workflow from data collection to deployment</li>
+                        <li>Real-world applications in drug discovery and materials science</li>
+                        <li>Essential mathematical foundations (linear algebra, calculus, statistics)</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Prerequisites</h4>
+                        <p style="margin-bottom: 0;">Basic Python programming knowledge. Familiarity with NumPy and Pandas is helpful but not required.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-basics.html" class="btn btn-primary">Start Module 1</a>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="module2" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 2: Supervised Learning</h2>
+                    <p>Master classification and regression algorithms with hands-on examples and evaluation techniques.</p>
+                </div>
+                <div class="content-body">
+                    <p>Supervised learning is the most widely used type of machine learning. This module covers essential algorithms for prediction tasks, from simple linear models to powerful ensemble methods.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Algorithms</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Beginner</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Topics Covered</h3>
+                    <ul>
+                        <li>Classification: Logistic Regression, Support Vector Machines</li>
+                        <li>Regression: Linear, Polynomial, Ridge, Lasso, Elastic Net</li>
+                        <li>Decision Trees and Random Forests</li>
+                        <li>Gradient Boosting (XGBoost, LightGBM)</li>
+                        <li>Evaluation metrics and cross-validation techniques</li>
+                        <li>Bias-variance tradeoff and regularization</li>
+                    </ul>
+
+                    <div class="highlight-box purple">
+                        <h4>Hands-On Projects</h4>
+                        <p style="margin-bottom: 0;">Build a molecular property predictor and a reaction yield prediction model using real chemical datasets.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-supervised.html" class="btn btn-primary">Start Module 2</a>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="module3" class="content-panel">
+                <div class="content-header">
+                    <h2>Module 3: Deep Learning</h2>
+                    <p>Dive into neural networks and modern architectures powering today's AI revolution.</p>
+                </div>
+                <div class="content-body">
+                    <p>Deep learning has transformed artificial intelligence, enabling breakthroughs in computer vision, natural language processing, and scientific discovery. This module covers the architectures you need to know.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">7</div>
+                            <div class="stat-label">Sections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Architectures</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Intermediate</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Architectures Covered</h3>
+                    <ul>
+                        <li>Feedforward Neural Networks and activation functions</li>
+                        <li>Backpropagation and optimization algorithms (SGD, Adam)</li>
+                        <li>Convolutional Neural Networks (CNNs) for image analysis</li>
+                        <li>Recurrent Neural Networks (RNNs, LSTMs, GRUs) for sequences</li>
+                        <li>Transformers and attention mechanisms (BERT, GPT)</li>
+                        <li>Graph Neural Networks for molecular data</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>Chemistry Applications</h4>
+                        <p style="margin-bottom: 0;">Learn how Graph Neural Networks predict molecular properties and how Transformers are used in drug discovery.</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="ml-deeplearning.html" class="btn btn-primary">Start Module 3</a>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="visualizations" class="content-panel">
+                <div class="content-header">
+                    <h2>Interactive Visualizations</h2>
+                    <p>Explore machine learning concepts through interactive visualizations. These demos help you understand algorithms and techniques intuitively.</p>
+                </div>
+                <div class="content-body">
+                    <div class="module-cards">
+                        <a href="visualization-gnn.html" class="module-card">
+                            <span class="module-badge badge-intermediate">Interactive</span>
+                            <h4>Graph Neural Networks</h4>
+                            <p>Visualize message passing, node embeddings, and molecular graph representations. See how GNNs process graph-structured data step by step.</p>
+                        </a>
+                        <a href="visualization-pca.html" class="module-card">
+                            <span class="module-badge badge-beginner">Interactive</span>
+                            <h4>Principal Component Analysis</h4>
+                            <p>Understand dimensionality reduction through interactive projections. See scree plots, variance explained, and chemistry applications.</p>
+                        </a>
+                    </div>
+
+                    <h3>What You'll Learn</h3>
+                    <ul>
+                        <li><strong>GNN Visualization:</strong> Message passing mechanisms, node aggregation, and molecular property prediction</li>
+                        <li><strong>PCA Visualization:</strong> Data projection, eigenvalue decomposition, and variance explained</li>
+                        <li><strong>Interactive Controls:</strong> Adjust parameters and see real-time effects on algorithms</li>
+                        <li><strong>Chemistry Examples:</strong> Real molecular datasets and chemical applications</li>
+                    </ul>
+
+                    <div class="highlight-box green">
+                        <h4>Why Visualize?</h4>
+                        <p style="margin-bottom: 0;">Interactive visualizations bridge the gap between theory and intuition. By manipulating data and parameters in real-time, you develop a deeper understanding of how algorithms work and why they make certain decisions.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    
+    <footer>
+        <p>Powered by GenAI Research | Machine Learning Education Initiative</p>
+    </footer>
+
+    <script>
+        
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentPanels = document.querySelectorAll('.content-panel');
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                contentPanels.forEach(p => p.classList.remove('active'));
+
+                
+                item.classList.add('active');
+
+                
+                const panelId = item.getAttribute('data-panel');
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -62,7 +62,7 @@ class Config:
     # Allowed subdirectories that may be served via static file routes.
     # Any request for a path outside these directories will be rejected.
     STATIC_ALLOWED_DIRS: Set[str] = field(
-        default_factory=lambda: {'TMC', 'AI', 'virus', 'redox-ligands', 'technical-modules'}
+        default_factory=lambda: {'TMC', 'AI', 'virus', 'reductive-coupling', 'technical-modules'}
     )
 
     @property

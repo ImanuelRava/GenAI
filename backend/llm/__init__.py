@@ -21,7 +21,7 @@ from .client import (
 )
 from .prompts import (
     NICOBOT_SYSTEM_PROMPT,
-    REDOX_SYSTEM_PROMPT,
+    REDCROSS_SYSTEM_PROMPT,
     EXPLAIN_SYSTEM_PROMPT,
     PREDEFINED_EXPLANATIONS,
 )
@@ -41,7 +41,7 @@ __all__ = [
     'explain_concept',
     'explain_concept_async',
     'NICOBOT_SYSTEM_PROMPT',
-    'REDOX_SYSTEM_PROMPT',
+    'REDCROSS_SYSTEM_PROMPT',
     'EXPLAIN_SYSTEM_PROMPT',
     'PREDEFINED_EXPLANATIONS',
 ]

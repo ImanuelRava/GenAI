@@ -1,7 +1,7 @@
 # GenAI Research Platform
 
 A Flask-based research platform for **transition-metal chemistry** (TMC),
-**redox-active ligands**, **AI/ML education**, and **virology**. The backend
+**reductive coupling**, **AI/ML education**, and **virology**. The backend
 exposes citation-network analysis, NiCOBot chat (with RAG over a curated
 reaction database), ChemExtract PDF extraction, GNN/PCA visualizations, and
 knowledge-graph generation. Eight LLM providers are supported behind a
@@ -164,7 +164,7 @@ GenAI/
 │   └── nicobot_data/             # Curated reaction database (LFS-tracked)
 ├── AI/                           # ML/AI educational HTML pages
 ├── TMC/                          # Transition-metal chemistry HTML pages
-├── redox-ligands/                # Redox-active ligand HTML pages + pipeline
+├── reductive-coupling/            # Reductive coupling HTML pages + pipeline
 ├── virus/                        # Virology HTML pages
 ├── logic_flow/                   # Standalone flowchart HTML pages
 ├── css/                          # Shared header.css
@@ -314,7 +314,7 @@ All endpoints live under `/api/*`. Key families:
 | **Citation network** | `POST /api/network` (PDF or Excel upload) |
 | **Visualization** | `GET /api/gnn/*`, `GET /api/pca/*` |
 | **LLM** | `GET /api/llm/status`, `POST /api/llm/chat`, `GET /api/llm/providers` |
-| **Chat** | `POST /api/nicobot/chat[/async]`, `POST /api/redox/chat[/async]` |
+| **Chat** | `POST /api/nicobot/chat[/async]`, `POST /api/redcross/chat[/async]` |
 | **Knowledge graph** | `POST /api/knowledge-graph[/async][/explain]` |
 | **Database** | `GET /api/database/{status,search/compounds,search/papers,...}` |
 | **Data extraction** | `POST /api/extract[/pdf/vision/chemextract/reactionlens][...]` |
@@ -337,7 +337,7 @@ You set `FLASK_DEBUG=1` and `FLASK_HOST=0.0.0.0`. The fixed `wsgi.py` forces
 `127.0.0.1` in this case. To bind publicly with debug off, just remove
 `FLASK_DEBUG`.
 
-### "SSL: CERTIFICATE_VERIFY_FAILED" in the redox-ligand pipeline
+### "SSL: CERTIFICATE_VERIFY_FAILED" in the reductive coupling pipeline
 
 The pipeline now verifies TLS by default. If you're behind a corporate
 TLS-intercepting proxy, set `LIGAND_INSECURE_TLS=1` in your environment as a

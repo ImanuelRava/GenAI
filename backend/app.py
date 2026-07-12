@@ -150,9 +150,9 @@ def api_status():
             'llm': '/api/llm/*',
             'knowledge_graph': '/api/knowledge-graph',
             'nicobot_chat': '/api/nicobot/chat',
-            'redox_chat': '/api/redox/chat',
+            'redcross_chat': '/api/redcross/chat',
             'database': '/api/database/*',
-            'ral_database': '/api/ral-database/*',
+            'redcross_database': '/api/redcross-database/*',
         },
     })
 
@@ -211,14 +211,14 @@ def virus_files(filename):
     return _safe_serve('virus', filename)
 
 
-@app.route('/redox-ligands/')
-def redox_index():
-    return _safe_serve('redox-ligands', 'index.html')
+@app.route('/reductive-coupling/')
+def redcoupling_index():
+    return _safe_serve('reductive-coupling', 'index.html')
 
 
-@app.route('/redox-ligands/<path:filename>')
-def redox_files(filename):
-    return _safe_serve('redox-ligands', filename)
+@app.route('/reductive-coupling/<path:filename>')
+def redcoupling_files(filename):
+    return _safe_serve('reductive-coupling', filename)
 
 
 @app.route('/technical-modules/')
@@ -264,25 +264,25 @@ except ImportError:
     _db_registered = False
     logging.warning("[STARTUP] Database blueprint not registered (missing optional deps).")
 
-# --- Optional: RAL database (needs ral_data) ---
+# --- Optional: RedCross database (needs redcross_data) ---
 try:
-    from routes.ral_database import ral_database_bp
-    app.register_blueprint(ral_database_bp)
-    _ral_db_registered = True
+    from routes.redcross_database import redcross_database_bp
+    app.register_blueprint(redcross_database_bp)
+    _redcross_db_registered = True
 except ImportError:
-    _ral_db_registered = False
-    logging.warning("[STARTUP] RAL database blueprint not registered (missing optional deps).")
+    _redcross_db_registered = False
+    logging.warning("[STARTUP] RedCross database blueprint not registered (missing optional deps).")
 
 # ---------------------------------------------------------------------------
-# Register chat blueprints (NiCOBot, Redox, Knowledge Graph)
+# Register chat blueprints (NiCOBot, RedCross, Knowledge Graph)
 # ---------------------------------------------------------------------------
 
 from chat.nicobot import register_nicobot_blueprint
-from chat.redox import register_redox_blueprint
+from chat.redcross import register_redcross_blueprint
 from chat.knowledge_graph import register_knowledge_graph_blueprint
 
 register_nicobot_blueprint(app, limiter)
-register_redox_blueprint(app, limiter)
+register_redcross_blueprint(app, limiter)
 register_knowledge_graph_blueprint(app, limiter)
 
 # ---------------------------------------------------------------------------
@@ -294,8 +294,8 @@ if _viz_registered:
     _bps.append("viz")
 if _db_registered:
     _bps.append("database")
-if _ral_db_registered:
-    _bps.append("ral_database")
+if _redcross_db_registered:
+    _bps.append("redcross_database")
 _db_msg = ", ".join(_bps)
 logging.info(f"[STARTUP] GenAI Research Platform v2.2.0")
 logging.info(f"[STARTUP] Backend Dir: {BACKEND_DIR}")
