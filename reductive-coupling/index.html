@@ -6,429 +6,108 @@
     <title>Reductive Coupling | GenAI Research</title>
     <link rel="stylesheet" href="../TMC/css/shared.css">
     <style>
-        :root {
-            --rc-primary: #2563eb;
-            --rc-primary-light: #3b82f6;
-            --rc-primary-dark: #1d4ed8;
-            --rc-accent: #06b6d4;
-            --rc-bg: #f0f9ff;
-            --rc-bg-card: #ffffff;
-            --rc-border: #e0e7ff;
-            --rc-text: #1e293b;
-            --rc-text-muted: #64748b;
-            --rc-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
-            --radius: 12px;
+        .content-panel {
+            padding: 24px;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f1f5f9;
-            color: var(--rc-text);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        header {
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 60px;
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--rc-text);
-        }
-        .logo-icon svg { width: 36px; height: 36px; }
-        .logo-title { font-weight: 700; font-size: 1.1rem; }
-        .logo-subtitle { display: block; font-size: 0.7rem; color: var(--rc-text-muted); }
-        nav ul { list-style: none; display: flex; gap: 8px; }
-        nav a {
-            text-decoration: none;
-            color: var(--rc-text-muted);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        nav a:hover { background: #f1f5f9; color: var(--rc-text); }
-        nav a.active-rc { background: var(--rc-bg); color: var(--rc-primary); font-weight: 600; }
-
-        /* Layout */
-        .main-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            min-height: calc(100vh - 60px - 48px);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            min-width: 260px;
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
-            padding: 20px 0;
-            position: sticky;
-            top: 60px;
-            height: calc(100vh - 60px);
-            overflow-y: auto;
-        }
-        .sidebar-header {
-            padding: 0 20px 16px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--rc-text-muted);
-        }
-        .sidebar-nav { list-style: none; }
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: var(--rc-text-muted);
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-item:hover { background: var(--rc-bg); color: var(--rc-text); }
-        .sidebar-item.active {
-            background: var(--rc-bg);
-            color: var(--rc-primary);
-            border-left-color: var(--rc-primary);
-            font-weight: 600;
-        }
-        .sidebar-icon { width: 18px; height: 18px; flex-shrink: 0; }
-
-        /* Content */
-        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
-        .content-panel { display: none; }
-        .content-panel.active { display: block; }
-
         .content-header {
-            background: var(--rc-gradient);
-            color: #fff;
-            padding: 32px 28px;
-            border-radius: var(--radius);
-            margin-bottom: 24px;
+            margin: -24px -24px 24px -24px;
+            padding: 32px 24px;
         }
-        .content-header h2 { font-size: 1.5rem; margin-bottom: 6px; }
-        .content-header p { opacity: 0.9; font-size: 0.95rem; }
-
-        .content-body h3 {
-            font-size: 1.15rem;
-            margin: 24px 0 12px;
-            color: var(--rc-text);
-        }
-        .content-body p { margin-bottom: 14px; color: #334155; }
-        .content-body ul, .content-body ol {
-            padding-left: 24px;
+        .content-panel > h2,
+        .content-panel > h3 {
+            padding: 0;
+            margin-top: 24px;
             margin-bottom: 16px;
         }
-        .content-body li { margin-bottom: 6px; color: #334155; }
-
-        /* Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
+        .content-panel > p,
+        .content-panel > ul,
+        .content-panel > ol {
+            padding: 0;
         }
-        .stat-card {
-            background: var(--rc-bg);
-            padding: 16px;
-            border-radius: var(--radius);
-            text-align: center;
-            border: 1px solid var(--rc-border);
+        .content-panel > ul,
+        .content-panel > ol {
+            padding-left: 24px;
         }
-        .stat-number { font-size: 1.6rem; font-weight: 700; color: var(--rc-primary); }
-        .stat-label { font-size: 0.8rem; color: var(--rc-text-muted); margin-top: 2px; }
-
-        .module-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-            margin: 16px 0;
+        .content-panel > .highlight-box,
+        .content-panel > .info-box,
+        .content-panel > .warning-box,
+        .content-panel > .module-cards,
+        .content-panel > .steps-container,
+        .content-panel > .reaction-scheme,
+        .content-panel > .diagram-container,
+        .content-panel > .cards-grid,
+        .content-panel > .data-table,
+        .content-panel > .formula-box,
+        .content-panel > .network-diagram,
+        .content-panel > .stats-grid,
+        .content-panel > .btn-group {
+            margin-left: 0;
+            margin-right: 0;
         }
-        .module-card {
-            background: var(--rc-bg-card);
-            border: 1px solid var(--rc-border);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-decoration: none;
-            color: var(--rc-text);
-            transition: all 0.2s;
-        }
-        .module-card:hover {
-            border-color: var(--rc-primary);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-            transform: translateY(-2px);
-        }
-        .module-card h4 { margin-bottom: 8px; color: var(--rc-primary-dark); }
-        .module-card p { font-size: 0.88rem; color: var(--rc-text-muted); margin-bottom: 0; }
-        .module-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        .badge-interactive { background: #dbeafe; color: #1d4ed8; }
-        .badge-ai { background: #ede9fe; color: #7c3aed; }
-        .badge-data { background: #d1fae5; color: #059669; }
-
-        /* Info boxes */
-        .highlight-box {
-            background: #eff6ff;
-            border-left: 4px solid var(--rc-primary);
-            padding: 16px 20px;
-            border-radius: 0 var(--radius) var(--radius) 0;
-            margin: 20px 0;
-        }
-        .highlight-box h4 { margin-bottom: 6px; color: var(--rc-primary-dark); }
-        .highlight-box p:last-child { margin-bottom: 0; }
-        .highlight-box.purple { background: #faf5ff; border-left-color: #8b5cf6; }
-        .highlight-box.purple h4 { color: #6d28d9; }
-        .highlight-box.green { background: #f0fdf4; border-left-color: #22c55e; }
-        .highlight-box.green h4 { color: #15803d; }
-        .highlight-box.cyan { background: #ecfeff; border-left-color: #06b6d4; }
-        .highlight-box.cyan h4 { color: #0e7490; }
-
-        .info-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 16px 20px;
-            border-radius: var(--radius);
-            margin: 20px 0;
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0;
-            font-size: 0.88rem;
-        }
-        .data-table th {
-            background: var(--rc-primary);
-            color: #fff;
-            padding: 10px 14px;
-            text-align: left;
-            font-weight: 600;
-        }
-        .data-table th:first-child { border-radius: 8px 0 0 0; }
-        .data-table th:last-child { border-radius: 0 8px 0 0; }
-        .data-table td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .data-table tr:hover td { background: var(--rc-bg); }
-
-        /* Welcome panel */
-        .welcome-panel { text-align: center; padding: 48px 24px; }
-        .welcome-icon { margin-bottom: 16px; }
-        .welcome-icon svg { width: 64px; height: 64px; color: var(--rc-primary); }
-        .welcome-panel h2 { font-size: 1.6rem; margin-bottom: 10px; }
-
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-        }
-        .btn-primary {
-            background: var(--rc-primary);
-            color: #fff;
-        }
-        .btn-primary:hover { background: var(--rc-primary-dark); }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--rc-primary);
-            color: var(--rc-primary);
-        }
-        .btn-outline:hover { background: var(--rc-bg); }
-        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
-
-        /* Chat widget */
-        .chat-container {
-            background: var(--rc-bg-card);
-            border: 1px solid var(--rc-border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        .chat-header {
-            background: var(--rc-gradient);
-            color: #fff;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .chat-header h4 { font-size: 0.95rem; }
-        .chat-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        .chat-status-dot {
-            width: 8px;
-            height: 8px;
-            background: #4ade80;
-            border-radius: 50%;
-        }
-        .chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .chat-msg {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            line-height: 1.5;
-        }
-        .chat-msg.bot {
-            background: var(--rc-bg);
-            border: 1px solid var(--rc-border);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-        .chat-msg.user {
-            background: var(--rc-primary);
-            color: #fff;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        .chat-input-area {
-            display: flex;
-            border-top: 1px solid #e2e8f0;
-        }
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            outline: none;
-            font-size: 0.9rem;
-            font-family: inherit;
-        }
-        .chat-send {
-            background: var(--rc-primary);
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-        .chat-send:hover { background: var(--rc-primary-dark); }
-
-        /* Descriptor cards */
         .descriptor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
             margin: 16px 0;
         }
         .descriptor-card {
-            background: var(--rc-bg-card);
-            border: 1px solid var(--rc-border);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius);
             padding: 16px;
-            text-align: center;
+            transition: box-shadow var(--transition-normal);
+        }
+        .descriptor-card:hover {
+            box-shadow: var(--shadow-md);
         }
         .descriptor-card .symbol {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--rc-primary);
+            color: var(--section-primary);
+            margin-bottom: 6px;
         }
         .descriptor-card .desc-name {
             font-size: 0.82rem;
-            color: var(--rc-text-muted);
-            margin-top: 4px;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
-
-        /* Reaction scheme */
         .reaction-scheme {
-            background: #f8fafc;
-            border: 2px solid var(--rc-border);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius);
-            padding: 24px;
+            padding: 20px 24px;
             text-align: center;
-            margin: 20px 0;
             font-size: 1.1rem;
-            font-family: 'Georgia', serif;
+            margin: 16px 0;
+            line-height: 2;
         }
         .reaction-scheme .arrow {
             display: inline-block;
-            color: var(--rc-primary);
-            font-weight: 700;
-            margin: 0 12px;
+            margin: 0 10px;
+            font-size: 1.3rem;
         }
         .reaction-scheme .conditions {
             display: block;
-            font-size: 0.8rem;
-            color: var(--rc-text-muted);
-            margin-top: 8px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 16px;
-            color: var(--rc-text-muted);
-            font-size: 0.82rem;
-            border-top: 1px solid #e2e8f0;
-            background: #fff;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
         }
     </style>
+    <link rel="stylesheet" href="../css/header.css">
 </head>
-<body>
+<body class="theme-green">
 
     <header>
         <div class="header-inner">
             <a href="../index.html" class="logo-section">
                 <div class="logo-icon">
                     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="32" cy="32" r="28" stroke="#2563eb" stroke-width="3" fill="none"/>
+                        <circle cx="32" cy="32" r="28" stroke="#8b5cf6" stroke-width="3" fill="none"/>
                         <circle cx="32" cy="15" r="6" fill="#3b82f6"/>
-                        <circle cx="49" cy="32" r="6" fill="#06b6d4"/>
-                        <circle cx="32" cy="49" r="6" fill="#2563eb"/>
-                        <circle cx="15" cy="32" r="6" fill="#0ea5e9"/>
-                        <circle cx="32" cy="32" r="7" fill="#2563eb"/>
+                        <circle cx="49" cy="32" r="6" fill="#10b981"/>
+                        <circle cx="32" cy="49" r="6" fill="#f59e0b"/>
+                        <circle cx="15" cy="32" r="6" fill="#ef4444"/>
+                        <circle cx="32" cy="32" r="7" fill="#8b5cf6"/>
                         <path d="M32 21 L32 25 M41 32 L37 32 M32 43 L32 39 M23 32 L27 32" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
                         <path d="M28 28 L25 25 M36 28 L39 25 M36 36 L39 39 M28 36 L25 39" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
                     </svg>
@@ -453,38 +132,32 @@
     </header>
 
     <div class="main-wrapper">
-
         <aside class="sidebar">
-            <div class="sidebar-header">Reductive Coupling</div>
+            <div class="sidebar-header">
+                <span class="sidebar-title">Reductive Coupling</span>
+            </div>
             <ul class="sidebar-nav">
-                <li class="sidebar-item active" data-panel="welcome">
+                <li class="sidebar-item active" data-panel="redcross-bot">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        <polyline points="9,22 9,12 15,12 15,22"/>
-                    </svg>
-                    <span class="sidebar-item-text">Overview</span>
-                </li>
-                <li class="sidebar-item" data-panel="chatbot">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <path d="M9 3h6v6l4 7.5a2 2 0 0 1-1.75 2.98H6.75A2 2 0 0 1 5 16.5L9 9V3z"/>
+                        <line x1="9" y1="3" x2="15" y2="3"/>
                     </svg>
                     <span class="sidebar-item-text">RedCross Bot</span>
                 </li>
                 <li class="sidebar-item" data-panel="ligands">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
                     </svg>
                     <span class="sidebar-item-text">N-Ligand Classes</span>
                 </li>
                 <li class="sidebar-item" data-panel="descriptors">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="3" y1="9" x2="21" y2="9"/>
-                        <line x1="3" y1="15" x2="21" y2="15"/>
-                        <line x1="9" y1="3" x2="9" y2="21"/>
-                        <line x1="15" y1="3" x2="15" y2="21"/>
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
                     </svg>
                     <span class="sidebar-item-text">Electronic Descriptors</span>
                 </li>
@@ -504,8 +177,8 @@
                 </li>
                 <li class="sidebar-item" data-panel="resources">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                     </svg>
                     <span class="sidebar-item-text">Key References</span>
                 </li>
@@ -514,73 +187,54 @@
 
         <main class="content-area">
 
-            <!-- ===== WELCOME ===== -->
-            <div id="welcome" class="content-panel active">
-                <div class="welcome-panel">
-                    <div class="welcome-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            <path d="M2 17l10 5 10-5"/>
-                            <path d="M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <h2>Reductive Cross-Coupling</h2>
-                    <p>Explore the application of nitrogen ligands in reductive cross-coupling reactions, powered by AI-driven analysis of electronic structure and catalytic performance data.</p>
-                    <p style="color: var(--rc-text-muted); font-size: 0.95rem; margin-top: 8px;">Select a section from the sidebar to explore.</p>
-                </div>
-            </div>
-
-            <!-- ===== REDCROSS BOT ===== -->
-            <div id="chatbot" class="content-panel">
+            <!-- ===== REDCROSS BOT (MAIN CHAT PANEL) ===== -->
+            <div id="redcross-bot" class="content-panel active" style="position: relative;">
+                <button class="settings-btn" id="settingsBtn" title="AI Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
                 <div class="content-header">
                     <h2>RedCross Bot</h2>
-                    <p>AI-powered assistant for reductive coupling chemistry and nitrogen ligand selection</p>
+                    <p>Your AI assistant for Reductive Cross-Coupling chemistry and nitrogen ligand selection.</p>
                 </div>
                 <div class="content-body">
-                    <p>RedCross Bot is a specialized AI assistant designed to help researchers navigate the complex landscape of nitrogen-based ligands for reductive cross-coupling reactions. It is grounded in a curated database of 238 ligands with DFT-computed electronic properties and 49 fully-curated reductive coupling literature entries.</p>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">238</div>
-                            <div class="stat-label">Ligands with DFT Data</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">49</div>
-                            <div class="stat-label">Curated Reactions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">7</div>
-                            <div class="stat-label">N-Ligand Families</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">8</div>
-                            <div class="stat-label">Electronic Descriptors</div>
-                        </div>
+                    <div class="api-status disconnected" id="apiStatus" style="cursor: pointer;" onclick="document.getElementById('settingsBtn').click();">
+                        <div class="api-status-dot"></div>
+                        <span id="apiStatusText">Offline mode - <strong>Click here to configure AI</strong></span>
                     </div>
 
-                    <h3>What RedCross Bot Can Do</h3>
-                    <ul>
-                        <li><strong>Ligand Comparison:</strong> Compare electronic properties across nitrogen ligand families (bipyridines, phenanthrolines, bisoxazolines, pybox, etc.) with database-grounded quantitative data</li>
-                        <li><strong>Ligand Recommendation:</strong> Suggest optimal nitrogen ligands for specific reductive coupling transformations based on electronic descriptors and literature precedent</li>
-                        <li><strong>Database Query:</strong> Retrieve HOMO, LUMO, HOMO-LUMO gap, electrophilicity index (omega), ionization potential, electron affinity, and HOMA aromaticity indices for any ligand in the database</li>
-                        <li><strong>Mechanistic Insight:</strong> Provide electronic-structure reasoning for why certain nitrogen ligands excel in particular coupling reactions, supplementing database data with domain knowledge</li>
-                        <li><strong>Literature Guidance:</strong> Reference specific DOIs and curated reaction entries from the research database</li>
-                    </ul>
-
-                    <div class="highlight-box">
-                        <h4>Database-Grounded Responses</h4>
-                        <p>RedCross Bot always prioritizes data from the research database. When database values are used, they are explicitly attributed. When the database lacks specific information, the bot clearly labels any supplemental knowledge from its training data.</p>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="askQuestion('Suggest similar ligands to 4,4\'-di-tert-butyl-2,2\'-bipyridine based on electronic properties')">Similar Ligands</button>
+                        <button class="quick-btn" onclick="askQuestion('Compare bipyridine and bisoxazoline ligands for reductive cross-coupling')">Ligand Comparison</button>
+                        <button class="quick-btn" onclick="askQuestion('Which nitrogen ligand class has the smallest HOMO-LUMO gap?')">HOMO-LUMO Gap</button>
+                        <button class="quick-btn" onclick="askQuestion('Recommend alternative ligands to phenanthroline with similar electronic profiles')">Alt. to Phen</button>
+                        <button class="quick-btn" onclick="askQuestion('What is the best nitrogen ligand for reductive coupling of aryl bromides?')">Best Ligand</button>
+                        <button class="quick-btn" onclick="askQuestion('How does electrophilicity index (omega) affect ligand performance in reductive coupling?')">Electrophilicity</button>
                     </div>
 
-                    <h3>Example Queries</h3>
-                    <div class="info-box">
-                        <ul>
-                            <li>"Compare bipyridine and bisoxazoline ligands for reductive cross-coupling"</li>
-                            <li>"What is the HOMO-LUMO gap of 4,4'-di-tert-butyl-2,2'-bipyridine?"</li>
-                            <li>"Which nitrogen ligand class has the lowest electrophilicity index?"</li>
-                            <li>"What ligand was used in the reductive coupling of aryl bromides with benzyl chlorides?"</li>
-                            <li>"How does phenanthroline compare to bipyridine in terms of HOMO energy?"</li>
-                        </ul>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                <div class="message-avatar">RC</div>
+                                <div class="message-body">
+                                    <div class="message-sender">RedCross Bot</div>
+                                    <div class="message-text">
+                                        Hello! I'm RedCross Bot, your specialized assistant for Reductive Cross-Coupling chemistry and nitrogen ligand selection. I have access to a database of 238 ligands with DFT-computed electronic properties and 225 curated reductive coupling reactions. Click a quick question above or type your own question below!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <textarea class="chat-input" id="chatInput" placeholder="Ask about nitrogen ligands, reductive coupling, electronic descriptors..." rows="1"></textarea>
+                            <button class="send-btn" id="sendBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -709,7 +363,7 @@
                             <tr>
                                 <td><strong>Gap</strong></td>
                                 <td>Higher kinetic stability</td>
-                                <td>Wide gap = robust ligand; narrow gap = more redox-active</td>
+                                <td>Wide gap = robust ligand; narrow gap = more electronically labile</td>
                             </tr>
                             <tr>
                                 <td><strong>omega</strong></td>
@@ -756,9 +410,9 @@
                                 <td>238 ligands</td>
                             </tr>
                             <tr>
-                                <td><strong>DOI List.xlsx</strong></td>
-                                <td>Fully-curated reductive coupling reactions with optimum ligand, coupling partner, and detailed ligand knowledge entries</td>
-                                <td>49 curated + 182 DOI-only</td>
+                                <td><strong>reaction_database.xlsx</strong></td>
+                                <td>Fully-curated reductive coupling reactions with DOI, title, optimum ligand, coupling partner, and ligand knowledge entries</td>
+                                <td>225 fully-curated reactions</td>
                             </tr>
                         </tbody>
                     </table>
@@ -859,7 +513,7 @@
                     <p>Foundational literature on reductive coupling and nitrogen ligand design</p>
                 </div>
                 <div class="content-body">
-                    <p>The following references represent some of the foundational work in reductive cross-coupling with nitrogen ligands. The full database contains 49 curated reaction entries with DOIs — query RedCross Bot for specific literature recommendations.</p>
+                    <p>The following references represent some of the foundational work in reductive cross-coupling with nitrogen ligands. The full database contains 225 curated reaction entries with DOIs — query RedCross Bot for specific literature recommendations.</p>
 
                     <h3>Reviews and Perspectives</h3>
                     <ul>
@@ -892,25 +546,460 @@
         </main>
     </div>
 
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal" style="max-width: 500px;">
+            <div class="settings-header">
+                <h3>RedCross Bot AI Settings</h3>
+                <button class="settings-close" id="settingsClose">&times;</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-group">
+                    <label class="settings-label">Select LLM Provider</label>
+                    <div class="provider-cards" id="providerCards">
+                        <div class="provider-card" data-provider="deepseek">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">DeepSeek</div>
+                                <div class="provider-desc">Fast & affordable AI</div>
+                            </div>
+                            <div class="provider-badge">Popular</div>
+                        </div>
+                        <div class="provider-card" data-provider="groq">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Groq</div>
+                                <div class="provider-desc">FREE - Ultra fast</div>
+                            </div>
+                            <div class="provider-badge free">FREE</div>
+                        </div>
+                        <div class="provider-card" data-provider="gemini">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Google Gemini</div>
+                                <div class="provider-desc">FREE - Powerful</div>
+                            </div>
+                            <div class="provider-badge free">FREE</div>
+                        </div>
+                        <div class="provider-card" data-provider="openai">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <circle cx="12" cy="12" r="4"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">OpenAI</div>
+                                <div class="provider-desc">GPT-4 models</div>
+                            </div>
+                        </div>
+                        <div class="provider-card" data-provider="openrouter">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">OpenRouter</div>
+                                <div class="provider-desc">Multi-model access</div>
+                            </div>
+                        </div>
+                        <div class="provider-card" data-provider="ollama">
+                            <div class="provider-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                            </div>
+                            <div class="provider-info">
+                                <div class="provider-name">Ollama</div>
+                                <div class="provider-desc">Local - No API key</div>
+                            </div>
+                            <div class="provider-badge local">LOCAL</div>
+                        </div>
+                    </div>
+                    <select class="settings-select" id="providerSelect" style="display: none;">
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="groq">Groq (FREE)</option>
+                        <option value="gemini">Google Gemini (FREE)</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="ollama">Ollama (Local)</option>
+                    </select>
+                </div>
+
+                <div class="settings-group" id="apiKeyGroup">
+                    <label class="settings-label">API Key <span style="color: #ef4444;">*</span></label>
+                    <input type="password" class="settings-input" id="apiKeyInput" placeholder="Enter your API key...">
+                    <div class="settings-hint" id="apiKeyHint">
+                        <a href="https://platform.deepseek.com" target="_blank">Get your DeepSeek API key</a>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="settings-label">Model (Optional)</label>
+                    <select class="settings-select" id="modelSelect">
+                        <option value="">Default for provider</option>
+                    </select>
+                    <div class="settings-hint">Leave as default for best results</div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn btn-outline" id="settingsCancel">Cancel</button>
+                <button class="btn btn-primary" id="settingsSave">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>Powered by GenAI Research | Reductive Coupling Initiative &mdash; Nitrogen Ligands for Cross-Coupling Catalysis</p>
+        <p>Powered by GenAI Research | Reductive Coupling Initiative</p>
     </footer>
 
     <script>
+        const PROVIDER_CONFIG = {
+            deepseek: {
+                name: 'DeepSeek',
+                url: 'https://platform.deepseek.com',
+                requiresKey: true,
+                models: [
+                    { value: 'deepseek-chat', label: 'DeepSeek Chat (Recommended)' },
+                    { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner' }
+                ]
+            },
+            groq: {
+                name: 'Groq',
+                url: 'https://console.groq.com',
+                requiresKey: true,
+                models: [
+                    { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
+                    { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B (Fast)' }
+                ]
+            },
+            gemini: {
+                name: 'Google Gemini',
+                url: 'https://ai.google.dev',
+                requiresKey: true,
+                models: [
+                    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
+                    { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' }
+                ]
+            },
+            openai: {
+                name: 'OpenAI',
+                url: 'https://platform.openai.com/api-keys',
+                requiresKey: true,
+                models: [
+                    { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' },
+                    { value: 'gpt-4o', label: 'GPT-4o' }
+                ]
+            },
+            openrouter: {
+                name: 'OpenRouter',
+                url: 'https://openrouter.ai/keys',
+                requiresKey: true,
+                models: [
+                    { value: 'meta-llama/llama-3-8b-instruct:free', label: 'Llama 3 8B (FREE)' },
+                    { value: 'deepseek/deepseek-chat', label: 'DeepSeek Chat' }
+                ]
+            },
+            ollama: {
+                name: 'Ollama',
+                url: 'https://ollama.ai',
+                requiresKey: false,
+                models: [
+                    { value: 'llama3', label: 'Llama 3' },
+                    { value: 'mistral', label: 'Mistral' },
+                    { value: 'deepseek-coder', label: 'DeepSeek Coder' }
+                ]
+            }
+        };
+
+        // Migration: remove any previously stored API keys from localStorage
+        (function migrateSettings() {
+            try {
+                const old = JSON.parse(localStorage.getItem('redcrossSettings') || '{}');
+                if (old.apiKey) {
+                    delete old.apiKey;
+                    localStorage.setItem('redcrossSettings', JSON.stringify(old));
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('redcrossSettings') || '{}');
+            // Provider and model are safe to persist; API key is NEVER stored
+            return { provider: settings.provider || 'deepseek', apiKey: '', model: settings.model || '' };
+        }
+
+        function saveSettings(settings) {
+            // Save only provider & model preferences — NEVER store the API key
+            const safe = { provider: settings.provider, model: settings.model };
+            localStorage.setItem('redcrossSettings', JSON.stringify(safe));
+        }
+
         const sidebarItems = document.querySelectorAll('.sidebar-item');
-        const contentPanels = document.querySelectorAll('.content-panel');
+        const panels = document.querySelectorAll('.content-panel');
 
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
+                const panelId = item.dataset.panel;
                 sidebarItems.forEach(i => i.classList.remove('active'));
-                contentPanels.forEach(p => p.classList.remove('active'));
-
                 item.classList.add('active');
-
-                const panelId = item.getAttribute('data-panel');
-                document.getElementById(panelId).classList.add('active');
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    if (panel.id === panelId) {
+                        panel.classList.add('active');
+                    }
+                });
             });
         });
+
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsClose = document.getElementById('settingsClose');
+        const settingsCancel = document.getElementById('settingsCancel');
+        const settingsSave = document.getElementById('settingsSave');
+        const providerSelect = document.getElementById('providerSelect');
+        const providerCards = document.getElementById('providerCards');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKeyGroup = document.getElementById('apiKeyGroup');
+        const modelSelect = document.getElementById('modelSelect');
+        const apiKeyHint = document.getElementById('apiKeyHint');
+
+        function selectProviderCard(provider) {
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.provider === provider) {
+                    card.classList.add('selected');
+                }
+            });
+            providerSelect.value = provider;
+            updateModelOptions();
+            updateApiKeyVisibility(provider);
+            const config = PROVIDER_CONFIG[provider];
+            if (config && config.requiresKey) {
+                apiKeyHint.innerHTML = `<a href="${config.url}" target="_blank">Get your ${config.name} API key</a>`;
+            } else if (provider === 'ollama') {
+                apiKeyHint.innerHTML = `<span style="color: #10b981;">No API key needed - Ollama runs locally!</span>`;
+            }
+        }
+
+        function updateApiKeyVisibility(provider) {
+            const config = PROVIDER_CONFIG[provider];
+            if (config && !config.requiresKey) {
+                apiKeyGroup.style.display = 'none';
+            } else {
+                apiKeyGroup.style.display = 'block';
+            }
+        }
+
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', () => {
+                selectProviderCard(card.dataset.provider);
+            });
+        });
+
+        function updateModelOptions() {
+            const provider = providerSelect.value;
+            const config = PROVIDER_CONFIG[provider];
+            modelSelect.innerHTML = '<option value="">Default for provider</option>';
+            if (config && config.models) {
+                config.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.value;
+                    option.textContent = model.label;
+                    modelSelect.appendChild(option);
+                });
+            }
+        }
+
+        async function updateApiStatus() {
+            const settings = loadSettings();
+            const apiStatus = document.getElementById('apiStatus');
+            const apiStatusText = document.getElementById('apiStatusText');
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            if (apiKey) {
+                apiStatus.classList.remove('disconnected');
+                apiStatus.classList.add('connected');
+                apiStatusText.innerHTML = `Connected to <strong>${PROVIDER_CONFIG[settings.provider]?.name || settings.provider}</strong>`;
+                settingsBtn.classList.add('configured');
+                return;
+            }
+
+            if (settings.provider === 'ollama') {
+                apiStatus.classList.remove('disconnected');
+                apiStatus.classList.add('connected');
+                apiStatusText.innerHTML = `Connected to <strong>Ollama (Local)</strong>`;
+                settingsBtn.classList.add('configured');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/llm/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.has_backend_key) {
+                        apiStatus.classList.remove('disconnected');
+                        apiStatus.classList.add('connected');
+                        const providerName = PROVIDER_CONFIG[data.default_provider]?.name || data.default_provider;
+                        apiStatusText.innerHTML = `Connected to <strong>${providerName}</strong> (Server)`;
+                        settingsBtn.classList.add('configured');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not check backend LLM status:', e);
+            }
+
+            apiStatus.classList.remove('connected');
+            apiStatus.classList.add('disconnected');
+            apiStatusText.innerHTML = 'Offline mode - <strong>Click here to configure AI</strong>';
+            settingsBtn.classList.remove('configured');
+        }
+
+        settingsBtn.addEventListener('click', () => {
+            const settings = loadSettings();
+            selectProviderCard(settings.provider);
+            apiKeyInput.value = '';  // API key is never pre-filled from storage
+            modelSelect.value = settings.model;
+            settingsOverlay.classList.add('active');
+        });
+
+        settingsClose.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+        settingsCancel.addEventListener('click', () => settingsOverlay.classList.remove('active'));
+
+        settingsSave.addEventListener('click', () => {
+            saveSettings({
+                provider: providerSelect.value,
+                apiKey: apiKeyInput.value,
+                model: modelSelect.value
+            });
+            settingsOverlay.classList.remove('active');
+            updateApiStatus();
+        });
+
+        settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
+        });
+
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatMessages = document.getElementById('chatMessages');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isUser ? 'You' : 'RC'}</div>
+                <div class="message-body">
+                    <div class="message-sender">${isUser ? 'You' : 'RedCross Bot'}</div>
+                    <div class="message-text">${content}</div>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'chat-message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">RC</div>
+                <div class="message-body">
+                    <div class="message-sender">RedCross Bot</div>
+                    <div class="message-text typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage(message) {
+            const settings = loadSettings();
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            addMessage(message, true);
+            addTypingIndicator();
+
+            try {
+                const response = await fetch('/api/redcross/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        provider: settings.provider || undefined,
+                        api_key: apiKey || undefined,
+                        model: settings.model || undefined
+                    })
+                });
+
+                removeTypingIndicator();
+                const data = await response.json();
+
+                if (data.success) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`Error: ${data.error || 'Failed to get response'}`, false);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Connection failed. Is the server running?', false);
+            }
+        }
+
+        function askQuestion(q) {
+            chatInput.value = q;
+            sendMessage(q);
+        }
+
+        sendBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                chatInput.value = '';
+            }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        updateApiStatus();
+        updateModelOptions();
     </script>
 </body>
 </html>

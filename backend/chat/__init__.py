@@ -1,0 +1,1 @@
+# chat package — blueprint registration modules for NiCOBot, RedCross, Knowledge Graph

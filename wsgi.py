@@ -18,10 +18,6 @@ import logging
 PROJECT_HOME = os.path.dirname(os.path.abspath(__file__))
 BACKEND_PATH = os.path.join(PROJECT_HOME, 'backend')
 
-# Ensure both dirs are on sys.path so that
-#   "from backend.app import app"  (needs PROJECT_HOME)
-#   "from core.config import ..."  (needs BACKEND_PATH)
-# both resolve correctly.
 for p in (PROJECT_HOME, BACKEND_PATH):
     if p not in sys.path:
         sys.path.insert(0, p)

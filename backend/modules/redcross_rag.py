@@ -7,8 +7,8 @@ loading and search to ``RedCrossDatabase.search_combined()``, then formats
 the results for LLM prompt injection.
 
 The underlying database service uses the real research datasets:
-  - Grand_Data.xlsx  — 238 ligands with DFT-computed electronic descriptors
-  - DOI List.xlsx    — 49 curated reductive coupling reactions
+  - ligand_database.xlsx  — 238 ligands with DFT-computed electronic descriptors
+  - reaction_database.xlsx  — 225 curated reductive coupling reactions
 
 Interface consumed by ``chat/redcross.py`` and ``chat/helpers.py``:
     rag = get_redcross_rag()
@@ -34,6 +34,7 @@ class RedCrossContext:
     ligands: List[Dict[str, Any]] = field(default_factory=list)
     reactions: List[Dict[str, Any]] = field(default_factory=list)
     detected_class: Optional[str] = None
+    similarity_context: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -52,6 +53,29 @@ def _format_ligand(lig: Dict[str, Any]) -> str:
     parts.append(f"  R1-HOMA: {lig.get('R1_HOMA', 'N/A')}")
     parts.append(f"  R2-HOMA: {lig.get('R2_HOMA', 'N/A')}")
     return "\n".join(parts)
+
+
+def _format_similarity(ref: Dict[str, Any],
+                       similar: List[Dict[str, Any]]) -> str:
+    """Format similarity results for LLM consumption."""
+    lines = [
+        "== Ligand Similarity Suggestions ==",
+        f"Reference ligand: {ref['name']} (class: {ref['class']})",
+        f"  HOMO={ref['HOMO_eV']} eV, LUMO={ref['LUMO_eV']} eV, "
+        f"Gap={ref['Gap_eV']} eV, omega={ref['omega_eV']} eV",
+        "",
+        "Most similar ligands (by normalised Euclidean distance on 8 DFT descriptors):",
+    ]
+    for i, s in enumerate(similar, 1):
+        lines.append(
+            f"  {i}. {s['name']} (class: {s['class']}) "
+            f"[similarity: {s['similarity']}]"
+        )
+        lines.append(
+            f"     HOMO={s['HOMO_eV']} eV, LUMO={s['LUMO_eV']} eV, "
+            f"Gap={s['Gap_eV']} eV, omega={s['omega_eV']} eV"
+        )
+    return "\n".join(lines)
 
 
 def _format_reaction(rxn: Dict[str, Any]) -> str:
@@ -174,10 +198,15 @@ class RedCrossRAG:
     MAX_LIGANDS = 10
     MAX_REACTIONS = 10
 
+    # Keywords that trigger similarity search
+    _SIM_TRIGGERS = ('similar', 'alternative', 'suggestion', 'recommend',
+                     'closest', 'analogue', 'analog', 'substitute')
+
     def retrieve_context(self, message: str) -> RedCrossContext:
         """Retrieve relevant ligand and reaction data for a user message.
 
-        Returns a ``RedCrossContext`` with formatted context and structured data.
+        When the query contains similarity-triggering keywords, also runs
+        ``find_similar_ligands()`` and appends the results to the context.
         Never raises — returns empty context on any error.
         """
         try:
@@ -192,6 +221,7 @@ class RedCrossRAG:
                 logger.warning("RedCross RAG: database load failed")
                 return RedCrossContext()
 
+        # --- Standard RAG retrieval ---
         try:
             result = db.search_combined(
                 message,
@@ -202,15 +232,28 @@ class RedCrossRAG:
             logger.warning("RedCross RAG: search_combined error: %s", e)
             return RedCrossContext()
 
-        if not result['ligands'] and not result['reactions']:
-            return RedCrossContext()
-
         detected_classes = result.get('detected_classes') or []
         if result.get('detected_class') and not detected_classes:
             detected_classes = [result['detected_class']]
 
         class_comparison = result.get('class_comparison')
 
+        # --- Similarity retrieval (triggered by keywords) ---
+        similarity_text = ""
+        msg_lower = message.lower()
+        if any(kw in msg_lower for kw in self._SIM_TRIGGERS):
+            try:
+                ref, similar = db.find_similar_ligands(message, top_k=5)
+                if ref and similar:
+                    similarity_text = _format_similarity(ref, similar)
+                    logger.info(
+                        "RedCross RAG: similarity for '%s' -> %d results",
+                        ref['name'], len(similar),
+                    )
+            except Exception as e:
+                logger.warning("RedCross RAG: similarity error: %s", e)
+
+        # --- Assemble formatted context ---
         formatted = _build_formatted_context(
             result['ligands'],
             result['reactions'],
@@ -218,11 +261,16 @@ class RedCrossRAG:
             class_comparison,
         )
 
+        # Append similarity section if available
+        if similarity_text:
+            formatted = formatted + "\n\n" + similarity_text if formatted else similarity_text
+
         logger.info(
-            "RedCross RAG: %d ligands, %d reactions, classes=%s",
+            "RedCross RAG: %d ligands, %d reactions, classes=%s, similarity=%s",
             len(result['ligands']),
             len(result['reactions']),
             detected_classes,
+            bool(similarity_text),
         )
 
         return RedCrossContext(
@@ -230,6 +278,7 @@ class RedCrossRAG:
             ligands=result['ligands'],
             reactions=result['reactions'],
             detected_class=result.get('detected_class'),
+            similarity_context=similarity_text,
         )
 
     def build_enhanced_prompt(self, message: str, system_prompt: str) -> str:

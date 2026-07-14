@@ -14,9 +14,6 @@ import logging
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(BACKEND_DIR)
 
-# Both directories on sys.path so:
-#   "from backend.app import app"  (needs BASE_DIR / project root)
-#   "from core.config import ..."    (needs BACKEND_DIR)
 for _p in (BACKEND_DIR, BASE_DIR):
     if _p not in sys.path:
         sys.path.insert(0, _p)
@@ -59,8 +56,6 @@ CORS(app, resources={
     }
 })
 
-# Rate limiter: use Redis when REDIS_URL is configured (shared across workers),
-# otherwise fall back to in-memory (single-worker only — see startup warning).
 _rate_storage = os.environ.get('REDIS_URL', 'memory://')
 
 limiter = Limiter(
@@ -277,13 +272,29 @@ except ImportError:
 # Register chat blueprints (NiCOBot, RedCross, Knowledge Graph)
 # ---------------------------------------------------------------------------
 
-from chat.nicobot import register_nicobot_blueprint
-from chat.redcross import register_redcross_blueprint
-from chat.knowledge_graph import register_knowledge_graph_blueprint
+try:
+    from chat.nicobot import register_nicobot_blueprint
+    register_nicobot_blueprint(app, limiter)
+    _nicobot_chat_registered = True
+except ImportError:
+    _nicobot_chat_registered = False
+    logging.warning("[STARTUP] NiCOBot chat blueprint not registered (missing optional deps).")
 
-register_nicobot_blueprint(app, limiter)
-register_redcross_blueprint(app, limiter)
-register_knowledge_graph_blueprint(app, limiter)
+try:
+    from chat.redcross import register_redcross_blueprint
+    register_redcross_blueprint(app, limiter)
+    _redcross_chat_registered = True
+except ImportError:
+    _redcross_chat_registered = False
+    logging.warning("[STARTUP] RedCross chat blueprint not registered (missing optional deps).")
+
+try:
+    from chat.knowledge_graph import register_knowledge_graph_blueprint
+    register_knowledge_graph_blueprint(app, limiter)
+    _kg_chat_registered = True
+except ImportError:
+    _kg_chat_registered = False
+    logging.warning("[STARTUP] Knowledge Graph chat blueprint not registered (missing optional deps).")
 
 # ---------------------------------------------------------------------------
 # Startup banner
@@ -296,6 +307,12 @@ if _db_registered:
     _bps.append("database")
 if _redcross_db_registered:
     _bps.append("redcross_database")
+if _nicobot_chat_registered:
+    _bps.append("nicobot_chat")
+if _redcross_chat_registered:
+    _bps.append("redcross_chat")
+if _kg_chat_registered:
+    _bps.append("knowledge_graph")
 _db_msg = ", ".join(_bps)
 logging.info(f"[STARTUP] GenAI Research Platform v2.2.0")
 logging.info(f"[STARTUP] Backend Dir: {BACKEND_DIR}")
@@ -307,9 +324,6 @@ logging.info(f"[STARTUP] Registered API blueprints: {_db_msg}")
 
 
 if __name__ == '__main__':
-    # SECURITY: prefer `python wsgi.py` for local dev — this entry point is kept
-    # for backwards compatibility. Debug mode is gated behind FLASK_DEBUG=1 and
-    # is forced to 127.0.0.1 to avoid exposing the Werkzeug debugger (RCE risk).
     is_replit = bool(os.environ.get('REPL_ID') or os.environ.get('REPL_SLUG'))
     debug = os.environ.get('FLASK_DEBUG', '0') == '1'
     default_host = '0.0.0.0' if is_replit else '127.0.0.1'
