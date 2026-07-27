@@ -1,0 +1,58 @@
+# Version control
+.git
+.gitattributes
+.gitignore
+
+# Environment files (set via platform dashboard, not baked into image)
+.env
+backend/.env
+.env.*
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+*.egg
+.venv
+venv
+env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploads (runtime only, not in image)
+backend/uploads/*
+
+# Data too large for image (mount as volume or restore via git lfs)
+# Uncomment if you prefer to mount nicobot_data/ at runtime:
+# backend/nicobot_data/*.csv
+# backend/nicobot_data/*.xlsx
+
+# Test / CI
+.pytest_cache
+.coverage
+htmlcov
+
+# Replit
+.replit
+replit.nix
+
+# This file
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Deployment configs (not needed in image)
+deploy/

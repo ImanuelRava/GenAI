@@ -1,0 +1,38 @@
+# ==========================================================================
+# Local development with Docker Compose
+# Usage: docker compose up --build
+# ==========================================================================
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_DEBUG=1
+      - SECRET_KEY=local-dev-secret-change-me
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      # Hot-reload source code without rebuilding
+      - .:/app
+      # Persist uploads across restarts
+      - uploads:/app/backend/uploads
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  uploads:
+  redis_data:

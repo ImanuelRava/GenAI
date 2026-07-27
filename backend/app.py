@@ -324,15 +324,16 @@ logging.info(f"[STARTUP] Registered API blueprints: {_db_msg}")
 
 
 if __name__ == '__main__':
-    is_replit = bool(os.environ.get('REPL_ID') or os.environ.get('REPL_SLUG'))
+    import sys
+    logging.warning(
+        "backend/app.py __main__ invoked directly. "
+        "Prefer: python wsgi.py  or  gunicorn wsgi:application"
+    )
     debug = os.environ.get('FLASK_DEBUG', '0') == '1'
-    default_host = '0.0.0.0' if is_replit else '127.0.0.1'
-    host = os.environ.get('FLASK_HOST', default_host)
-    default_port = os.environ.get('PORT', '5000') if is_replit else '5000'
-    port = int(os.environ.get('FLASK_PORT') or default_port)
+    platform_port = os.environ.get('PORT', '')
+    is_hosted = bool(platform_port or os.environ.get('FLASK_PORT', ''))
+    host = os.environ.get('FLASK_HOST', '0.0.0.0' if is_hosted else '127.0.0.1')
+    port = int(os.environ.get('FLASK_PORT') or platform_port or '5000')
     if debug and host not in ('127.0.0.1', 'localhost'):
-        logging.warning(
-            "FLASK_DEBUG=1 with FLASK_HOST=%s — forcing 127.0.0.1 to avoid RCE.", host
-        )
         host = '127.0.0.1'
     app.run(debug=debug, host=host, port=port)

@@ -1,0 +1,21 @@
+# ==========================================================================
+# Render.com — auto-detected from repo root
+# Docs: https://render.com/docs/deploy-flask
+# ==========================================================================
+services:
+  - type: web
+    name: genai-research-platform
+    runtime: docker
+    plan: starter          # $7/mo — always-on; free plan spins down after 15 min
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GUNICORN_WORKERS
+        value: "2"
+      - key: GUNICORN_TIMEOUT
+        value: "120"
+    # Uncomment if you want persistent disk for uploads:
+    # disk:
+    #   name: uploads
+    #   mountPath: /app/backend/uploads
+    #   sizeGB: 1

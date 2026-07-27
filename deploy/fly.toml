@@ -1,0 +1,36 @@
+# ==========================================================================
+# Fly.io — deploy with: fly launch --config deploy/fly.toml
+# Docs: https://fly.io/docs/languages-and-frameworks/python/
+# ==========================================================================
+app = "genai-research-platform"
+
+[build]
+  # Fly uses Dockerfile by default
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  GUNICORN_WORKERS = "2"
+  GUNICORN_TIMEOUT = "120"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+[mounts]
+  source = "uploads"
+  destination = "/app/backend/uploads"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
