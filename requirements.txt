@@ -12,7 +12,7 @@ networkx>=2.6.0
 # platforms without system-level rdkit. If you have rdkit installed via
 # your OS package manager (e.g. via replit.nix on Replit), you can use
 # 'rdkit' instead — but rdkit-pypi is the safer default.
-rdkit-pypi>=2022.9.1
+# rdkit-pypi>=2022.9.1
 
 # PDF Processing
 pypdf>=3.0.0
